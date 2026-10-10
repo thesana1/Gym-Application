@@ -40,7 +40,15 @@ NEXTAUTH_SECRET=your-secret-here
 MONGO_URI=mongodb://localhost:27017/nextjs-starter
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 ```
+
+The protected dashboard includes an image uploader. Each image is limited to
+3 MB, resized to fit within 2048 × 2048 pixels, converted to WebP, and uploaded
+to the `gym-application` Cloudinary folder. Set the Cloudinary credentials above
+to enable uploads.
 
 Start development server:
 

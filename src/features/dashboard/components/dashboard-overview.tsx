@@ -9,6 +9,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
+import { ImageUpload } from '@/features/dashboard/components/image-upload';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import {
@@ -160,6 +161,10 @@ export const DashboardOverview = ({ userName }: DashboardOverviewProps) => {
             })}
           </CardContent>
         </Card>
+      </section>
+
+      <section aria-label="Image uploads">
+        <ImageUpload />
       </section>
     </div>
   );
