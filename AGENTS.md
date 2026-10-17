@@ -21,7 +21,7 @@ npx vitest run src/features/auth/service/auth.service.spec.ts
 Pre-commit hook (Husky) runs `lint → build → test` in sequence and blocks the commit on failure.
 
 Required env vars (see `.env.example`):
-- `NEXTAUTH_URL`, `NEXTAUTH_SECRET` — NextAuth
+- `NEXTAUTH_URL`, `AUTH_SECRET` — NextAuth (`NEXTAUTH_SECRET` is also accepted)
 - `MONGO_URI` — MongoDB connection string
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` — Google OAuth
 

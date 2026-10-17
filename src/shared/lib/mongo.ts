@@ -8,8 +8,15 @@ class MongoClientManager {
 
   async connect(retries = MAX_RETRIES): Promise<void> {
     if (this.isConnected) return;
+    const uri = process.env.MONGO_URI;
+    if (!uri) {
+      throw new Error(
+        'MONGO_URI is not configured. Set it in the environment before using database-backed features.'
+      );
+    }
+
     try {
-      await mongoose.connect(process.env.MONGO_URI!);
+      await mongoose.connect(uri);
       this.isConnected = true;
       console.log('Connected to MongoDB');
     } catch (error) {

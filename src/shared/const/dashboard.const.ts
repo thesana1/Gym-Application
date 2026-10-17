@@ -1,63 +1,33 @@
-export type DashboardMetric = {
+export type DashboardNextStep = {
   title: string;
-  value: string;
-  delta: string;
-  trend: 'up' | 'down' | 'flat';
-  icon: 'activity' | 'clock' | 'trending-up' | 'users';
+  description: string;
+  icon: 'workout' | 'nutrition' | 'progress';
+  href: string | null;
 };
 
-export const DASHBOARD_METRICS: DashboardMetric[] = [
+export const DASHBOARD_NEXT_STEPS: DashboardNextStep[] = [
   {
-    title: 'Total users',
-    value: '1,234',
-    delta: '+12%',
-    trend: 'up',
-    icon: 'users',
+    title: 'Training plans',
+    description: 'Build a workout around your goal, experience, and available equipment.',
+    icon: 'workout',
+    href: '/dashboard/workouts',
   },
   {
-    title: 'Active sessions',
-    value: '56',
-    delta: '+4',
-    trend: 'up',
-    icon: 'activity',
+    title: 'Nutrition',
+    description: 'Set practical nutrition targets and keep track of what you eat.',
+    icon: 'nutrition',
+    href: '/dashboard/nutrition',
   },
   {
-    title: 'Growth rate',
-    value: '8.2%',
-    delta: '+1.1%',
-    trend: 'up',
-    icon: 'trending-up',
+    title: 'Meal ideas',
+    description: 'Find recipe ideas from ingredients you already have.',
+    icon: 'nutrition',
+    href: '/dashboard/food-generator',
   },
   {
-    title: 'Avg. session',
-    value: '24m',
-    delta: '-2m',
-    trend: 'down',
-    icon: 'clock',
+    title: 'Progress tracking',
+    description: 'Review your training and measurements as you build consistency.',
+    icon: 'progress',
+    href: '/dashboard/progress',
   },
-];
-
-export type DashboardActivity = {
-  title: string;
-  detail: string;
-  time: string;
-};
-
-export const DASHBOARD_ACTIVITY: DashboardActivity[] = [
-  { title: 'New user registered', detail: 'jordan@acme.co', time: '2m ago' },
-  { title: 'Subscription upgraded', detail: 'Pro · annual', time: '40m ago' },
-  { title: 'API key created', detail: 'production', time: '1h ago' },
-  { title: 'Password reset', detail: 'sam@acme.co', time: '3h ago' },
-];
-
-export type DashboardChannel = {
-  label: string;
-  share: number;
-};
-
-export const DASHBOARD_CHANNELS: DashboardChannel[] = [
-  { label: 'Direct', share: 48 },
-  { label: 'Organic', share: 27 },
-  { label: 'Referral', share: 16 },
-  { label: 'Social', share: 9 },
 ];

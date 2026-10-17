@@ -1,4 +1,4 @@
-import { ArrowRight, Boxes, Layers, Shield, type LucideIcon } from 'lucide-react';
+import { Activity, ArrowRight, Target, Utensils, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { Footer } from '@/shared/components/layout/footer';
@@ -8,9 +8,9 @@ import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
 import { HOME_FEATURES, HOME_STATS, type FeatureCard } from '@/shared/const/home.const';
 
 const FEATURE_ICON_MAP: Record<FeatureCard['icon'], LucideIcon> = {
-  layers: Layers,
-  shield: Shield,
-  boxes: Boxes,
+  activity: Activity,
+  utensils: Utensils,
+  target: Target,
 };
 
 export const HomePage = () => {
@@ -23,24 +23,24 @@ export const HomePage = () => {
           <div className="animate-rise inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1">
             <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
             <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-              Production-ready starter
+              Fitness, with direction
             </span>
           </div>
 
           <h1 className="animate-rise animate-rise-1 mt-6 max-w-3xl text-4xl font-bold leading-tight sm:text-6xl">
-            Launch your SaaS on a foundation that&apos;s{' '}
-            <span className="text-primary">already built.</span>
+            A clearer path to better{' '}
+            <span className="text-primary">fitness.</span>
           </h1>
 
           <p className="animate-rise animate-rise-2 mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Auth, database, state, and UI wired together and tested — so day one
-            starts at feature one, not setup.
+            Bring training, nutrition, and progress together around your goals.
+            Start with a plan, build consistency, and adjust as you go.
           </p>
 
           <div className="animate-rise animate-rise-3 mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button size="lg" asChild className="font-semibold">
               <Link href="/sign-up">
-                Get started
+                Start your journey
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
@@ -64,7 +64,7 @@ export const HomePage = () => {
           className="mx-auto w-full max-w-5xl px-6 pb-24 sm:px-10"
         >
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            What&apos;s included
+            A practical place to start
           </p>
 
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">

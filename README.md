@@ -36,11 +36,15 @@ Required values:
 
 ```env
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret-here
+AUTH_SECRET=your-generated-secret
 MONGO_URI=mongodb://localhost:27017/nextjs-starter
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
+
+Generate a secret with `openssl rand -base64 32`. Keep the same `AUTH_SECRET`
+across app instances and deployments so existing sessions remain valid. For
+backward compatibility, the app also accepts `NEXTAUTH_SECRET`.
 
 Start development server:
 
@@ -119,7 +123,8 @@ src/
 
 ## Docker
 
-Start app and local MongoDB:
+Start app and local MongoDB (Compose loads app credentials from `.env`
+and connects the app container to the `mongo` service):
 
 ```bash
 docker compose up

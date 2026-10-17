@@ -1,5 +1,6 @@
 'use client';
-import { signIn, getSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { getSession, signIn } from 'next-auth/react';
 
 import { useAuthStore } from '@/features/auth/hooks/useAuthStore';
 import { User } from '@/features/auth/types/auth.types';
@@ -8,11 +9,15 @@ import { LoginType } from '@/features/auth/validations/auth.validation';
 
 export const useLogin = () => {
   const { setUser, setLoading, setError } = useAuthStore();
+  const router = useRouter();
 
   const handleSession = async (setUserFn: typeof setUser) => {
     const session = await getSession();
     const sessionUser = session?.user as User | undefined;
-    if (!sessionUser) return;
+    if (!sessionUser) {
+      setError('Your account session could not be loaded. Please try again.');
+      return;
+    }
 
     setUserFn({
       id: sessionUser.id ?? '',
@@ -22,7 +27,7 @@ export const useLogin = () => {
       avatar: sessionUser.avatar ?? '',
     });
 
-    window.location.href = sessionUser.role === 'admin' ? '/dashboard' : '/';
+    router.replace('/dashboard');
   };
 
   const login = async (data: LoginType) => {
@@ -36,7 +41,11 @@ export const useLogin = () => {
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        setError(
+          result.error === 'Configuration'
+            ? 'Sign-in is temporarily unavailable. Check the server Auth.js and database configuration.'
+            : 'Invalid email or password'
+        );
         return;
       }
 

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { afterAll, describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('mongoose', async (importOriginal) => {
   const actual = await importOriginal<typeof mongoose>();
@@ -19,8 +19,11 @@ describe('MongoClientManager', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('MONGO_URI', 'mongodb://localhost:27017/test');
     manager = new MongoClientManager();
   });
+
+  afterAll(() => vi.unstubAllEnvs());
 
   it('connects to MongoDB on first call', async () => {
     vi.mocked(mongoose.connect).mockResolvedValueOnce(mongoose);
@@ -47,6 +50,15 @@ describe('MongoClientManager', () => {
   it('throws after max retries exhausted', async () => {
     vi.mocked(mongoose.connect).mockRejectedValue(new Error('always fail'));
     await expect(manager.connect(0)).rejects.toThrow('always fail');
+  });
+
+  it('fails immediately when MONGO_URI is missing', async () => {
+    vi.stubEnv('MONGO_URI', '');
+
+    await expect(manager.connect()).rejects.toThrow(
+      'MONGO_URI is not configured.'
+    );
+    expect(mongoose.connect).not.toHaveBeenCalled();
   });
 
   it('disconnect calls mongoose.disconnect and resets state', async () => {

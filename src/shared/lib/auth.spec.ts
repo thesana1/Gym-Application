@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { afterAll, describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Capture the config passed to NextAuth so we can test callbacks directly
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,6 +34,9 @@ vi.mock('@/features/auth/service/auth.service', () => ({
   upsertOAuthUserService: vi.fn(),
 }));
 
+vi.stubEnv('AUTH_SECRET', 'test-auth-secret');
+afterAll(() => vi.unstubAllEnvs());
+
 // Import after mocks so NextAuth() is called with mocked providers
 await import('@/shared/lib/auth');
 const { userRepository } = await import('@/features/auth/repository/user.repository');
@@ -53,6 +56,10 @@ const fakeUser = {
 
 describe('auth callbacks — signIn', () => {
   beforeEach(() => vi.clearAllMocks());
+
+  it('passes the configured Auth.js secret explicitly', () => {
+    expect(capturedConfig.secret).toBe('test-auth-secret');
+  });
 
   it('returns true for non-Google providers without DB call', async () => {
     const result = await capturedConfig.callbacks.signIn({

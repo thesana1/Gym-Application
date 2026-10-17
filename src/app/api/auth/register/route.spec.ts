@@ -56,4 +56,18 @@ describe('POST /api/auth/register', () => {
     const res = await POST(makeRequest({}));
     expect(res.status).toBe(500);
   });
+
+  it('reports an unconfigured database as service unavailable', async () => {
+    mockValidate.mockResolvedValueOnce({ data: {} } as never);
+    mockRegister.mockRejectedValueOnce(
+      new Error('MONGO_URI is not configured.')
+    );
+
+    const res = await POST(makeRequest({}));
+
+    expect(res.status).toBe(503);
+    await expect(res.json()).resolves.toEqual({
+      error: 'DATABASE_NOT_CONFIGURED',
+    });
+  });
 });

@@ -16,7 +16,12 @@ export const useRegister = () => {
       await http.post('/auth/register', data);
       router.push('/sign-in');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      const message = err instanceof Error ? err.message : 'Registration failed';
+      setError(
+        message === 'DATABASE_NOT_CONFIGURED'
+          ? 'Account creation is unavailable until the server MongoDB connection is configured.'
+          : message
+      );
     } finally {
       setLoading(false);
     }

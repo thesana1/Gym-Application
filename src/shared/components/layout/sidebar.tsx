@@ -1,5 +1,19 @@
 'use client';
-import { LayoutDashboard, type LucideIcon } from 'lucide-react';
+import {
+  Activity,
+  Apple,
+  BookOpen,
+  ChartNoAxesCombined,
+  Dumbbell,
+  LayoutDashboard,
+  MapPin,
+  Medal,
+  Salad,
+  UserRound,
+  Users,
+  Trophy,
+  type LucideIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -8,6 +22,17 @@ import { cn } from '@/shared/lib/utils';
 
 const SIDEBAR_ICON_MAP: Record<SidebarNavItem['icon'], LucideIcon> = {
   dashboard: LayoutDashboard,
+  dumbbell: Dumbbell,
+  apple: Apple,
+  salad: Salad,
+  activity: Activity,
+  'map-pin': MapPin,
+  users: Users,
+  trophy: Trophy,
+  'book-open': BookOpen,
+  medal: Medal,
+  chart: ChartNoAxesCombined,
+  'user-round': UserRound,
 };
 
 type SidebarProps = {
@@ -26,7 +51,7 @@ export const Sidebar = ({ className, onNavigate }: SidebarProps) => {
       )}
     >
       <p className="px-3 pb-2 pt-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-        Workspace
+        Fitness
       </p>
       <nav className="flex flex-col gap-1">
         {SIDEBAR_NAV_ITEMS.map(({ href, label, icon }) => {

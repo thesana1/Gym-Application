@@ -2,30 +2,30 @@ export type FeatureCard = {
   label: string;
   title: string;
   description: string;
-  icon: 'layers' | 'shield' | 'boxes';
+  icon: 'activity' | 'utensils' | 'target';
 };
 
 export const HOME_FEATURES: FeatureCard[] = [
   {
-    label: 'Framework',
-    title: 'Next.js 16',
+    label: 'Training',
+    title: 'A plan with direction',
     description:
-      'App Router, React Server Components, and streaming built in. Ship fast on architecture that scales.',
-    icon: 'layers',
+      'Build toward your strength, muscle, endurance, or general fitness goals with a workout structure that can grow with you.',
+    icon: 'activity',
   },
   {
-    label: 'Auth & data',
-    title: 'NextAuth + MongoDB',
+    label: 'Nutrition',
+    title: 'Make food work for you',
     description:
-      'Credentials and OAuth with JWT sessions, wired to MongoDB via Mongoose. Secure by default, extensible by design.',
-    icon: 'shield',
+      'Understand nutrition targets and find practical meal ideas around the foods and preferences that matter to you.',
+    icon: 'utensils',
   },
   {
-    label: 'State & UI',
-    title: 'Zustand + shadcn/ui',
+    label: 'Progress',
+    title: 'Notice the changes',
     description:
-      'Vanilla Zustand stores via context for predictable state. shadcn/ui for a polished, accessible interface.',
-    icon: 'boxes',
+      'Keep your training and progress in one place so you can see what is working and decide what to focus on next.',
+    icon: 'target',
   },
 ];
 
@@ -35,7 +35,7 @@ export type HomeStat = {
 };
 
 export const HOME_STATS: HomeStat[] = [
-  { value: 'Day 1', label: 'Auth, DB & UI ready' },
-  { value: '100%', label: 'TypeScript strict' },
-  { value: 'Vitest', label: 'Tests wired in' },
+  { value: '01', label: 'Understand your goals' },
+  { value: '02', label: 'Build a steady routine' },
+  { value: '03', label: 'Track and adjust' },
 ];

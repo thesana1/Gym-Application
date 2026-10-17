@@ -1,5 +1,5 @@
 'use client';
-import { Triangle } from 'lucide-react';
+import { Dumbbell } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -12,7 +12,6 @@ import { APP_NAME } from '@/shared/const/app.const';
 type SessionUser = {
   name?: string | null;
   avatar?: string | null;
-  role?: 'admin' | 'user';
 };
 
 export const Header = () => {
@@ -34,7 +33,7 @@ export const Header = () => {
           aria-hidden="true"
           className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-foreground text-background"
         >
-          <Triangle className="size-3 fill-current" />
+          <Dumbbell className="size-4" />
         </span>
         <span className="text-sm font-semibold tracking-tight text-foreground">
           {APP_NAME}
@@ -46,11 +45,9 @@ export const Header = () => {
 
         {sessionUser ? (
           <>
-            {sessionUser.role === 'admin' && (
-              <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground hover:bg-accent">
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-            )}
+            <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground hover:bg-accent">
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
             <div className="flex items-center gap-3">
               {sessionUser.avatar ? (
                 <Image
