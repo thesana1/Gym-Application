@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-
+import { ImageUpload } from '@/features/dashboard/components/image-upload';
 import type { FitnessProfile } from '@/features/fitness/service/fitness-profile.service';
 import {
   Card,
@@ -186,6 +186,10 @@ export const DashboardOverview = ({
             );
           })}
         </div>
+      </section>
+
+      <section aria-label="Image uploads">
+        <ImageUpload />
       </section>
     </div>
   );
