@@ -13,7 +13,8 @@ export type SidebarNavItem = {
     | 'trophy'
     | 'book-open'
     | 'medal'
-    | 'chart';
+    | 'chart'
+    | 'badge-check';
 };
 
 export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
@@ -29,4 +30,5 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
   { href: '/dashboard/coaches', label: 'Coaches', icon: 'users' },
   { href: '/dashboard/challenges', label: 'Challenges', icon: 'trophy' },
   { href: '/dashboard/profile', label: 'Fitness profile', icon: 'user-round' },
+  { href: '/dashboard/membership', label: 'Membership', icon: 'badge-check' },
 ];

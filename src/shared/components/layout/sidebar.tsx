@@ -2,6 +2,7 @@
 import {
   Activity,
   Apple,
+  BadgeCheck,
   BookOpen,
   ChartNoAxesCombined,
   Dumbbell,
@@ -31,6 +32,7 @@ const SIDEBAR_ICON_MAP: Record<SidebarNavItem['icon'], LucideIcon> = {
   trophy: Trophy,
   'book-open': BookOpen,
   medal: Medal,
+  'badge-check': BadgeCheck,
   chart: ChartNoAxesCombined,
   'user-round': UserRound,
 };

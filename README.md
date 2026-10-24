@@ -43,6 +43,12 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
+DODO_PAYMENTS_API_KEY=your-api-key
+DODO_PAYMENTS_WEBHOOK_KEY=your-webhook-signing-key
+DODO_PAYMENTS_ENVIRONMENT=test_mode
+DODO_PAYMENTS_VIP_PRODUCT_ID=your-vip-product-id
+DODO_PAYMENTS_VIPPLUS_PRODUCT_ID=your-vipplus-product-id
+DODO_PAYMENTS_SUPERVIP_PRODUCT_ID=your-supervip-product-id
 ```
 
 Generate a secret with `openssl rand -base64 32`. Keep the same `AUTH_SECRET`
@@ -53,6 +59,21 @@ The protected dashboard includes an image uploader. Each image is limited to
 3 MB, resized to fit within 2048 × 2048 pixels, converted to WebP, and uploaded
 to the `gym-application` Cloudinary folder. Set the Cloudinary credentials above
 to enable uploads.
+
+### Membership subscriptions
+
+Create three **monthly recurring** products in Dodo Payments, priced at $10
+(VIP), $20 (VIP Plus), and $40 (Super VIP). Add each product ID and your API key
+to the environment variables above. Set `DODO_PAYMENTS_ENVIRONMENT` to
+`test_mode` while testing and `live_mode` for production. The app deliberately
+defaults to test mode unless `live_mode` is explicitly selected.
+
+Create a Dodo Payments webhook pointing to `/api/webhooks/dodo` on your deployed
+app. Subscribe it to the subscription lifecycle events, and set its signing key
+as `DODO_PAYMENTS_WEBHOOK_KEY`. Membership activation and the account badge are
+driven by verified webhooks. Cancellation is scheduled for the end of the
+current billing period; access remains active until Dodo Payments reports the
+subscription's final status.
 
 Start development server:
 

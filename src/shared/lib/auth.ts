@@ -4,6 +4,7 @@ import Google from 'next-auth/providers/google';
 
 import { userRepository } from '@/features/auth/repository/user.repository';
 import { upsertOAuthUserService } from '@/features/auth/service/auth.service';
+import type { MembershipSummary } from '@/features/membership/types/membership.types';
 import { hashPassword } from '@/shared/utils/password';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -56,6 +57,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     async jwt({ token, user }) {
       const authUser = user as ({ role?: 'admin' | 'user'; avatar?: string | null } & typeof user) | undefined;
+      const membershipToken = token as typeof token & {
+        membership?: MembershipSummary | null;
+      };
 
       if (user) {
         token.id = authUser?.id ?? token.sub ?? '';
@@ -71,8 +75,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.name = dbUser.name;
           token.avatar = dbUser.avatar ?? (token.avatar as string | null | undefined);
           token.role = (dbUser.role as 'admin' | 'user') ?? 'user';
+          membershipToken.membership = dbUser.membership
+            ? {
+              tier: dbUser.membership.tier,
+              status: dbUser.membership.status,
+              subscriptionId: dbUser.membership.subscriptionId,
+              nextBillingDate: dbUser.membership.nextBillingDate?.toISOString(),
+              cancelAtPeriodEnd: dbUser.membership.cancelAtPeriodEnd,
+            }
+            : null;
         } else {
           token.role = 'user';
+          membershipToken.membership = null;
         }
       }
 
@@ -81,16 +95,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     async session({ session, token }) {
       if (token) {
+        const membershipToken = token as typeof token & {
+          membership?: MembershipSummary | null;
+        };
         const user = session.user as typeof session.user & {
           id: string;
           role: 'admin' | 'user';
           avatar?: string | null;
+          membership?: MembershipSummary | null;
         };
         user.id = token.id as string;
         user.email = token.email as string;
         user.name = token.name as string;
         user.avatar = (token.avatar as string | null | undefined) ?? null;
         user.role = (token.role as 'admin' | 'user' | undefined) ?? 'user';
+        user.membership = membershipToken.membership ?? null;
       }
       return session;
     },

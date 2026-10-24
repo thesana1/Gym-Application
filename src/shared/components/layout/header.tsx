@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
 import { useLogout } from '@/features/auth/hooks/use-logout';
+import { MembershipBadge } from '@/features/membership/components/membership-badge';
+import type { MembershipSummary } from '@/features/membership/types/membership.types';
 import { ThemeToggle } from '@/shared/components/layout/theme-toggle';
 import { Button } from '@/shared/components/ui/button';
 import { APP_NAME } from '@/shared/const/app.const';
@@ -12,6 +14,7 @@ import { APP_NAME } from '@/shared/const/app.const';
 type SessionUser = {
   name?: string | null;
   avatar?: string | null;
+  membership?: MembershipSummary | null;
 };
 
 export const Header = () => {
@@ -62,7 +65,10 @@ export const Header = () => {
                   {initials || 'U'}
                 </div>
               )}
-              <span className="text-sm text-muted-foreground hidden sm:block">{userName}</span>
+              <div className="flex items-center gap-2">
+                <span className="hidden text-sm text-muted-foreground sm:block">{userName}</span>
+                <MembershipBadge membership={sessionUser.membership} />
+              </div>
             </div>
             <Button
               variant="ghost"

@@ -14,6 +14,7 @@ vi.mock('@/features/auth/schema/user.schema', () => ({
     create: vi.fn(),
     findByIdAndUpdate: vi.fn(),
     findByIdAndDelete: vi.fn(),
+    updateOne: vi.fn(),
   },
 }));
 

@@ -1,4 +1,5 @@
 import { UserDocument, UserModel } from '@/features/auth/schema/user.schema';
+import type { Membership } from '@/features/membership/types/membership.types';
 import { mongo } from '@/shared/lib/mongo';
 
 export const userRepository = {
@@ -34,6 +35,37 @@ export const userRepository = {
   async updateByEmail(email: string, data: Partial<UserDocument>): Promise<boolean> {
     await mongo.connect();
     const result = await UserModel.updateOne({ email }, { $set: data });
+    return result.matchedCount > 0;
+  },
+
+  async updateMembershipById(id: string, membership: Membership): Promise<boolean> {
+    await mongo.connect();
+    const result = await UserModel.updateOne(
+      {
+        _id: id,
+        $or: [
+          {
+            'membership.subscriptionId': membership.subscriptionId,
+            $or: [
+              { 'membership.lastEventAt': { $exists: false } },
+              { 'membership.lastEventAt': { $lte: membership.lastEventAt } },
+            ],
+          },
+          { membership: null },
+          { 'membership.status': { $in: ['cancelled', 'expired', 'failed'] } },
+        ],
+      },
+      { $set: { membership } }
+    );
+    return result.matchedCount > 0;
+  },
+
+  async markMembershipCancellationById(id: string): Promise<boolean> {
+    await mongo.connect();
+    const result = await UserModel.updateOne(
+      { _id: id },
+      { $set: { 'membership.cancelAtPeriodEnd': true } }
+    );
     return result.matchedCount > 0;
   },
 
