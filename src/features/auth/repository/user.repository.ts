@@ -52,7 +52,10 @@ export const userRepository = {
             ],
           },
           { membership: null },
-          { 'membership.status': { $in: ['cancelled', 'expired', 'failed'] } },
+          {
+            'membership.status': { $in: ['cancelled', 'expired', 'failed'] },
+            'membership.lastEventAt': { $lte: membership.lastEventAt },
+          },
         ],
       },
       { $set: { membership } }
@@ -67,6 +70,13 @@ export const userRepository = {
       { $set: { 'membership.cancelAtPeriodEnd': true } }
     );
     return result.matchedCount > 0;
+  },
+
+  async recordMembershipRefund(id: string, subscriptionId: string, periodEnd: Date) {
+    await mongo.connect();
+    return UserModel.updateOne({ _id: id, 'membership.subscriptionId': subscriptionId }, {
+      $max: { 'membership.refundedPeriodEnd': periodEnd },
+    });
   },
 
   async deleteById(id: string): Promise<boolean> {

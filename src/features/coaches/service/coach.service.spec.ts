@@ -16,6 +16,9 @@ vi.mock('@/features/coaches/repository/coach.repository', () => ({
   },
 }));
 
+vi.mock('@/features/membership/service/access.service', () => ({ getBillingAccessService: vi.fn() }));
+vi.mock('@/features/membership/service/consultation-credit.service', () => ({ getConsultationCreditsService: vi.fn() }));
+
 import { coachRepository } from '@/features/coaches/repository/coach.repository';
 import {
   createConsultationRequestService,
@@ -24,6 +27,8 @@ import {
   listOwnConsultationRequestsService,
   updateConsultationRequestService,
 } from '@/features/coaches/service/coach.service';
+import { getBillingAccessService } from '@/features/membership/service/access.service';
+import { getConsultationCreditsService } from '@/features/membership/service/consultation-credit.service';
 
 const mockRepository = vi.mocked(coachRepository);
 const MEMBER_ID = '507f1f77bcf86cd799439011';
@@ -63,7 +68,11 @@ const consultationRequest = (
   }) as never;
 
 describe('coach services', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getBillingAccessService).mockResolvedValue({ data: { coachConsultationsIncluded: true }, status: 200 } as never);
+    vi.mocked(getConsultationCreditsService).mockResolvedValue({ data: { purchaseIds: [] }, status: 200 });
+  });
 
   it('returns only fields needed to display a verified directory profile', async () => {
     mockRepository.findVerified.mockResolvedValueOnce([coachProfile()]);
@@ -159,7 +168,8 @@ describe('coach services', () => {
       COACH_ID,
       expect.objectContaining({ topic: 'Training plan' }),
       PROFILE_ID,
-      'Coach Example'
+      'Coach Example',
+      undefined
     );
   });
 
@@ -182,6 +192,28 @@ describe('coach services', () => {
     expect(result.data[0]).not.toHaveProperty('memberUserId');
     expect(mockRepository.findMemberRequests).toHaveBeenCalledWith(MEMBER_ID);
     expect(mockRepository.findCoachRequests).toHaveBeenCalledWith(MEMBER_ID);
+  });
+
+  it('requires payment for non-Premium consultation requests', async () => {
+    mockRepository.findByProfileId.mockResolvedValueOnce(coachProfile());
+    vi.mocked(getBillingAccessService).mockResolvedValueOnce({ data: { coachConsultationsIncluded: false }, status: 200 } as never);
+    const result = await createConsultationRequestService(MEMBER_ID, {
+      coachProfileId: PROFILE_ID, topic: 'Training', message: 'Help with my training plan.', preferredAvailability: '',
+    });
+    expect(result).toEqual({ data: { error: 'CONSULTATION_PAYMENT_REQUIRED' }, status: 402 });
+    expect(mockRepository.createRequest).not.toHaveBeenCalled();
+  });
+
+  it('associates a paid credit with the request and handles concurrent credit use', async () => {
+    mockRepository.findByProfileId.mockResolvedValue(coachProfile());
+    vi.mocked(getBillingAccessService).mockResolvedValue({ data: { coachConsultationsIncluded: false }, status: 200 } as never);
+    vi.mocked(getConsultationCreditsService).mockResolvedValue({ data: { purchaseIds: ['paid-credit'] }, status: 200 });
+    mockRepository.createRequest.mockResolvedValueOnce(consultationRequest('pending', '2026-11-07T12:00:00Z'));
+    const input = { coachProfileId: PROFILE_ID, topic: 'Training', message: 'Help with my training plan.', preferredAvailability: '' };
+    expect((await createConsultationRequestService(MEMBER_ID, input)).status).toBe(201);
+    expect(mockRepository.createRequest).toHaveBeenLastCalledWith(MEMBER_ID, COACH_ID, input, PROFILE_ID, 'Coach Example', 'paid-credit');
+    mockRepository.createRequest.mockRejectedValueOnce(Object.assign(new Error('duplicate credit'), { code: 11000 }));
+    expect((await createConsultationRequestService(MEMBER_ID, input)).status).toBe(409);
   });
 
   it('does not expose received requests to profiles awaiting review', async () => {

@@ -2,6 +2,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
 
+import { getBillingAccessService } from '@/features/membership/service/access.service';
 import { auth } from '@/shared/lib/auth';
 
 export const runtime = 'nodejs';
@@ -59,9 +60,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
   }
 
-  const user = session.user as { role?: string };
+  const user = session.user as { id?: string; role?: string };
   if (user.role !== 'admin') {
-    return NextResponse.json({ error: 'FORBIDDEN' }, { status: 403 });
+    if (!user.id) return NextResponse.json({ error: 'FORBIDDEN' }, { status: 403 });
+    try {
+      const access = await getBillingAccessService(user.id);
+      if ('error' in access.data) return NextResponse.json(access.data, { status: access.status });
+      if (!access.data.unlimitedPhotoUploads) {
+        return NextResponse.json({ error: 'PREMIUM_REQUIRED' }, { status: 403 });
+      }
+    } catch {
+      return NextResponse.json({ error: 'INTERNAL_ERROR' }, { status: 500 });
+    }
   }
 
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;

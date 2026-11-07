@@ -8,6 +8,8 @@ import type {
   ConsultationRequestStatusType,
   ConsultationRequestType,
 } from '@/features/coaches/validations/coach.validation';
+import { getBillingAccessService } from '@/features/membership/service/access.service';
+import { getConsultationCreditsService } from '@/features/membership/service/consultation-credit.service';
 import type { ServiceResult } from '@/shared/types/common';
 
 export type CoachProfile = {
@@ -121,15 +123,24 @@ export async function createConsultationRequestService(
     return { data: { error: 'CANNOT_REQUEST_SELF' }, status: 400 };
   }
 
-  const request = await coachRepository.createRequest(
-    memberUserId,
-    profile.coachUserId.toString(),
-    input,
-    profile._id.toString(),
-    profile.displayName
-  );
-  if (!request) return { data: { error: 'INTERNAL_ERROR' }, status: 500 };
-  return { data: toConsultationRequest(request, 'outgoing'), status: 201 };
+  const access = await getBillingAccessService(memberUserId);
+  if ('error' in access.data) return { data: access.data, status: access.status };
+  const credits = await getConsultationCreditsService(memberUserId);
+  if ('error' in credits.data) return { data: credits.data, status: credits.status };
+  const purchaseId = access.data.coachConsultationsIncluded ? undefined : credits.data.purchaseIds[0];
+  if (!access.data.coachConsultationsIncluded && !purchaseId) {
+    return { data: { error: 'CONSULTATION_PAYMENT_REQUIRED' }, status: 402 };
+  }
+  try {
+    const request = await coachRepository.createRequest(
+      memberUserId, profile.coachUserId.toString(), input, profile._id.toString(), profile.displayName, purchaseId
+    );
+    if (!request) return { data: { error: 'INTERNAL_ERROR' }, status: 500 };
+    return { data: toConsultationRequest(request, 'outgoing'), status: 201 };
+  } catch (error) {
+    const duplicate = error instanceof Error && 'code' in error && error.code === 11000;
+    return { data: { error: duplicate ? 'CONSULTATION_CREDIT_IN_USE' : 'INTERNAL_ERROR' }, status: duplicate ? 409 : 500 };
+  }
 }
 
 export async function listOwnConsultationRequestsService(

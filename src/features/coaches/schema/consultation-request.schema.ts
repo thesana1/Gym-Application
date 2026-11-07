@@ -20,6 +20,7 @@ const ConsultationRequestSchema = new Schema(
       required: true,
     },
     coachName: { type: String, required: true, maxlength: 80 },
+    paymentPurchaseId: { type: String, required: false },
     topic: { type: String, required: true, maxlength: 120 },
     message: { type: String, required: true, maxlength: 1200 },
     preferredAvailability: { type: String, maxlength: 300 },
@@ -33,6 +34,11 @@ const ConsultationRequestSchema = new Schema(
   },
   { timestamps: true }
 );
+
+ConsultationRequestSchema.index({ paymentPurchaseId: 1 }, {
+  unique: true,
+  partialFilterExpression: { paymentPurchaseId: { $type: 'string' }, status: { $in: ['pending', 'accepted'] } },
+});
 
 export type ConsultationRequestDocument =
   InferSchemaType<typeof ConsultationRequestSchema> & {

@@ -5,6 +5,7 @@ import Google from 'next-auth/providers/google';
 import { userRepository } from '@/features/auth/repository/user.repository';
 import { upsertOAuthUserService } from '@/features/auth/service/auth.service';
 import type { MembershipSummary } from '@/features/membership/types/membership.types';
+import { isMembershipEntitled } from '@/shared/utils/membership';
 import { hashPassword } from '@/shared/utils/password';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -78,10 +79,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           membershipToken.membership = dbUser.membership
             ? {
               tier: dbUser.membership.tier,
+              entitled: isMembershipEntitled(dbUser.membership),
               status: dbUser.membership.status,
               subscriptionId: dbUser.membership.subscriptionId,
               nextBillingDate: dbUser.membership.nextBillingDate?.toISOString(),
               cancelAtPeriodEnd: dbUser.membership.cancelAtPeriodEnd,
+              refundedPeriodEnd: dbUser.membership.refundedPeriodEnd?.toISOString(),
             }
             : null;
         } else {

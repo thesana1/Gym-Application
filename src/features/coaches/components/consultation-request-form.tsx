@@ -60,8 +60,9 @@ export const ConsultationRequestForm = ({
         />
       </label>
       <p className="text-xs text-muted-foreground">
-        This sends a request, not a booking. No payment or appointment is
-        created. You may cancel until the request is declined or cancelled.
+        Premium includes unlimited consultation requests. Otherwise, one purchased
+        consultation credit is reserved per request and returned if declined or cancelled.
+        The coach must accept your request; this does not reserve an appointment time.
         Keep medical details and private contact information out of the message.
       </p>
       <div className="flex gap-2">

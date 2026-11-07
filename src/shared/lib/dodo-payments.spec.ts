@@ -1,96 +1,75 @@
-import DodoPayments from 'dodopayments';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+// @vitest-environment node
+import { createHmac } from 'node:crypto';
 
-const mocks = vi.hoisted(() => ({
-  createCheckout: vi.fn(),
-  cancelSubscription: vi.fn(),
-  unwrap: vi.fn(),
-}));
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('dodopayments', () => ({
-  default: vi.fn().mockImplementation(function DodoPaymentsMock() {
-    return {
-      checkoutSessions: { create: mocks.createCheckout },
-      subscriptions: { update: mocks.cancelSubscription },
-      webhooks: { unwrap: mocks.unwrap },
-    };
-  }),
-}));
+import { DodoPaymentsClient } from '@/shared/lib/dodo-payments';
 
-import { dodoPayments } from './dodo-payments';
+describe('DodoPaymentsClient', () => {
+  const client = new DodoPaymentsClient();
+  const secret = Buffer.from('test-webhook-secret-with-enough-entropy').toString('base64');
 
-describe('dodoPayments', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.unstubAllEnvs();
-    vi.stubEnv('DODO_PAYMENTS_API_KEY', 'test-api-key');
-    vi.stubEnv('DODO_PAYMENTS_WEBHOOK_KEY', 'test-webhook-key');
+    vi.stubEnv('DODO_PAYMENTS_API_KEY', ' test-api-key ');
+    vi.stubEnv('DODO_PAYMENTS_WEBHOOK_KEY', `whsec_${secret}`);
+    vi.stubEnv('DODO_PAYMENTS_ENVIRONMENT', 'test');
+    vi.stubEnv('NEXTAUTH_URL', 'http://localhost:3000');
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('maps test and live aliases explicitly and rejects invalid environments', () => {
+    expect(client.config.environment).toBe('test_mode');
+    expect(client.config.apiKey).toBe('test-api-key');
+    vi.stubEnv('DODO_PAYMENTS_ENVIRONMENT', 'live');
+    expect(client.config.environment).toBe('live_mode');
+    vi.stubEnv('DODO_PAYMENTS_ENVIRONMENT', 'production');
+    expect(() => client.config).toThrow();
   });
 
-  it('creates a hosted checkout with server-owned user metadata', async () => {
-    mocks.createCheckout.mockResolvedValueOnce({ checkout_url: 'https://checkout.example' });
-
-    const result = await dodoPayments.createCheckout(
-      'pdt_vip',
-      { id: 'user-123', email: 'member@example.com', name: 'Member' },
-      'https://gym.example/dashboard/membership'
-    );
-
-    expect(result.checkout_url).toBe('https://checkout.example');
-    expect(mocks.createCheckout).toHaveBeenCalledWith({
-      product_cart: [{ product_id: 'pdt_vip', quantity: 1 }],
-      customer: { email: 'member@example.com', name: 'Member' },
-      metadata: { userId: 'user-123' },
-      feature_flags: { allow_customer_editing_email: false },
-      return_url: 'https://gym.example/dashboard/membership',
-      cancel_url: 'https://gym.example/dashboard/membership',
-    });
-    expect(DodoPayments).toHaveBeenCalledWith({
-      bearerToken: 'test-api-key',
-      environment: 'test_mode',
-    });
+  it('rejects missing secrets and uses the configured origin for redirects', () => {
+    expect(client.returnUrl).toBe('http://localhost:3000/dashboard/membership');
+    vi.stubEnv('DODO_PAYMENTS_WEBHOOK_KEY', '');
+    expect(() => client.config).toThrow();
   });
 
-  it('schedules cancellation at the next billing date', async () => {
-    await dodoPayments.cancelAtBillingDate('sub_123');
-
-    expect(mocks.cancelSubscription).toHaveBeenCalledWith('sub_123', {
-      status: 'cancelled',
-      cancel_at_next_billing_date: true,
-      cancel_reason: 'cancelled_by_customer',
-    });
+  it('verifies the exact raw body with the official SDK and rejects tampering and replay', () => {
+    const body = JSON.stringify({ type: 'payment.succeeded', timestamp: new Date().toISOString(), data: {} });
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const signature = createHmac('sha256', Buffer.from(secret, 'base64')).update(`msg_test.${timestamp}.${body}`).digest('base64');
+    const headers = { 'webhook-id': 'msg_test', 'webhook-timestamp': timestamp, 'webhook-signature': `v1,${signature}` };
+    expect(client.verifyWebhook(body, headers).type).toBe('payment.succeeded');
+    expect(() => client.verifyWebhook(`${body} `, headers)).toThrow();
+    expect(() => client.verifyWebhook(body, { ...headers, 'webhook-timestamp': '1' })).toThrow();
+    expect(() => client.verifyWebhook(body, {})).toThrow();
   });
 
-  it('verifies webhooks with the configured signing key', () => {
-    const event = { type: 'subscription.active' };
-    mocks.unwrap.mockReturnValueOnce(event);
-
-    expect(
-      dodoPayments.verifyWebhook('signed-body', {
-        'webhook-id': 'evt_123',
-        'webhook-signature': 'signature',
-        'webhook-timestamp': '123456',
-      })
-    ).toBe(event);
-    expect(mocks.unwrap).toHaveBeenCalledWith('signed-body', {
-      headers: {
-        'webhook-id': 'evt_123',
-        'webhook-signature': 'signature',
-        'webhook-timestamp': '123456',
-      },
-      key: 'test-webhook-key',
-    });
+  it('reuses an existing tagged product without creating another', async () => {
+    const create = vi.fn();
+    vi.spyOn(client, 'client', 'get').mockReturnValue({ products: {
+      list: () => [{ product_id: 'pdt_existing', metadata: { catalog_key: client.catalogKey('premium') } }], create,
+    } } as never);
+    expect(await client.findOrCreateProduct('premium')).toBe('pdt_existing');
+    expect(create).not.toHaveBeenCalled();
+    vi.restoreAllMocks();
   });
 
-  it('fails explicitly when checkout credentials are missing', async () => {
-    vi.stubEnv('DODO_PAYMENTS_API_KEY', '');
+  it('schedules cancellation without immediately cancelling paid access', async () => {
+    const update = vi.fn();
+    vi.spyOn(client, 'client', 'get').mockReturnValue({ subscriptions: { update } } as never);
+    await client.cancelAtBillingDate('sub_1');
+    expect(update).toHaveBeenCalledWith('sub_1', { cancel_at_next_billing_date: true });
+    vi.restoreAllMocks();
+  });
 
-    await expect(
-      dodoPayments.createCheckout(
-        'pdt_vip',
-        { id: 'user-123', email: 'member@example.com', name: 'Member' },
-        'https://gym.example/dashboard/membership'
-      )
-    ).rejects.toThrow('DODO_PAYMENTS_API_KEY is not configured');
+  it.each(['premium', 'consultation'] as const)('creates the %s product with server-owned pricing', async (kind) => {
+    const create = vi.fn().mockResolvedValue({ product_id: 'pdt_new' });
+    vi.spyOn(client, 'client', 'get').mockReturnValue({ products: { list: () => [], create } } as never);
+    expect(await client.findOrCreateProduct(kind)).toBe('pdt_new');
+    const input = create.mock.calls[0][0];
+    expect(input.price).toMatchObject({ price: 2000, currency: 'USD', type: kind === 'premium' ? 'recurring_price' : 'one_time_price' });
+    if (kind === 'premium') expect(input.price).toMatchObject({
+      payment_frequency_count: 1, payment_frequency_interval: 'Month', subscription_period_count: 20, subscription_period_interval: 'Year',
+    });
+    vi.restoreAllMocks();
   });
 });

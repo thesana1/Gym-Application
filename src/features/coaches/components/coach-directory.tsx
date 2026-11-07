@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 import { CoachApplication } from '@/features/coaches/components/coach-application';
@@ -14,24 +15,16 @@ import type {
   CoachProfileType,
   ConsultationRequestFormType,
 } from '@/features/coaches/validations/coach.validation';
+import { COACH_ERRORS } from '@/shared/const/coaching.const';
 import { http } from '@/shared/lib/http';
 
 type CoachDirectoryProps = {
   isAdmin: boolean;
 };
 
-const FRIENDLY_ERRORS: Record<string, string> = {
-  COACH_NOT_AVAILABLE: 'This coach is no longer available in the directory.',
-  CANNOT_REQUEST_SELF: 'You cannot request a consultation with your own profile.',
-  FORBIDDEN: 'You do not have permission to review coach applications.',
-  NOT_FOUND: 'This profile or request is no longer available.',
-  UNAUTHORIZED: 'Sign in to use the coach directory.',
-  VALIDATION_ERROR: 'Please review the submitted details and try again.',
-};
-
 const getErrorMessage = (error: unknown) =>
   error instanceof Error
-    ? FRIENDLY_ERRORS[error.message] ?? error.message
+    ? COACH_ERRORS[error.message] ?? error.message
     : 'The request could not be completed.';
 
 export const CoachDirectory = ({ isAdmin }: CoachDirectoryProps) => {
@@ -155,9 +148,13 @@ export const CoachDirectory = ({ isAdmin }: CoachDirectoryProps) => {
         <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Coach directory</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Browse profiles with reviewed qualifications and send a consultation
-          request. No prices, ratings, or appointment slots are advertised.
+          request. Consultations are included with Premium, or available with a purchased consultation credit.
         </p>
       </header>
+
+      <Link href="/dashboard/membership" className="w-fit text-sm font-medium text-primary underline underline-offset-4">
+        View Premium and consultation credits
+      </Link>
 
       {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
       {notice && <p className="text-sm text-primary" role="status">{notice}</p>}

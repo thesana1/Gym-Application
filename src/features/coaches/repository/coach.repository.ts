@@ -119,15 +119,18 @@ export const coachRepository = {
     coachUserId: string,
     request: ConsultationRequestType,
     coachProfileId: string,
-    coachName: string
+    coachName: string,
+    paymentPurchaseId?: string
   ): Promise<ConsultationRequestDocument | null> {
     await mongo.connect();
+    await ConsultationRequestModel.init();
     const document = await ConsultationRequestModel.create({
       ...request,
       memberUserId,
       coachUserId,
       coachProfileId,
       coachName,
+      paymentPurchaseId,
       status: 'pending',
     });
     return ConsultationRequestModel.findById(document._id)
@@ -143,6 +146,13 @@ export const coachRepository = {
       .sort({ createdAt: -1 })
       .lean<ConsultationRequestDocument[]>()
       .exec();
+  },
+
+  async cancelRequestsForPurchase(paymentPurchaseId: string) {
+    await mongo.connect();
+    return ConsultationRequestModel.updateMany({ paymentPurchaseId, status: { $in: ['pending', 'accepted'] } }, {
+      $set: { status: 'cancelled' },
+    });
   },
 
   async findCoachRequests(

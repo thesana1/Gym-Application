@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import sharp from 'sharp';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { getBillingAccessService } from '@/features/membership/service/access.service';
 import { auth } from '@/shared/lib/auth';
 
 import { POST } from './route';
@@ -15,6 +16,7 @@ vi.mock('cloudinary', () => ({
 }));
 vi.mock('sharp', () => ({ default: vi.fn() }));
 vi.mock('@/shared/lib/auth', () => ({ auth: vi.fn() }));
+vi.mock('@/features/membership/service/access.service', () => ({ getBillingAccessService: vi.fn() }));
 
 const mockAuth = vi.mocked(auth);
 const mockSharp = vi.mocked(sharp);
@@ -90,6 +92,25 @@ describe('POST /api/uploads/images', () => {
 
     expect(response.status).toBe(413);
     expect(mockSharp).not.toHaveBeenCalled();
+  });
+
+  it('allows repeated uploads for a paid Premium member without an upload-count cap', async () => {
+    mockAuth.mockResolvedValue({ user: { id: 'member-id', role: 'user' } } as never);
+    vi.mocked(getBillingAccessService).mockResolvedValue({ data: { unlimitedPhotoUploads: true }, status: 200 } as never);
+    const file = new File(['photo'], 'photo.png', { type: 'image/png' });
+    expect((await POST(makeRequest(file))).status).toBe(200);
+    expect((await POST(makeRequest(file))).status).toBe(200);
+    expect(getBillingAccessService).toHaveBeenCalledWith('member-id');
+  });
+
+  it('rejects unpaid users before processing or storing their photo', async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: 'member-id', role: 'user' } } as never);
+    vi.mocked(getBillingAccessService).mockResolvedValueOnce({ data: { unlimitedPhotoUploads: false }, status: 200 } as never);
+    const response = await POST(makeRequest(new File(['photo'], 'photo.png', { type: 'image/png' })));
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ error: 'PREMIUM_REQUIRED' });
+    expect(mockSharp).not.toHaveBeenCalled();
+    expect(mockUploadStream).not.toHaveBeenCalled();
   });
 
   it('accepts a file at the 3 MB limit', async () => {

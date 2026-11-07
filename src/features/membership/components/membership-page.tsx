@@ -1,198 +1,97 @@
 'use client';
 
-import { BadgeCheck, LoaderCircle, Star } from 'lucide-react';
-import { useState } from 'react';
+import { Check, CreditCard, Loader2 } from 'lucide-react';
 
-import type { MembershipSummary, MembershipTier } from '@/features/membership/types/membership.types';
+import { useBilling } from '@/features/membership/hooks/use-billing';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
-import { MEMBERSHIP_PLANS } from '@/shared/const/membership.const';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { BILLING_PRODUCTS, PREMIUM_BENEFITS } from '@/shared/const/membership-payments.const';
 
-type MembershipPageProps = {
-  membership: MembershipSummary | null;
-};
+type MembershipPageProps = { checkoutStatus?: string; testMode: boolean };
 
-const getErrorMessage = (code?: string) => {
-  if (code === 'ACTIVE_MEMBERSHIP_EXISTS') {
-    return 'You already have an active membership. Cancel it before starting another plan.';
-  }
-  if (code === 'PLAN_NOT_CONFIGURED') {
-    return 'This plan is not available yet. Please contact the gym team.';
-  }
-  if (code === 'PAYMENTS_NOT_CONFIGURED') {
-    return 'Payments are not configured yet. Please contact the gym team.';
-  }
-  return 'Something went wrong. Please try again.';
-};
-
-const formatBillingDate = (date: string) =>
-  new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'medium',
-    timeZone: 'UTC',
-  }).format(new Date(date));
-
-export const MembershipPage = ({ membership: initialMembership }: MembershipPageProps) => {
-  const [membership, setMembership] = useState(initialMembership);
-  const [loadingTier, setLoadingTier] = useState<MembershipTier | null>(null);
-  const [cancelling, setCancelling] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const hasActiveMembership =
-    membership !== null && ['active', 'past_due'].includes(membership.status);
-  const hasOngoingSubscription =
-    membership !== null &&
-    !['cancelled', 'failed', 'expired'].includes(membership.status);
-
-  const startCheckout = async (tier: MembershipTier) => {
-    setLoadingTier(tier);
-    setMessage(null);
-
-    try {
-      const response = await fetch('/api/membership/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier }),
-      });
-      const result: { checkoutUrl?: string; error?: string } = await response.json();
-
-      if (!response.ok || !result.checkoutUrl) {
-        setMessage(getErrorMessage(result.error));
-        return;
-      }
-
-      window.location.assign(result.checkoutUrl);
-    } catch {
-      setMessage('Could not connect to checkout. Please try again.');
-    } finally {
-      setLoadingTier(null);
-    }
-  };
-
-  const cancelMembership = async () => {
-    setCancelling(true);
-    setMessage(null);
-
-    try {
-      const response = await fetch('/api/membership/cancel', { method: 'POST' });
-      const result: {
-        message?: string;
-        error?: string;
-      } = await response.json();
-
-      if (!response.ok) {
-        setMessage(getErrorMessage(result.error));
-        return;
-      }
-
-      setMembership((current) =>
-        current ? { ...current, cancelAtPeriodEnd: true } : current
-      );
-      setMessage(result.message ?? 'Your cancellation has been scheduled.');
-    } catch {
-      setMessage('Could not cancel your membership. Please try again.');
-    } finally {
-      setCancelling(false);
-    }
-  };
+export function MembershipPage({ checkoutStatus, testMode }: MembershipPageProps) {
+  const { access, busy, error, runAction } = useBilling(checkoutStatus === 'returned');
+  const premium = access?.plan === 'premium';
+  const disabled = !!busy || !access;
+  const formatPrice = (cents: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-      <header className="flex flex-col gap-3">
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Membership
-        </p>
-        <h1 className="text-3xl font-bold">Train with more support</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Choose a monthly plan. Your membership badge appears after Dodo Payments confirms
-          your subscription.
-        </p>
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Membership</p>
+          <h1 className="mt-1 text-3xl font-bold">Plans & billing</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Your fitness, without limits. Cancel your subscription anytime.</p>
+        </div>
+        {testMode && <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold">Test payments</span>}
       </header>
 
-      {membership ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <BadgeCheck className="size-5 text-primary" />
-              Your membership
-            </CardTitle>
-            <CardDescription>
-              {MEMBERSHIP_PLANS.find(({ tier }) => tier === membership.tier)?.name} ·{' '}
-              {membership.status.replaceAll('_', ' ')}
-              {membership.cancelAtPeriodEnd ? ' · Cancels at the end of this billing period' : ''}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {checkoutStatus === 'returned' && (
+        <p role="status" className="rounded-lg border border-border bg-muted p-4 text-sm">
+          Your checkout has returned. Payment confirmation can take a moment; your verified access is shown below.
+        </p>
+      )}
+      {checkoutStatus === 'cancelled' && <p role="status" className="text-sm text-muted-foreground">You left checkout. Your access is shown below.</p>}
+      {error && <p role="alert" className="rounded-lg border border-destructive p-4 text-sm text-destructive">{error}</p>}
+
+      <Card>
+        <CardHeader><CardTitle>Your membership</CardTitle></CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <p className="text-lg font-semibold">{access ? premium ? 'Premium — unlimited access' : 'Free plan' : 'Loading membership…'}</p>
+          {access?.subscriptionStatus && <p className="text-sm text-muted-foreground">Subscription status: {access.subscriptionStatus.replaceAll('_', ' ')}</p>}
+          {access?.currentPeriodEnd && (
             <p className="text-sm text-muted-foreground">
-              {membership.nextBillingDate
-                ? `Next billing date: ${formatBillingDate(membership.nextBillingDate)}`
-                : 'Your subscription status is synced with Dodo Payments.'}
+              {access.cancelAtPeriodEnd ? 'Scheduled to end' : 'Current period ends'}: {new Date(access.currentPeriodEnd).toLocaleDateString()}
             </p>
-            {hasOngoingSubscription && !membership.cancelAtPeriodEnd ? (
-              <Button
-                variant="outline"
-                disabled={cancelling}
-                onClick={() => {
-                  if (window.confirm('Cancel at the end of your current billing period?')) {
-                    void cancelMembership();
-                  }
-                }}
-              >
-                {cancelling ? <LoaderCircle className="size-4 animate-spin" /> : null}
-                Cancel membership
+          )}
+          {access && <p className="text-sm">{premium ? 'Coach consultations are included.' : `Consultation credits: ${access.consultationCredits}`}</p>}
+          <div className="flex flex-wrap gap-3">
+            {access?.canManageBilling && (
+              <Button variant="outline" disabled={disabled} onClick={() => void runAction('portal')}>
+                <CreditCard className="size-4" /> Manage billing
               </Button>
-            ) : null}
+            )}
+            <Button variant="ghost" disabled={!!busy} onClick={() => void runAction('refresh')}>Refresh status</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <section aria-label="Payment options" className="grid gap-6 md:grid-cols-2">
+        <Card className="border-primary">
+          <CardHeader>
+            <CardTitle>Premium</CardTitle>
+            <p className="text-3xl font-bold">
+              {formatPrice(BILLING_PRODUCTS.premium.price)}<span className="text-sm font-normal text-muted-foreground"> / month</span>
+            </p>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-6">
+            <ul className="flex flex-col gap-3">
+              {PREMIUM_BENEFITS.map((benefit) => (
+                <li key={benefit} className="flex gap-2 text-sm"><Check className="size-4 shrink-0 text-primary" />{benefit}</li>
+              ))}
+            </ul>
+            <Button disabled={disabled || premium} onClick={() => void runAction('premium')}>
+              {busy === 'premium' && <Loader2 className="size-4 animate-spin" />}
+              {premium ? 'Premium is active' : 'Get Premium'}
+            </Button>
+            <p className="text-xs text-muted-foreground">Renews monthly. Applicable taxes are calculated at checkout.</p>
           </CardContent>
         </Card>
-      ) : null}
-
-      <section aria-label="Membership plans" className="grid gap-4 md:grid-cols-3">
-        {MEMBERSHIP_PLANS.map(({ tier, name, price }, index) => {
-          const isCurrentPlan = membership?.tier === tier && hasActiveMembership;
-          return (
-            <Card key={tier} className={index === 1 ? 'border-primary/50 shadow-sm' : undefined}>
-              <CardHeader>
-                <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <Star aria-hidden="true" className="size-5" />
-                </span>
-                <CardTitle className="mt-2">{name}</CardTitle>
-                <CardDescription>
-                  {isCurrentPlan ? 'Your current plan' : 'Monthly membership'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <p className="text-3xl font-bold">
-                  ${price}
-                  <span className="ml-1 text-sm font-normal text-muted-foreground">/ month</span>
-                </p>
-                {isCurrentPlan ? (
-                  <Button variant="secondary" disabled>
-                    Current plan
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={hasOngoingSubscription || loadingTier !== null}
-                    onClick={() => void startCheckout(tier)}
-                  >
-                    {loadingTier === tier ? (
-                      <LoaderCircle className="size-4 animate-spin" />
-                    ) : null}
-                    Choose {name}
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
+        <Card>
+          <CardHeader>
+            <CardTitle>Coach consultation</CardTitle>
+            <p className="text-3xl font-bold">{premium ? 'Included' : formatPrice(BILLING_PRODUCTS.consultation.price)}</p>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-6">
+            <p className="text-sm text-muted-foreground">Purchase one individual consultation, or join Premium for consultations and unlimited features.</p>
+            <Button variant="outline" disabled={disabled || premium} onClick={() => void runAction('consultation')}>
+              {busy === 'consultation' && <Loader2 className="size-4 animate-spin" />}
+              {premium ? 'Included in your membership' : 'Buy a consultation'}
+            </Button>
+            <p className="text-xs text-muted-foreground">One-time payment. A consultation credit is added after payment is confirmed.</p>
+          </CardContent>
+        </Card>
       </section>
-
-      <p aria-live="polite" className="min-h-5 text-sm text-muted-foreground">
-        {message}
-      </p>
     </div>
   );
-};
+}

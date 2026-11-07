@@ -51,7 +51,7 @@ The experience should feel like a grounded personal training dashboard: calm, ho
 
 - keep the app useful for everyday fitness tracking
 - make all totals based on actual user-entered data
-- avoid invented metrics, fake availability, or premium gating
+- avoid invented metrics, fake availability, and unsupported premium claims
 - respect the user's privacy and keep social mechanics opt-in
 - support a single coherent fitness loop without overbuilding unrelated features
 
@@ -168,3 +168,14 @@ The product is successful when a new user can:
 - use the app as a self-contained training dashboard without needing social features to be valuable
 
 This is the current target product definition for the repository and is the basis for the work tracked in [todos/](./todos/).
+
+## Confirmed payment decision
+
+The product owner has explicitly requested real Dodo Payments billing: Premium
+costs USD 20/month and includes unlimited photo uploads, all existing fitness
+features without usage quotas, and coach consultation requests. Non-members may
+purchase one consultation credit for USD 20. Products are provisioned dynamically.
+Premium upload and consultation access are checked by the server. Other existing
+fitness features retain their free access until specific free-plan limits are
+agreed. Image-size constraints and coach acceptance still apply. Test and live
+billing records are separate; only verified provider state grants paid access.

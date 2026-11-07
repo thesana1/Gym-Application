@@ -1,30 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createMembershipCheckoutService } from '@/features/membership/service/membership.service';
-import { MembershipCheckoutSchema } from '@/features/membership/validations/membership.validation';
-import { auth } from '@/shared/lib/auth';
+import { createCheckoutService } from '@/features/membership/service/checkout.service';
+import { CheckoutSchema } from '@/features/membership/validations/membership-payments.validation';
+import { billingUser } from '@/shared/middleware/billing-user';
 import { validateBody } from '@/shared/middleware/validate-body';
 
-type SessionUser = {
-  id?: string;
-};
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
-    const user = session?.user as SessionUser | undefined;
-    if (!user?.id) {
-      return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
-    }
-
-    const validated = await validateBody(request, MembershipCheckoutSchema);
+    const userId = await billingUser(req);
+    if (userId instanceof NextResponse) return userId;
+    const validated = await validateBody(req, CheckoutSchema);
     if (validated instanceof NextResponse) return validated;
-
-    const result = await createMembershipCheckoutService(
-      user.id,
-      validated.data.tier,
-      new URL('/dashboard/membership', request.url).toString()
-    );
+    const result = await createCheckoutService(userId, validated.data);
     return NextResponse.json(result.data, { status: result.status });
   } catch {
     return NextResponse.json({ error: 'INTERNAL_ERROR' }, { status: 500 });

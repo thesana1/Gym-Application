@@ -8,7 +8,7 @@ type MembershipBadgeProps = {
 };
 
 export const MembershipBadge = ({ membership }: MembershipBadgeProps) => {
-  if (!membership || !['active', 'past_due'].includes(membership.status)) {
+  if (!membership?.entitled) {
     return null;
   }
 

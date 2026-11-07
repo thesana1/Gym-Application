@@ -65,13 +65,15 @@ export function ImageUpload() {
 
         if (!response.ok || !result.url) {
           const errorMessage =
-            result.error === 'CLOUDINARY_NOT_CONFIGURED'
-              ? 'Cloudinary credentials are missing. Configure them in the environment.'
-              : result.error === 'INVALID_IMAGE'
-                ? `${file.name} is not a supported image.`
-                : result.error === 'IMAGE_UPLOAD_FAILED'
-                  ? `Could not upload ${file.name}. Please try again.`
-                  : result.error ?? 'IMAGE_UPLOAD_FAILED';
+            result.error === 'PREMIUM_REQUIRED'
+              ? 'Photo uploads are included with Premium. Open Membership to upgrade.'
+              : result.error === 'CLOUDINARY_NOT_CONFIGURED'
+                ? 'Cloudinary credentials are missing. Configure them in the environment.'
+                : result.error === 'INVALID_IMAGE'
+                  ? `${file.name} is not a supported image.`
+                  : result.error === 'IMAGE_UPLOAD_FAILED'
+                    ? `Could not upload ${file.name}. Please try again.`
+                    : result.error ?? 'IMAGE_UPLOAD_FAILED';
           throw new Error(errorMessage);
         }
 

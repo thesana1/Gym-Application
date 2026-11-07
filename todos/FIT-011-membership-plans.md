@@ -1,6 +1,6 @@
 # FIT-011: Add free and premium membership entitlements
 
-**Status:** Later  
+**Status:** Implemented (free-plan quotas deferred)
 **Priority:** P2  
 **Depends on:** FIT-004, FIT-006, FIT-007, FIT-008
 
@@ -24,12 +24,15 @@ whether premium access is useful to me.
 
 ## Product decision
 
-The product owner chose to defer free-plan caps and premium pricing and keep
-all currently shipped features ungated. No paid tier, price, billing, renewal,
-or cancellation promise is implemented or advertised. This ticket remains
-deferred rather than inventing unvalidated limits or claiming server-enforced
-premium access that does not exist.
+The product owner has now explicitly authorized Dodo Payments billing with
+Premium at USD 20/month and individual consultation credits at USD 20. Premium
+includes unlimited photo-upload count, existing fitness features without usage
+quotas, and included coach consultation requests. The existing image-size limit
+remains. Other free-plan caps remain undecided and are not invented.
 
-Revisit after member research identifies valued features and acceptable limits.
-At that point, define entitlements and enforce them in the relevant server
-routes before introducing any purchase flow.
+Implemented: dynamic product provisioning, hosted checkout, customer portal,
+verified payment/subscription/refund webhooks, server-side paid-period checks,
+Premium image uploads, and consultation credits protected from concurrent double
+spending. Credits become available again if a coach request is declined or
+cancelled. Public HTTPS webhook configuration and Cloudinary credentials remain
+deployment setup requirements. No appointment availability is fabricated.

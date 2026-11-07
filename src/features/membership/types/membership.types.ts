@@ -19,13 +19,17 @@ export type Membership = {
   customerId?: string;
   nextBillingDate?: Date;
   cancelAtPeriodEnd: boolean;
+  environment?: 'test_mode' | 'live_mode';
+  refundedPeriodEnd?: Date;
   lastEventAt: Date;
 };
 
 export type MembershipSummary = {
+  entitled?: boolean;
   tier: MembershipTier;
   status: MembershipStatus;
   subscriptionId: string;
   nextBillingDate?: string;
+  refundedPeriodEnd?: string;
   cancelAtPeriodEnd: boolean;
 };

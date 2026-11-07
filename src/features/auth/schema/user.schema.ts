@@ -4,7 +4,7 @@ const MembershipSchema = new Schema(
   {
     tier: {
       type: String,
-      enum: ['vip', 'vipplus', 'supervip'],
+      enum: ['premium', 'vip', 'vipplus', 'supervip'],
       required: true,
     },
     status: {
@@ -16,6 +16,8 @@ const MembershipSchema = new Schema(
     customerId: { type: String, required: false },
     nextBillingDate: { type: Date, required: false },
     cancelAtPeriodEnd: { type: Boolean, default: false, required: true },
+    environment: { type: String, enum: ['test_mode', 'live_mode'], required: false },
+    refundedPeriodEnd: { type: Date, required: false },
     lastEventAt: { type: Date, required: true },
   },
   { _id: false }

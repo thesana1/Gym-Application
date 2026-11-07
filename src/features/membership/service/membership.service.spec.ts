@@ -24,9 +24,7 @@ import { dodoPayments } from '@/shared/lib/dodo-payments';
 
 import {
   cancelMembershipService,
-  createMembershipCheckoutService,
   getMembershipService,
-  getMembershipTierForProduct,
   syncMembershipFromWebhook,
 } from './membership.service';
 
@@ -53,51 +51,6 @@ describe('membership service', () => {
 
   afterEach(() => vi.unstubAllEnvs());
 
-  it('creates a checkout from the configured server-side product id', async () => {
-    vi.stubEnv('DODO_PAYMENTS_API_KEY', 'test-api-key');
-    vi.stubEnv('DODO_PAYMENTS_VIP_PRODUCT_ID', 'pdt_vip');
-    mockRepository.findById.mockResolvedValueOnce(makeUser());
-    mockPayments.createCheckout.mockResolvedValueOnce({
-      checkout_url: 'https://checkout.example',
-    } as never);
-
-    const result = await createMembershipCheckoutService(
-      USER_ID,
-      'vip',
-      'https://gym.example/dashboard/membership'
-    );
-
-    expect(result).toEqual({
-      data: { checkoutUrl: 'https://checkout.example' },
-      status: 200,
-    });
-    expect(mockPayments.createCheckout).toHaveBeenCalledWith(
-      'pdt_vip',
-      { id: USER_ID, email: 'member@example.com', name: 'Member' },
-      'https://gym.example/dashboard/membership'
-    );
-  });
-
-  it('does not start a second checkout for an entitled member', async () => {
-    const user = makeUser({
-      tier: 'vip',
-      status: 'active',
-      subscriptionId: 'sub_active',
-      cancelAtPeriodEnd: false,
-      lastEventAt: new Date(),
-    });
-    mockRepository.findById.mockResolvedValueOnce(user);
-
-    const result = await createMembershipCheckoutService(
-      USER_ID,
-      'supervip',
-      'https://gym.example/dashboard/membership'
-    );
-
-    expect(result).toEqual({ data: { error: 'ACTIVE_MEMBERSHIP_EXISTS' }, status: 409 });
-    expect(mockPayments.createCheckout).not.toHaveBeenCalled();
-  });
-
   it('schedules cancellation and keeps the membership until period end', async () => {
     vi.stubEnv('DODO_PAYMENTS_API_KEY', 'test-api-key');
     mockRepository.findById.mockResolvedValueOnce(
@@ -119,13 +72,6 @@ describe('membership service', () => {
     expect(result.data).toEqual({
       message: 'Membership will remain active until the end of the billing period',
     });
-  });
-
-  it('resolves plan tier only from configured Dodo product ids', () => {
-    vi.stubEnv('DODO_PAYMENTS_SUPERVIP_PRODUCT_ID', 'pdt_supervip');
-
-    expect(getMembershipTierForProduct('pdt_supervip')).toBe('supervip');
-    expect(getMembershipTierForProduct('unknown')).toBeUndefined();
   });
 
   it('links a verified webhook by checkout email when subscription metadata is absent', async () => {
@@ -170,6 +116,7 @@ describe('membership service', () => {
     expect(result).toEqual({
       data: {
         tier: 'vip',
+        entitled: false,
         status: 'active',
         subscriptionId: 'sub_active',
         nextBillingDate: '2026-02-01T00:00:00.000Z',
