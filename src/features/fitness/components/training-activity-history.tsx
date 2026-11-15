@@ -2,51 +2,37 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { ProgressHeader } from '@/features/fitness/components/progress-header';
 import type { TrainingActivity } from '@/features/fitness/service/training-activity.service';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
+import { COMMON_COPY } from '@/shared/const/copy-common.const';
+import { PROGRESS_COPY } from '@/shared/const/copy-progress.const';
 import { http } from '@/shared/lib/http';
+import { cn } from '@/shared/lib/utils';
 
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
+const copy = PROGRESS_COPY.activity;
+const WEEK_OPTIONS = [4, 8] as const;
+const MAX_DOTS = 14;
 
-const ERROR_MESSAGES: Record<string, string> = {
-  UNAUTHORIZED: 'Sign in to review your training activity.',
-  VALIDATION_ERROR: 'Choose a supported report range.',
+const formatRange = (start: string, end: string) => {
+  const format = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
+  return `${format.format(new Date(start))} – ${format.format(new Date(end))}`;
 };
-
-const getErrorMessage = (error: unknown) =>
-  error instanceof Error
-    ? ERROR_MESSAGES[error.message] ?? 'Could not load your training activity.'
-    : 'Could not load your training activity.';
 
 export const TrainingActivityHistory = () => {
   const [weeks, setWeeks] = useState<4 | 8>(4);
   const [activity, setActivity] = useState<TrainingActivity | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   const loadActivity = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
-      setActivity(
-        await http.get<TrainingActivity>('/fitness/activity', {
-          params: { weeks },
-        })
-      );
-    } catch (loadError) {
+      setActivity(await http.get<TrainingActivity>('/fitness/activity', { params: { weeks } }));
+    } catch {
       setActivity(null);
-      setError(getErrorMessage(loadError));
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -56,111 +42,52 @@ export const TrainingActivityHistory = () => {
     void loadActivity();
   }, [loadActivity]);
 
-  const highestWorkoutCount = Math.max(
-    1,
-    ...(activity?.periods.map(({ workoutCount }) => workoutCount) ?? [])
-  );
-
+  const periods = activity ? [...activity.periods].reverse() : [];
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Your own log history
-        </p>
-        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">
-          Training activity
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Review workout logs, sets, and exercise variety in rolling
-          seven-day periods. These counts describe what you entered, not training
-          quality, health outcomes, or a recommended schedule.
-        </p>
-      </header>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Report range</CardTitle>
-          <CardDescription>
-            Each period is a consecutive seven-day window ending at the current
-            time. Only your own saved workout history is used.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <Button
-            variant={weeks === 4 ? 'default' : 'outline'}
-            aria-pressed={weeks === 4}
-            onClick={() => setWeeks(4)}
-            disabled={loading}
-          >
-            Past 4 weeks
-          </Button>
-          <Button
-            variant={weeks === 8 ? 'default' : 'outline'}
-            aria-pressed={weeks === 8}
-            onClick={() => setWeeks(8)}
-            disabled={loading}
-          >
-            Past 8 weeks
-          </Button>
-        </CardContent>
-      </Card>
-
-      {error && (
-        <Card>
-          <CardContent className="flex flex-wrap items-center justify-between gap-3 pt-6">
-            <p className="text-sm text-destructive" role="alert">{error}</p>
-            <Button variant="outline" onClick={() => void loadActivity()}>
-              Try again
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {loading ? (
-        <p className="text-sm text-muted-foreground" role="status">
-          Loading training history…
-        </p>
-      ) : activity ? (
-        <section aria-label={`${activity.weeks}-week training activity`} className="grid gap-4">
-          {activity.periods.map((period) => (
-            <Card key={period.start}>
-              <CardHeader>
-                <CardTitle className="text-base">
-                  {formatDate(period.start)} – {formatDate(period.end)}
-                </CardTitle>
-                <CardDescription>
-                  {period.workoutCount} workout
-                  {period.workoutCount === 1 ? '' : 's'} logged
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
-                <progress
-                  className="h-2 w-full accent-primary"
-                  max={highestWorkoutCount}
-                  value={period.workoutCount}
-                  aria-label={`${period.workoutCount} workouts logged in this period`}
-                />
-                <dl className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Sets logged</dt>
-                    <dd className="font-semibold">{period.setCount}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Exercises</dt>
-                    <dd className="font-semibold">{period.distinctExerciseCount}</dd>
-                  </div>
-                </dl>
-              </CardContent>
-            </Card>
+    <div className="animate-rise">
+      <ProgressHeader />
+      <div className="flex flex-col gap-4">
+        <div role="group" aria-label={copy.weeksLabel} className="grid grid-cols-2 gap-2">
+          {WEEK_OPTIONS.map((option) => (
+            <button key={option} type="button" aria-pressed={weeks === option} disabled={loading} onClick={() => setWeeks(option)}
+              className={cn('min-h-12 rounded-lg border text-base font-semibold focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60',
+                weeks === option ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:bg-accent')}>
+              {copy.weeks(option)}
+            </button>
           ))}
-        </section>
-      ) : null}
+        </div>
 
-      <p className="text-xs text-muted-foreground">
-        Empty periods mean no workout logs were found for that window. This
-        history does not assess whether your activity is sufficient or
-        appropriate for you.
-      </p>
+        {error ? (
+          <div className="flex flex-col items-start gap-3" role="alert">
+            <p className="text-base text-destructive">{copy.error}</p>
+            <Button variant="outline" onClick={() => void loadActivity()}>{COMMON_COPY.tryAgain}</Button>
+          </div>
+        ) : loading ? (
+          <div className="h-64 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
+        ) : (
+          <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
+            {periods.map((period, index) => (
+              <li key={period.start} className="flex flex-col gap-2 p-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <h2 className="text-base font-semibold">{index === 0 ? copy.thisWeek : formatRange(period.start, period.end)}</h2>
+                  <p className="text-lg font-semibold tabular-nums">{copy.workouts(period.workoutCount)}</p>
+                </div>
+                {period.workoutCount > 0 && (
+                  <>
+                    <div className="flex flex-wrap gap-1" aria-hidden="true">
+                      {Array.from({ length: Math.min(period.workoutCount, MAX_DOTS) }, (_, dot) => (
+                        <span key={dot} className="h-2.5 w-6 rounded-full bg-primary" />
+                      ))}
+                    </div>
+                    <p className="text-base tabular-nums text-muted-foreground">{copy.details(period.setCount, period.distinctExerciseCount)}</p>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="text-base text-muted-foreground">{copy.note}</p>
+      </div>
     </div>
   );
 };

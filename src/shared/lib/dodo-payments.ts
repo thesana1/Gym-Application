@@ -44,9 +44,9 @@ class DodoPaymentsClient {
     const product = await client.products.create({
       name: definition.name,
       description: definition.description,
-      tax_category: kind === 'premium' ? 'saas' : 'live_tutoring',
+      tax_category: 'saas',
       metadata: { catalog_key: key },
-      price: kind === 'premium' ? {
+      price: {
         ...basePrice,
         type: 'recurring_price',
         payment_frequency_count: 1,
@@ -54,7 +54,7 @@ class DodoPaymentsClient {
         subscription_period_count: 20,
         subscription_period_interval: 'Year',
         trial_period_days: 0,
-      } : { ...basePrice, type: 'one_time_price', pay_what_you_want: false },
+      },
     });
     return product.product_id;
   }

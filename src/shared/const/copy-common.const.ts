@@ -1,0 +1,32 @@
+export const COMMON_COPY = {
+  account: 'Account',
+  accountFallbackName: 'Your account',
+  signIn: 'Sign in',
+  signOut: 'Sign out',
+  createAccount: 'Create account',
+  darkMode: 'Dark mode',
+  lightMode: 'Light mode',
+  loading: 'Loading…',
+  saving: 'Saving…',
+  save: 'Save',
+  cancel: 'Cancel',
+  back: 'Back',
+  next: 'Next',
+  edit: 'Edit',
+  delete: 'Delete',
+  tryAgain: 'Try again',
+  seeAll: 'See all',
+  showLess: 'Show less',
+  somethingWentWrong: 'Something went wrong. Please try again.',
+  errorTitle: 'Oops, something went wrong',
+  goHome: 'Go to Home',
+  today: 'Today',
+  previousDay: 'Previous day',
+  nextDay: 'Next day',
+} as const;
+
+export const ACCOUNT_MENU_COPY = {
+  home: 'Home',
+  profile: 'My profile',
+  plan: 'My plan',
+} as const;

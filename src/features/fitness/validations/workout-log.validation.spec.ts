@@ -98,3 +98,15 @@ describe('WorkoutLogSchema', () => {
     );
   });
 });
+
+// Browser datetime-local inputs need conversion before the strict API schema.
+describe('WorkoutLogFormSchema', () => {
+  it('converts local completion times while the API continues to require an offset', async () => {
+    const { WorkoutLogFormSchema } = await import('@/features/fitness/validations/workout-log.validation');
+    const local = '2026-11-14T10:30';
+    const form = WorkoutLogFormSchema.parse({ ...validLog, completedAt: local });
+    expect(form.completedAt).toBe(new Date(local).toISOString());
+    expect(WorkoutLogSchema.safeParse(form).success).toBe(true);
+    expect(WorkoutLogSchema.safeParse({ ...validLog, completedAt: local }).success).toBe(false);
+  });
+});

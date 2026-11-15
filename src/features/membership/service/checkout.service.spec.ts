@@ -41,9 +41,8 @@ describe('billing checkout', () => {
     expect(purchaseRepository.update).toHaveBeenCalledWith('507f1f77bcf86cd799439011', expect.objectContaining({ checkoutSessionId: 'cks_1' }));
   });
 
-  it('includes coaching for Premium without making a charge', async () => {
+  it('refuses a second Premium checkout without making a charge', async () => {
     vi.mocked(getBillingAccessService).mockResolvedValue({ data: { plan: 'premium' }, status: 200 } as never);
-    expect(await createCheckoutService('user-id', { kind: 'consultation' })).toEqual({ data: { included: true }, status: 200 });
     expect((await createCheckoutService('user-id', { kind: 'premium' })).status).toBe(409);
     expect(dodoPayments.client.checkoutSessions.create).not.toHaveBeenCalled();
   });

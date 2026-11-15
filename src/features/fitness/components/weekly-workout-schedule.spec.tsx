@@ -37,17 +37,17 @@ describe('WeeklyWorkoutSchedule', () => {
       />
     );
 
-    const firstSession = await screen.findByLabelText('Session 1: Full body A');
+    const firstSession = await screen.findByLabelText('Workout 1: Full body A');
     expect(firstSession).toHaveValue('1');
     fireEvent.change(firstSession, { target: { value: '2' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Save schedule' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save my days' }));
 
     await waitFor(() => {
       expect(mockPut).toHaveBeenCalledWith('/fitness/schedule', {
         assignments: [{ weekday: 2, sessionIndex: 0 }],
       });
     });
-    expect(await screen.findByText('Schedule saved.')).toBeInTheDocument();
+    expect(await screen.findByText('Days saved.')).toBeInTheDocument();
   });
 
   it('offers a retry if the saved schedule cannot be loaded', async () => {
@@ -57,7 +57,7 @@ describe('WeeklyWorkoutSchedule', () => {
     render(<WeeklyWorkoutSchedule sessions={[{ title: 'Full body A' }]} />);
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Could not load your schedule. Please try again.'
+      'We could not load your days. Please try again.'
     );
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
 

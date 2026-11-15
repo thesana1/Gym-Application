@@ -3,25 +3,10 @@
 import { useMemo, useState } from 'react';
 
 import type { ProgressMeasurement } from '@/features/fitness/service/progress-measurement.service';
-import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
+import { MEASUREMENT_KEYS, PROGRESS_COPY, type MeasurementKey } from '@/shared/const/copy-progress.const';
+import { cn } from '@/shared/lib/utils';
 
-const MEASUREMENTS = [
-  { key: 'weightKg', label: 'Weight', unit: 'kg' },
-  { key: 'waistCm', label: 'Waist', unit: 'cm' },
-  { key: 'hipsCm', label: 'Hips', unit: 'cm' },
-  { key: 'chestCm', label: 'Chest', unit: 'cm' },
-  { key: 'armCm', label: 'Arm', unit: 'cm' },
-  { key: 'thighCm', label: 'Thigh', unit: 'cm' },
-] as const;
-
-type MeasurementKey = (typeof MEASUREMENTS)[number]['key'];
+const MEASUREMENTS = MEASUREMENT_KEYS.map((key) => ({ key, ...PROGRESS_COPY.fields[key] }));
 type MeasurementComparison = {
   key: MeasurementKey;
   label: string;
@@ -95,96 +80,50 @@ export const getMeasurementWindowSummary = (
   };
 };
 
-const formatChange = (change: number) =>
-  `${change > 0 ? '+' : ''}${change.toFixed(1)}`;
-
 const formatDate = (date: string) =>
-  new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(
-    new Date(`${date}T12:00:00`)
-  );
+  new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(new Date(`${date}T12:00:00`));
 
-type MeasurementWindowSummaryProps = {
-  measurements: ProgressMeasurement[];
-};
+type MeasurementWindowSummaryProps = { measurements: ProgressMeasurement[] };
 
-export const MeasurementWindowSummary = ({
-  measurements,
-}: MeasurementWindowSummaryProps) => {
+const copy = PROGRESS_COPY.compare;
+const WEEK_OPTIONS = [4, 8] as const;
+
+export const MeasurementWindowSummary = ({ measurements }: MeasurementWindowSummaryProps) => {
   const [weeks, setWeeks] = useState<4 | 8>(4);
-  const summary = useMemo(
-    () => getMeasurementWindowSummary(measurements, weeks),
-    [measurements, weeks]
-  );
+  const summary = useMemo(() => getMeasurementWindowSummary(measurements, weeks), [measurements, weeks]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent measurement comparison</CardTitle>
-        <CardDescription>
-          Compare the earliest and latest self-entered values for each
-          measurement type. Changes are descriptive only, not an assessment of
-          progress or health.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-wrap gap-2" aria-label="Comparison period">
-          <Button
-            variant={weeks === 4 ? 'default' : 'outline'}
-            aria-pressed={weeks === 4}
-            onClick={() => setWeeks(4)}
-          >
-            4 weeks
-          </Button>
-          <Button
-            variant={weeks === 8 ? 'default' : 'outline'}
-            aria-pressed={weeks === 8}
-            onClick={() => setWeeks(8)}
-          >
-            8 weeks
-          </Button>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          {formatDate(summary.startDate)} – {formatDate(summary.endDate)} ·{' '}
-          {summary.recordCount} record{summary.recordCount === 1 ? '' : 's'} in
-          this window
-        </p>
-        {summary.recordCount === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No measurements were recorded in this period.
-          </p>
-        ) : summary.comparisons.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            At least two dated values of the same measurement type are needed
-            for a comparison.
-          </p>
-        ) : (
-          <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {summary.comparisons.map((comparison) => (
-              <div
-                key={comparison.key}
-                className="rounded-md border border-border p-4"
-              >
-                <dt className="text-sm font-medium">{comparison.label}</dt>
-                <dd className="mt-2 text-lg font-semibold">
-                  {formatChange(comparison.change)} {comparison.unit}
-                </dd>
-                <dd className="mt-1 text-xs text-muted-foreground">
-                  {comparison.first} {comparison.unit} on{' '}
-                  {formatDate(comparison.firstDate)}
-                </dd>
-                <dd className="text-xs text-muted-foreground">
-                  {comparison.latest} {comparison.unit} on{' '}
-                  {formatDate(comparison.latestDate)}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
-        <p className="text-xs text-muted-foreground">
-          Only measurements you entered are shown. The app does not infer
-          missing values or recommend a target direction.
-        </p>
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-4">
+      <div role="group" aria-label={copy.periodLabel} className="grid grid-cols-2 gap-2">
+        {WEEK_OPTIONS.map((option) => (
+          <button key={option} type="button" aria-pressed={weeks === option} onClick={() => setWeeks(option)}
+            className={cn('min-h-12 rounded-lg border text-base font-semibold focus-visible:outline-2 focus-visible:outline-ring',
+              weeks === option ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:bg-accent')}>
+            {copy.weeks(option)}
+          </button>
+        ))}
+      </div>
+      <p className="text-base text-muted-foreground">
+        {copy.range(formatDate(summary.startDate), formatDate(summary.endDate), summary.recordCount)}
+      </p>
+      {summary.recordCount === 0 ? (
+        <p className="text-base">{copy.none}</p>
+      ) : summary.comparisons.length === 0 ? (
+        <p className="text-base">{copy.needTwo}</p>
+      ) : (
+        <dl className="flex flex-col divide-y divide-border">
+          {summary.comparisons.map((comparison) => (
+            <div key={comparison.key} className="flex flex-wrap items-baseline justify-between gap-x-3 py-3 first:pt-0">
+              <dt className="text-base font-semibold">{comparison.label}</dt>
+              <dd className="text-lg font-semibold tabular-nums">{copy.change(comparison.change, comparison.unit)}</dd>
+              <dd className="w-full text-base tabular-nums text-muted-foreground">
+                {copy.fromTo(comparison.first, comparison.latest, comparison.unit)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      <p className="text-base text-muted-foreground">{copy.note}</p>
+    </div>
   );
 };

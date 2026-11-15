@@ -1,3 +1,5 @@
+import dns from 'node:dns';
+
 import mongoose from 'mongoose';
 import { afterAll, describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -59,6 +61,24 @@ describe('MongoClientManager', () => {
       'MONGO_URI is not configured.'
     );
     expect(mongoose.connect).not.toHaveBeenCalled();
+  });
+
+  it('uses custom DNS servers for SRV lookups when MONGO_DNS_SERVERS is set', async () => {
+    const setServers = vi.spyOn(dns, 'setServers').mockImplementation(() => undefined);
+    vi.stubEnv('MONGO_DNS_SERVERS', '8.8.8.8, 1.1.1.1');
+    vi.mocked(mongoose.connect).mockResolvedValueOnce(mongoose);
+    await manager.connect();
+    expect(setServers).toHaveBeenCalledWith(['8.8.8.8', '1.1.1.1']);
+    setServers.mockRestore();
+  });
+
+  it('leaves system DNS untouched when MONGO_DNS_SERVERS is not set', async () => {
+    const setServers = vi.spyOn(dns, 'setServers').mockImplementation(() => undefined);
+    vi.stubEnv('MONGO_DNS_SERVERS', '');
+    vi.mocked(mongoose.connect).mockResolvedValueOnce(mongoose);
+    await manager.connect();
+    expect(setServers).not.toHaveBeenCalled();
+    setServers.mockRestore();
   });
 
   it('disconnect calls mongoose.disconnect and resets state', async () => {

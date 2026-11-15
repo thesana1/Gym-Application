@@ -6,7 +6,6 @@ import type { PurchaseDocument } from '@/features/membership/schema/purchase.sch
 import { getBillingAccessService } from '@/features/membership/service/access.service';
 
 vi.mock('@/features/membership/repository/purchase.repository', () => ({ purchaseRepository: { findForUser: vi.fn() } }));
-vi.mock('@/features/coaches/repository/coach.repository', () => ({ coachRepository: { findMemberRequests: vi.fn().mockResolvedValue([]) } }));
 vi.mock('@/shared/lib/dodo-payments', () => ({ dodoPayments: { config: { environment: 'test_mode' } } }));
 
 const purchase = (changes: Partial<PurchaseDocument> = {}): PurchaseDocument => ({
@@ -21,13 +20,13 @@ describe('getBillingAccessService', () => {
   it('defaults to free without purchases', async () => {
     vi.mocked(purchaseRepository.findForUser).mockResolvedValue([]);
     expect((await getBillingAccessService('user')).data).toMatchObject({
-      plan: 'free', unlimitedPhotoUploads: false, unlimitedFeatures: false, coachConsultationsIncluded: false,
+      plan: 'free', unlimitedPhotoUploads: false, unlimitedFeatures: false,
     });
   });
-  it('grants unlimited access and included coaching for a verified active subscription', async () => {
+  it('grants unlimited access for a verified active subscription', async () => {
     vi.mocked(purchaseRepository.findForUser).mockResolvedValue([purchase()]);
     expect((await getBillingAccessService('user')).data).toMatchObject({
-      plan: 'premium', unlimitedPhotoUploads: true, unlimitedFeatures: true, coachConsultationsIncluded: true,
+      plan: 'premium', unlimitedPhotoUploads: true, unlimitedFeatures: true,
     });
     expect(purchaseRepository.findForUser).toHaveBeenCalledWith('user', 'test_mode');
   });
@@ -48,11 +47,8 @@ describe('getBillingAccessService', () => {
     vi.mocked(purchaseRepository.findForUser).mockResolvedValue([purchase({ refundedPeriodEnd: new Date(0) })]);
     expect((await getBillingAccessService('user')).data).toMatchObject({ plan: 'premium' });
   });
-  it('counts paid consultation purchases once and excludes refunds and pending checkouts', async () => {
-    vi.mocked(purchaseRepository.findForUser).mockResolvedValue([
-      purchase({ kind: 'consultation' }), purchase({ kind: 'consultation', status: 'pending' }),
-      purchase({ kind: 'consultation', status: 'refunded' }),
-    ]);
-    expect((await getBillingAccessService('user')).data).toMatchObject({ plan: 'free', consultationCredits: 1 });
+  it('never grants Premium for a paid consultation bought before consultations were removed', async () => {
+    vi.mocked(purchaseRepository.findForUser).mockResolvedValue([purchase({ kind: 'consultation' })]);
+    expect((await getBillingAccessService('user')).data).toMatchObject({ plan: 'free' });
   });
 });

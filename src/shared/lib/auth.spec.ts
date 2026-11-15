@@ -109,13 +109,13 @@ describe('auth callbacks — jwt', () => {
     expect(token.avatar).toBe('https://example.com/avatar.png');
   });
 
-  it('defaults role to "user" when DB user not found', async () => {
+  it('invalidates the session when its user no longer exists', async () => {
     mockRepo.findByEmail.mockResolvedValueOnce(null);
     const token = await capturedConfig.callbacks.jwt({
       token: { email: 'nobody@example.com' },
       user: undefined,
     });
-    expect(token.role).toBe('user');
+    expect(token).toBeNull();
   });
 
   it('sets token fields from user on initial sign-in', async () => {

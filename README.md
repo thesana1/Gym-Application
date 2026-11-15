@@ -59,10 +59,9 @@ to enable uploads.
 
 ### Membership subscriptions
 
-Open `/dashboard/membership` to purchase **Premium for USD 20/month** or
-an **individual consultation credit for USD 20**. Premium includes unlimited photo
-uploads, all existing fitness features without usage caps, and coach consultation
-requests. Other fitness features keep their existing free access; no additional
+Open `/dashboard/membership` to purchase **Premium for USD 20/month**. Premium
+includes unlimited photo uploads, all existing fitness features without usage caps,
+and a higher daily AI request limit. Other fitness features keep their existing free access; no additional
 free-plan quotas have been invented. Each image still has a 3 MB file-size limit.
 
 Products are created dynamically on the first checkout and reused through a
@@ -97,18 +96,9 @@ The image-upload API checks paid access on the server for non-admin users, with
 no upload-count quota for Premium. Cloudinary credentials are still required to
 store images. Administrators retain their existing upload access.
 
-Coach requests are included for Premium. Other members must first buy a credit.
-A credit is reserved by an active request, with a unique database constraint
-preventing concurrent double spending. Declining or cancelling the request frees
-the credit for reuse. A full refund removes the credit and cancels its active
-request. Coach acceptance and appointment scheduling remain separate: payment
-buys a consultation credit, not a guaranteed appointment time.
-
 To verify the integration, complete a Dodo test checkout and check that Premium
 appears after webhook confirmation. Replay the same webhook to check idempotency,
-then test cancellation and full refunds. On a free account, purchase a consultation
-credit and send a coach request; a second active request cannot reuse that credit.
-Decline or cancel the request and check that the credit becomes available again.
+then test cancellation and full refunds.
 
 Start development server:
 
@@ -285,3 +275,56 @@ docker compose down -v
 - Remote image optimization is limited to Google OAuth avatars by default.
 - `npm audit fix` has been applied without force. A package override keeps
   transitive `postcss` on the patched version used by the toolchain.
+
+## Interaction audit — 2026-11-14
+
+The functional audit used the real Next.js server, Auth.js, API routes and
+MongoDB persistence in a separate disposable audit database. Mobile checks ran
+at 320px and 390px, and desktop at 1440px. Admin and paid-only branches used
+explicitly seeded test permissions and purchase records; those checks do not
+establish that a payment was processed.
+
+Fixes include stale-cookie authentication redirects, preserving protected
+callback URLs, case-insensitive email lookup, local workout date/time conversion,
+visible set validation errors, multiline coach qualifications, fresh nutrition
+summaries after log changes, and using seven days of data for weekly momentum.
+Provider failures remain explicit errors, including disabled upload credentials
+and missing consultation-category approval.
+
+Local `NEXTAUTH_URL` must exactly match the address serving this app. When the
+parent starter occupies port 3000 and this app runs on 3001, use
+`NEXTAUTH_URL=http://localhost:3001`. Google must allow
+`http://localhost:3001/api/auth/callback/google` for that configuration.
+
+| Area | Checks |
+| --- | --- |
+| Entry and accounts | Both landing actions, registration, invalid password, password sign-in, persistent session, expired-cookie recovery, protected callback, deleted-account session, sign-out |
+| Navigation | All 13 destinations, mobile drawer and bottom bar, desktop sidebar, account menu, light/dark toggle |
+| Training | Profile persistence, session selector, instructions, exercise substitutions/restoration, schedule save/clear, set/exercise controls, workout create/edit/delete, history filters |
+| Nutrition | Food create/edit/delete, dates, targets, seven-day refresh, recipe preference and allergen filters |
+| Progress | Measurement create/edit/delete, four/eight-week comparisons, personal records and training activity |
+| Coaching | Application, multiline qualifications, directory filters, admin verify/delist, unpaid request denial, reserved test-credit accept/decline/cancel and release |
+| Other | Equipment search/filter/disclosures, challenge join/leave, upload access enforcement, billing status/refresh and real Premium sandbox checkout opening |
+
+External checks that require follow-up:
+
+- Google authorization starts, but completing sign-in requires a Google test
+  account and confirmation that the callback URI is registered.
+- Dodo rejects `live_tutoring` with `UNSUPPORTED_TAX_CATEGORY`. Enable that
+  category for consultations or obtain Dodo's approved classification before
+  changing it. Premium sandbox checkout opens, but payment completion, provider
+  portal and subscription lifecycle still need a reachable public HTTPS webhook
+  endpoint at `/api/webhooks/dodo` and an actual completed sandbox purchase.
+- Cloudinary rejects the configured key as disabled. Restore an active matching
+  key/secret pair locally before retrying successful uploads.
+
+Regression checks: `npm run lint`, `npm run test:run`, and `npm run build`.
+
+Final verification: 75/75 core browser workflow groups passed across the three
+viewport widths, 15/15 additional coaching/entitlement checks passed on mobile
+and desktop, and stale/deleted-session plus callback regressions passed. Google
+redirect initiation and genuine Premium sandbox checkout initiation passed on
+mobile and desktop. All 355 Vitest tests, ESLint and the production build passed.
+These results do not claim successful Google consent, uploaded images, completed
+payments, provider portal/subscription operations, or live gym results while the
+external requirements above remain unresolved.

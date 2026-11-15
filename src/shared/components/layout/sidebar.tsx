@@ -1,83 +1,41 @@
 'use client';
-import {
-  Activity,
-  Apple,
-  BadgeCheck,
-  BookOpen,
-  ChartNoAxesCombined,
-  Dumbbell,
-  LayoutDashboard,
-  MapPin,
-  Medal,
-  Salad,
-  UserRound,
-  Users,
-  Trophy,
-  type LucideIcon,
-} from 'lucide-react';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { SIDEBAR_NAV_ITEMS, type SidebarNavItem } from '@/shared/const/navigation.const';
+import { NavIcon } from '@/shared/components/layout/nav-icon';
+import { MAIN_NAV_ITEMS, MORE_NAV_ITEMS, NAV_COPY, type NavItem } from '@/shared/const/navigation.const';
 import { cn } from '@/shared/lib/utils';
 
-const SIDEBAR_ICON_MAP: Record<SidebarNavItem['icon'], LucideIcon> = {
-  dashboard: LayoutDashboard,
-  dumbbell: Dumbbell,
-  apple: Apple,
-  salad: Salad,
-  activity: Activity,
-  'map-pin': MapPin,
-  users: Users,
-  trophy: Trophy,
-  'book-open': BookOpen,
-  medal: Medal,
-  'badge-check': BadgeCheck,
-  chart: ChartNoAxesCombined,
-  'user-round': UserRound,
-};
+type SidebarProps = { className?: string };
 
-type SidebarProps = {
-  className?: string;
-  onNavigate?: () => void;
-};
+const isActive = (item: NavItem, pathname: string) => pathname === item.href || Boolean(item.matches?.includes(pathname));
 
-export const Sidebar = ({ className, onNavigate }: SidebarProps) => {
-  const pathname = usePathname();
-
+const SidebarLink = ({ item, pathname }: { item: NavItem; pathname: string }) => {
+  const active = isActive(item, pathname);
   return (
-    <aside
-      className={cn(
-        'flex w-64 shrink-0 flex-col gap-1 border-r border-border bg-sidebar p-3',
-        className
-      )}
-    >
-      <p className="px-3 pb-2 pt-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-        Fitness
-      </p>
-      <nav className="flex flex-col gap-1">
-        {SIDEBAR_NAV_ITEMS.map(({ href, label, icon }) => {
-          const Icon = SIDEBAR_ICON_MAP[icon];
-          const isActive = pathname === href;
+    <Link href={item.href} aria-current={active ? 'page' : undefined}
+      className={cn('flex min-h-12 items-center gap-3 rounded-lg px-3 text-base font-medium transition-colors',
+        'focus-visible:outline-2 focus-visible:outline-ring',
+        active ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-accent hover:text-foreground')}>
+      <NavIcon name={item.icon} />
+      {item.label}
+    </Link>
+  );
+};
 
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={onNavigate}
-              aria-current={isActive ? 'page' : undefined}
-              className={cn(
-                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-              )}
-            >
-              <Icon className="size-4 shrink-0" />
-              {label}
-            </Link>
-          );
-        })}
+export const Sidebar = ({ className }: SidebarProps) => {
+  const pathname = usePathname();
+  return (
+    <aside className={cn('w-64 shrink-0 flex-col border-r border-border bg-sidebar p-3', className)}>
+      <nav aria-label={NAV_COPY.mainLabel} className="sticky top-20 flex flex-col gap-6">
+        <div className="flex flex-col gap-1">
+          {MAIN_NAV_ITEMS.map((item) => <SidebarLink key={item.href} item={item} pathname={pathname} />)}
+        </div>
+        <section aria-labelledby="sidebar-more" className="flex flex-col gap-1">
+          <h2 id="sidebar-more" className="px-3 pb-1 text-sm font-semibold text-muted-foreground">{NAV_COPY.sidebarMoreHeading}</h2>
+          {MORE_NAV_ITEMS.map((item) => <SidebarLink key={item.href} item={item} pathname={pathname} />)}
+        </section>
       </nav>
     </aside>
   );

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { AUTH_ROUTES, PROTECTED_ROUTES } from '@/shared/const/routes.const';
+import { PROTECTED_ROUTES } from '@/shared/const/routes.const';
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -9,15 +9,10 @@ export function proxy(req: NextRequest) {
     req.cookies.get('authjs.session-token')?.value ??
     req.cookies.get('__Secure-authjs.session-token')?.value;
 
-  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
-  if (isAuthRoute && sessionToken) {
-    return NextResponse.redirect(new URL('/dashboard', req.url));
-  }
-
   const isProtected = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
   if (isProtected && !sessionToken) {
     const loginUrl = new URL('/sign-in', req.url);
-    loginUrl.searchParams.set('callbackUrl', pathname);
+    loginUrl.searchParams.set('callbackUrl', pathname + req.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
 

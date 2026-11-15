@@ -1,103 +1,81 @@
-import { Activity, ArrowRight, Target, Utensils, type LucideIcon } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
+import { LandingPreview } from '@/features/marketing/components/landing-preview';
 import { Footer } from '@/shared/components/layout/footer';
 import { Header } from '@/shared/components/layout/header';
+import { NavIcon } from '@/shared/components/layout/nav-icon';
 import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
-import { HOME_FEATURES, HOME_STATS, type FeatureCard } from '@/shared/const/home.const';
+import { LANDING_COPY } from '@/shared/const/copy-public.const';
 
-const FEATURE_ICON_MAP: Record<FeatureCard['icon'], LucideIcon> = {
-  activity: Activity,
-  utensils: Utensils,
-  target: Target,
-};
+const copy = LANDING_COPY;
 
-export const HomePage = () => {
-  return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Header />
+const StartButtons = () => (
+  <div className="flex flex-col gap-3 sm:flex-row">
+    <Button size="lg" asChild className="w-full sm:w-auto">
+      <Link href="/sign-up">{copy.start}<ArrowRight className="size-5" aria-hidden="true" /></Link>
+    </Button>
+    <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
+      <Link href="/sign-in">{copy.signIn}</Link>
+    </Button>
+  </div>
+);
 
-      <main className="flex-1">
-        <section className="mx-auto w-full max-w-5xl px-6 pb-16 pt-20 sm:px-10 sm:pt-28">
-          <div className="animate-rise inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1">
-            <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
-            <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-              Fitness, with direction
-            </span>
-          </div>
-
-          <h1 className="animate-rise animate-rise-1 mt-6 max-w-3xl text-4xl font-bold leading-tight sm:text-6xl">
-            A clearer path to better{' '}
-            <span className="text-primary">fitness.</span>
+export const HomePage = () => (
+  <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <Header />
+    <main className="flex-1">
+      <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 pb-12 pt-10 sm:px-8 lg:grid-cols-2 lg:pb-20 lg:pt-20">
+        <div className="flex animate-rise flex-col gap-6">
+          <h1 className="text-balance text-5xl font-semibold leading-none sm:text-6xl">
+            {copy.titleStart}<span className="text-primary">{copy.titleAccent}</span>{copy.titleEnd}
           </h1>
+          <p className="max-w-xl text-xl text-muted-foreground">{copy.subtitle}</p>
+          <StartButtons />
+        </div>
+        <div className="animate-rise animate-rise-2"><LandingPreview /></div>
+      </section>
 
-          <p className="animate-rise animate-rise-2 mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Bring training, nutrition, and progress together around your goals.
-            Start with a plan, build consistency, and adjust as you go.
-          </p>
-
-          <div className="animate-rise animate-rise-3 mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button size="lg" asChild className="font-semibold">
-              <Link href="/sign-up">
-                Start your journey
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/sign-in">Sign in</Link>
-            </Button>
-          </div>
-
-          <dl className="animate-rise animate-rise-4 mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
-            {HOME_STATS.map(({ value, label }) => (
-              <div key={label} className="bg-background px-5 py-4">
-                <dt className="font-heading text-xl font-bold tracking-tight">{value}</dt>
-                <dd className="mt-0.5 text-sm text-muted-foreground">{label}</dd>
-              </div>
+      <section aria-labelledby="steps-title" className="border-y border-border bg-card">
+        <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
+          <h2 id="steps-title" className="text-2xl font-semibold">{copy.stepsTitle}</h2>
+          <ol className="mt-6 grid gap-4 sm:grid-cols-3">
+            {copy.steps.map((step, index) => (
+              <li key={step} className="flex items-center gap-4">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary font-heading text-xl font-semibold
+                  text-primary-foreground">{index + 1}</span>
+                <span className="text-lg font-medium">{step}</span>
+              </li>
             ))}
-          </dl>
-        </section>
+          </ol>
+        </div>
+      </section>
 
-        <section
-          aria-label="What's included"
-          className="mx-auto w-full max-w-5xl px-6 pb-24 sm:px-10"
-        >
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            A practical place to start
-          </p>
+      <section aria-labelledby="features-title" className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-8 lg:py-20">
+        <h2 id="features-title" className="text-2xl font-semibold">{copy.featuresTitle}</h2>
+        <ul className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+          {copy.features.map(({ icon, title, body }) => (
+            <li key={title} className="flex gap-4">
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><NavIcon name={icon} /></span>
+              <span className="flex flex-col">
+                <span className="text-lg font-semibold">{title}</span>
+                <span className="text-base text-muted-foreground">{body}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {HOME_FEATURES.map((feature) => {
-              const Icon = FEATURE_ICON_MAP[feature.icon];
-
-              return (
-                <Card
-                  key={feature.title}
-                  className="gap-0 transition-colors duration-300 hover:border-primary/40"
-                >
-                  <CardHeader className="pb-3">
-                    <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Icon className="size-5" />
-                    </span>
-                    <p className="mt-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                      {feature.label}
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    <h3 className="text-lg font-bold">{feature.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-      </main>
-
-      <Footer />
-    </div>
-  );
-};
+      <section aria-labelledby="closing-title" className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-8">
+        <div className="flex flex-col gap-5 rounded-3xl bg-primary px-6 py-10 text-primary-foreground sm:px-10">
+          <h2 id="closing-title" className="text-3xl font-semibold">{copy.closingTitle}</h2>
+          <p className="text-lg text-primary-foreground/90">{copy.closingBody}</p>
+          <Button size="lg" variant="secondary" asChild className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 sm:w-fit">
+            <Link href="/sign-up">{copy.start}<ArrowRight className="size-5" aria-hidden="true" /></Link>
+          </Button>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+);

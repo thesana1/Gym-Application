@@ -7,7 +7,7 @@ type SessionUser = {
 };
 
 type WorkoutsPageProps = {
-  searchParams: Promise<{ session?: string }>;
+  searchParams: Promise<{ session?: string; tab?: string }>;
 };
 
 export default async function WorkoutsPage({ searchParams }: WorkoutsPageProps) {
@@ -32,6 +32,7 @@ export default async function WorkoutsPage({ searchParams }: WorkoutsPageProps) 
     <WorkoutPlanPage
       profile={result.data}
       startSessionIndex={sessionIndex}
+      initialTab={query.tab === 'plan' || query.tab === 'past' ? query.tab : undefined}
     />
   );
 }

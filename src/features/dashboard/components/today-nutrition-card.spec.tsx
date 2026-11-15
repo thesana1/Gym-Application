@@ -4,62 +4,25 @@ import { describe, expect, it } from 'vitest';
 import { TodayNutritionCard } from '@/features/dashboard/components/today-nutrition-card';
 import type { NutritionEntry } from '@/features/nutrition/service/nutrition.service';
 
-const entries: NutritionEntry[] = [
-  {
-    id: 'entry-1',
-    date: '2026-10-17',
-    mealType: 'breakfast',
-    foodName: 'Oats',
-    calories: 300,
-    proteinGrams: 12,
-    carbohydrateGrams: 50,
-    fatGrams: 6,
-    fiberGrams: 8,
-    waterMl: 250,
-  },
-  {
-    id: 'entry-2',
-    date: '2026-10-17',
-    mealType: 'lunch',
-    foodName: 'Beans',
-    calories: 450,
-    proteinGrams: 22,
-    carbohydrateGrams: 60,
-    fatGrams: 10,
-    fiberGrams: 12,
-    waterMl: 300,
-  },
-];
+const entry = (id: string, calories: number): NutritionEntry => ({
+  id, date: '2026-10-17', mealType: 'lunch', foodName: 'Meal', calories,
+  proteinGrams: 10, carbohydrateGrams: 20, fatGrams: 5, fiberGrams: 3, waterMl: 0,
+});
+const targets = { calories: 2000, proteinGrams: 100, carbohydrateGrams: 250, fatGrams: 70, fiberGrams: 30, waterMl: 2000 };
 
 describe('TodayNutritionCard', () => {
-  it('sums only entered records and distinguishes user-entered targets', () => {
-    render(
-      <TodayNutritionCard
-        entries={entries}
-        targets={{
-          calories: 2000,
-          proteinGrams: 100,
-          carbohydrateGrams: 250,
-          fatGrams: 70,
-          fiberGrams: 30,
-          waterMl: 2000,
-        }}
-      />
-    );
+  it('adds up only the food entered today against the calorie goal the person set', () => {
+    render(<TodayNutritionCard entries={[entry('a', 300), entry('b', 450)]} targets={targets} />);
 
-    expect(screen.getByText('750 kcal')).toBeInTheDocument();
-    expect(screen.getByText('34 g')).toBeInTheDocument();
-    expect(screen.getByText('550 ml')).toBeInTheDocument();
-    expect(
-      screen.getByText(/User-entered targets — calories 2,000 kcal, protein 100 g/)
-    ).toBeInTheDocument();
+    expect(screen.getByText('750')).toBeInTheDocument();
+    expect(screen.getByRole('meter', { name: 'Calories' })).toHaveAttribute('aria-valuemax', '2000');
+    expect(screen.getByRole('link', { name: 'Add food' })).toHaveAttribute('href', '/dashboard/nutrition?add=1');
   });
 
-  it('does not show targets or imply intake when no records or targets exist', () => {
+  it('tells the person what to do when nothing is logged and no goal is set', () => {
     render(<TodayNutritionCard entries={[]} targets={null} />);
 
-    expect(screen.getByText('No food or water entries logged today.')).toBeInTheDocument();
-    expect(screen.getByText(/none are set/)).toBeInTheDocument();
-    expect(screen.queryByText(/User-entered targets/)).not.toBeInTheDocument();
+    expect(screen.getByText('Nothing added yet today.')).toBeInTheDocument();
+    expect(screen.queryByRole('meter')).not.toBeInTheDocument();
   });
 });

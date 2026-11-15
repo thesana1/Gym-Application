@@ -3,6 +3,7 @@ import mongoose, { Schema, type InferSchemaType } from 'mongoose';
 const PurchaseSchema = new Schema({
   userId: { type: String, required: true, index: true },
   environment: { type: String, enum: ['test_mode', 'live_mode'], required: true },
+  // 'consultation' stays valid so purchases made before consultations were removed still load.
   kind: { type: String, enum: ['premium', 'consultation'], required: true },
   productId: { type: String, required: true },
   status: { type: String, enum: ['pending', 'paid', 'failed', 'refunded', 'expired'], default: 'pending', required: true },

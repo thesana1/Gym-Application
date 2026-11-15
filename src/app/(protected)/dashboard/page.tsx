@@ -1,5 +1,4 @@
 import { DashboardOverview } from '@/features/dashboard/components/dashboard-overview';
-import { TodayOverview } from '@/features/dashboard/components/today-overview';
 import { getFitnessProfileService } from '@/features/fitness/service/fitness-profile.service';
 import { auth } from '@/shared/lib/auth';
 
@@ -22,10 +21,6 @@ export default async function DashboardPage() {
   }
 
   return (
-    <DashboardOverview
-      userName={user.name ?? ''}
-      profile={result.data}
-      todayOverview={<TodayOverview />}
-    />
+    <DashboardOverview userName={user.name ?? ''} profile={result.data} />
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { NutritionEntryForm } from '@/features/nutrition/components/nutrition-entry-form';
@@ -16,20 +17,39 @@ import type {
   NutritionEntryInput,
   NutritionEntryType,
 } from '@/features/nutrition/validations/nutrition.validation';
+import { PageHeader } from '@/shared/components/layout/page-header';
+import { SectionTabs } from '@/shared/components/layout/section-tabs';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
-import { Input } from '@/shared/components/ui/input';
+import { Disclosure } from '@/shared/components/ui/disclosure';
+import { FOOD_COPY } from '@/shared/const/copy-food.const';
+import { FOOD_TABS } from '@/shared/const/navigation.const';
 
-const getToday = () => {
-  const today = new Date();
-  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-  return today.toISOString().slice(0, 10);
+const toDateKey = (value: Date) => {
+  const date = new Date(value);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 10);
 };
+const getToday = () => toDateKey(new Date());
+const shiftDay = (date: string, days: number) => {
+  const next = new Date(`${date}T12:00:00`);
+  next.setDate(next.getDate() + days);
+  return toDateKey(next);
+};
+const formatDay = (date: string) =>
+  date === getToday() ? FOOD_COPY.day.today
+    : new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(`${date}T12:00:00`));
+
+const DayPicker = ({ date, onChange }: { date: string; onChange: (date: string) => void }) => (
+  <div className="flex items-center justify-between gap-2 rounded-2xl border border-border bg-card p-1">
+    <Button variant="ghost" aria-label={FOOD_COPY.day.backLabel} onClick={() => onChange(shiftDay(date, -1))}>
+      <ChevronLeft className="size-5" aria-hidden="true" />{FOOD_COPY.day.back}
+    </Button>
+    <p className="text-center font-heading text-lg font-semibold" aria-live="polite">{formatDay(date)}</p>
+    <Button variant="ghost" aria-label={FOOD_COPY.day.nextLabel} disabled={date >= getToday()} onClick={() => onChange(shiftDay(date, 1))}>
+      {FOOD_COPY.day.next}<ChevronRight className="size-5" aria-hidden="true" />
+    </Button>
+  </div>
+);
 
 const toEntryInput = (entry: NutritionEntry): NutritionEntryInput => ({
   date: entry.date,
@@ -44,22 +64,13 @@ const toEntryInput = (entry: NutritionEntry): NutritionEntryInput => ({
   notes: entry.notes ?? '',
 });
 
-export const NutritionDashboard = () => {
-  const {
-    targets,
-    entries,
-    loading,
-    saving,
-    error,
-    loadTargets,
-    loadEntries,
-    saveTargets,
-    saveEntry,
-    deleteEntry,
-    setError,
-  } = useNutrition();
+type NutritionDashboardProps = { startAdding?: boolean };
+
+export const NutritionDashboard = ({ startAdding = false }: NutritionDashboardProps) => {
+  const { targets, entries, loading, saving, error, loadTargets, loadEntries, saveTargets, saveEntry, deleteEntry, setError } = useNutrition();
+  const [historyVersion, setHistoryVersion] = useState(0);
   const [date, setDate] = useState(getToday);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(startAdding);
   const [editingEntry, setEditingEntry] = useState<NutritionEntry | null>(null);
 
   const refreshEntries = useCallback(() => {
@@ -74,104 +85,62 @@ export const NutritionDashboard = () => {
     refreshEntries();
   }, [refreshEntries]);
 
+  const closeForm = () => {
+    setIsFormOpen(false);
+    setEditingEntry(null);
+    setError(null);
+  };
+
   const handleSaveEntry = async (value: NutritionEntryType) => {
     if (await saveEntry(editingEntry?.id ?? null, value)) {
-      setIsFormOpen(false);
-      setEditingEntry(null);
+      closeForm();
       refreshEntries();
+      setHistoryVersion((version) => version + 1);
     }
   };
 
   const handleDeleteEntry = async (entry: NutritionEntry) => {
-    if (!window.confirm(`Delete "${entry.foodName}" from your food log?`)) return;
-    if (await deleteEntry(entry.id)) refreshEntries();
+    if (!window.confirm(FOOD_COPY.list.confirmDelete(entry.foodName))) return;
+    if (await deleteEntry(entry.id)) {
+      refreshEntries();
+      setHistoryVersion((version) => version + 1);
+    }
   };
 
-  const handleSaveTargets = async (value: NutritionTargets) =>
-    saveTargets(value);
+  const handleSaveTargets = async (value: NutritionTargets) => saveTargets(value);
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Eat with awareness
-        </p>
-        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Nutrition log</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Record meals and compare them with targets you choose.
-        </p>
-      </header>
+    <div className="flex animate-rise flex-col gap-5">
+      <PageHeader title={FOOD_COPY.title} description={FOOD_COPY.description} className="mb-1">
+        <SectionTabs tabs={FOOD_TABS} />
+      </PageHeader>
 
-      {error && (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-base text-destructive" role="alert">{error}</p>}
 
-      <NutritionTargetForm
-        targets={targets}
-        saving={saving}
-        onSave={handleSaveTargets}
-      />
-
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <label className="grid gap-2 text-sm font-medium">
-          Log date
-          <Input
-            type="date"
-            value={date}
-            onChange={(event) => setDate(event.target.value)}
-          />
-        </label>
-        {!isFormOpen && (
-          <Button
-            onClick={() => {
-              setEditingEntry(null);
-              setIsFormOpen(true);
-              setError(null);
-            }}
-          >
-            Add food entry
+      {isFormOpen ? (
+        <section aria-labelledby="food-form-title" className="rounded-2xl border border-border bg-card p-5">
+          <h2 id="food-form-title" className="mb-5 text-2xl font-semibold">{editingEntry ? FOOD_COPY.form.editTitle : FOOD_COPY.form.addTitle}</h2>
+          <NutritionEntryForm key={editingEntry?.id ?? `new-${date}`} date={date} saving={saving}
+            initialValues={editingEntry ? toEntryInput(editingEntry) : undefined} onCancel={closeForm} onSave={handleSaveEntry} />
+        </section>
+      ) : (
+        <>
+          <DayPicker date={date} onChange={setDate} />
+          <NutritionSummary entries={entries} targets={targets} />
+          <Button size="lg" className="sticky bottom-24 z-10 w-full shadow-lg lg:bottom-6"
+            onClick={() => { setEditingEntry(null); setIsFormOpen(true); setError(null); }}>
+            <Plus className="size-5" aria-hidden="true" />{FOOD_COPY.add}
           </Button>
-        )}
-      </div>
-
-      {isFormOpen && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {editingEntry ? 'Edit food entry' : 'Add food entry'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <NutritionEntryForm
-              key={editingEntry?.id ?? `new-${date}`}
-              date={date}
-              saving={saving}
-              initialValues={editingEntry ? toEntryInput(editingEntry) : undefined}
-              onCancel={() => {
-                setIsFormOpen(false);
-                setEditingEntry(null);
-                setError(null);
-              }}
-              onSave={handleSaveEntry}
-            />
-          </CardContent>
-        </Card>
+          <NutritionEntryHistory entries={entries} loading={loading} onDelete={handleDeleteEntry}
+            onEdit={(entry) => { setEditingEntry(entry); setIsFormOpen(true); setError(null); }} />
+          <Disclosure summary={FOOD_COPY.week.title}>
+            <SevenDayNutritionSummary refreshKey={historyVersion} />
+          </Disclosure>
+          <Disclosure summary={FOOD_COPY.goals.title}>
+            <NutritionTargetForm targets={targets} saving={saving} onSave={handleSaveTargets} />
+          </Disclosure>
+        </>
       )}
-
-      <NutritionSummary entries={entries} targets={targets} />
-      <SevenDayNutritionSummary targets={targets} />
-      <NutritionEntryHistory
-        entries={entries}
-        loading={loading}
-        onEdit={(entry) => {
-          setEditingEntry(entry);
-          setIsFormOpen(true);
-          setError(null);
-        }}
-        onDelete={handleDeleteEntry}
-      />
     </div>
   );
 };

@@ -5,13 +5,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { TrainingScheduleEditor } from '@/features/fitness/components/training-schedule-editor';
 import type { TrainingSchedule } from '@/features/fitness/service/training-schedule.service';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
+import { COMMON_COPY } from '@/shared/const/copy-common.const';
+import { WORKOUTS_COPY } from '@/shared/const/copy-workouts.const';
 import { http } from '@/shared/lib/http';
 
 type PlanSession = {
@@ -25,16 +20,9 @@ type WeeklyWorkoutScheduleProps = {
 type ScheduleResponse = TrainingSchedule;
 
 const getErrorMessage = (error: unknown, action: 'load' | 'save') => {
-  if (!(error instanceof Error)) {
-    return `Could not ${action} your schedule. Please try again.`;
-  }
-  if (error.message === 'PROFILE_REQUIRED') {
-    return 'Set up your fitness profile before scheduling plan sessions.';
-  }
-  if (error.message === 'VALIDATION_ERROR') {
-    return 'That schedule does not match your current plan. Reload and try again.';
-  }
-  return `Could not ${action} your schedule. Please try again.`;
+  if (error instanceof Error && error.message === 'PROFILE_REQUIRED') return WORKOUTS_COPY.errors.profileRequired;
+  if (error instanceof Error && error.message === 'VALIDATION_ERROR') return WORKOUTS_COPY.errors.scheduleMismatch;
+  return action === 'load' ? WORKOUTS_COPY.errors.scheduleLoad : WORKOUTS_COPY.errors.scheduleSave;
 };
 
 export const WeeklyWorkoutSchedule = ({
@@ -110,86 +98,42 @@ export const WeeklyWorkoutSchedule = ({
     }
   };
 
+  const copy = WORKOUTS_COPY.schedule;
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Choose your training days</CardTitle>
-        <CardDescription>
-          Assign plan sessions to weekdays that suit you. Leave a session
-          unscheduled if you prefer; other days are not a recommendation to
-          train. This schedule has no reminders.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <section aria-labelledby="schedule-title" className="rounded-2xl border border-border bg-card p-5">
+      <h2 id="schedule-title" className="text-xl font-semibold">{copy.title}</h2>
+      <p className="mt-1 text-base text-muted-foreground">{copy.description}</p>
+      <div className="mt-5 flex flex-col gap-4">
         {loading ? (
-          <p className="text-sm text-muted-foreground" role="status">
-            Loading your schedule…
-          </p>
+          <p className="text-base text-muted-foreground" role="status">{copy.loading}</p>
         ) : loadFailed ? (
-          <div className="flex items-center gap-3">
-            <p className="text-sm text-destructive" role="alert">{error}</p>
-            <Button variant="outline" onClick={() => void loadSchedule()}>
-              Try again
-            </Button>
+          <div className="flex flex-col items-start gap-3">
+            <p className="text-base text-destructive" role="alert">{error}</p>
+            <Button variant="outline" onClick={() => void loadSchedule()}>{COMMON_COPY.tryAgain}</Button>
           </div>
         ) : (
           <>
-            <TrainingScheduleEditor
-              sessions={sessions}
-              assignments={assignments}
-              saving={saving}
+            <TrainingScheduleEditor sessions={sessions} assignments={assignments} saving={saving}
               onAssignmentChange={(sessionIndex, weekday) => {
                 setSaved(false);
-                setAssignments((current) => ({
-                  ...current,
-                  [sessionIndex]: weekday,
-                }));
-              }}
-            />
+                setAssignments((current) => ({ ...current, [sessionIndex]: weekday }));
+              }} />
             <div className="flex flex-wrap items-center gap-3">
-              <Button
-                onClick={() => void saveSchedule(assignments)}
-                disabled={saving}
-              >
-                {saving ? 'Saving…' : 'Save schedule'}
-              </Button>
-              <Button
-                variant="outline"
+              <Button onClick={() => void saveSchedule(assignments)} disabled={saving}>{saving ? COMMON_COPY.saving : copy.save}</Button>
+              <Button variant="outline" disabled={saving || !Object.values(assignments).some((weekday) => weekday !== '')}
                 onClick={() => {
-                  const emptySchedule = sessions.reduce<Record<number, number | ''>>(
-                    (next, _, index) => {
-                      next[index] = '';
-                      return next;
-                    },
-                    {}
-                  );
+                  const emptySchedule = sessions.reduce<Record<number, number | ''>>((next, _, index) => ({ ...next, [index]: '' }), {});
                   setAssignments(emptySchedule);
                   void saveSchedule(emptySchedule);
-                }}
-                disabled={
-                  saving ||
-                  !Object.values(assignments).some((weekday) => weekday !== '')
-                }
-              >
-                Clear schedule
+                }}>
+                {copy.clear}
               </Button>
-              {saved && (
-                <p className="text-sm text-muted-foreground" role="status">
-                  Schedule saved.
-                </p>
-              )}
-              {error && (
-                <p className="text-sm text-destructive" role="alert">
-                  {error}
-                </p>
-              )}
+              {saved && <p className="text-base font-medium text-primary" role="status">{copy.saved}</p>}
             </div>
+            {error && <p className="text-base text-destructive" role="alert">{error}</p>}
           </>
         )}
-        {error && !loading && !loadFailed && (
-          <p className="text-sm text-destructive" role="alert">{error}</p>
-        )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 };

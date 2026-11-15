@@ -18,7 +18,7 @@ export const MembershipBadge = ({ membership }: MembershipBadgeProps) => {
   return (
     <span
       aria-label={`${plan.name} member`}
-      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-semibold text-primary"
+      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-sm font-semibold text-primary"
     >
       <BadgeCheck aria-hidden="true" className="size-3.5" />
       {plan.name}

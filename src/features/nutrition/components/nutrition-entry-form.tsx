@@ -1,27 +1,18 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
-import {
-  NutritionEntryInput,
-  NutritionEntrySchema,
-  NutritionEntryType,
-} from '@/features/nutrition/validations/nutrition.validation';
+import { NutritionEntryInput, NutritionEntrySchema, NutritionEntryType } from '@/features/nutrition/validations/nutrition.validation';
 import { Button } from '@/shared/components/ui/button';
+import { Disclosure } from '@/shared/components/ui/disclosure';
 import { Input } from '@/shared/components/ui/input';
+import { COMMON_COPY } from '@/shared/const/copy-common.const';
+import { FOOD_COPY } from '@/shared/const/copy-food.const';
+import { cn } from '@/shared/lib/utils';
 
 const EMPTY_ENTRY: NutritionEntryInput = {
-  date: '',
-  mealType: 'breakfast',
-  foodName: '',
-  calories: '',
-  proteinGrams: '',
-  carbohydrateGrams: '',
-  fatGrams: '',
-  fiberGrams: '',
-  waterMl: '',
-  notes: '',
+  date: '', mealType: 'breakfast', foodName: '', calories: '', proteinGrams: '', carbohydrateGrams: '', fatGrams: '', fiberGrams: '', waterMl: '', notes: '',
 };
 
 type NutritionEntryFormProps = {
@@ -32,106 +23,72 @@ type NutritionEntryFormProps = {
   onSave: (value: NutritionEntryType) => Promise<void>;
 };
 
-const MACRO_FIELDS = [
-  { name: 'calories', label: 'Calories (kcal)', min: '0', max: '10000' },
-  { name: 'proteinGrams', label: 'Protein (g)', min: '0', max: '1000' },
-  { name: 'carbohydrateGrams', label: 'Carbohydrates (g)', min: '0', max: '1500' },
-  { name: 'fatGrams', label: 'Fat (g)', min: '0', max: '500' },
-  { name: 'fiberGrams', label: 'Fiber (g)', min: '0', max: '200' },
-  { name: 'waterMl', label: 'Water (ml, optional)', min: '0', max: '10000' },
+const copy = FOOD_COPY.form;
+const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
+const NUMBER_FIELDS = [
+  { name: 'calories', label: copy.calories, wide: true },
+  { name: 'proteinGrams', label: copy.protein },
+  { name: 'carbohydrateGrams', label: copy.carbs },
+  { name: 'fatGrams', label: copy.fat },
+  { name: 'fiberGrams', label: copy.fiber },
+  { name: 'waterMl', label: copy.water, wide: true },
 ] as const;
 
-export const NutritionEntryForm = ({
-  date,
-  saving,
-  initialValues,
-  onCancel,
-  onSave,
-}: NutritionEntryFormProps) => {
+export const NutritionEntryForm = ({ date, saving, initialValues, onCancel, onSave }: NutritionEntryFormProps) => {
   const form = useForm<NutritionEntryInput, undefined, NutritionEntryType>({
     resolver: zodResolver(NutritionEntrySchema),
     defaultValues: initialValues ?? { ...EMPTY_ENTRY, date },
   });
+  const { errors } = form.formState;
+  const mealType = useWatch({ control: form.control, name: 'mealType' });
 
   return (
-    <form
-      className="space-y-4"
-      onSubmit={form.handleSubmit(onSave)}
-    >
-      <label className="grid gap-2 text-sm font-medium">
-        Food or meal
-        <Input maxLength={120} {...form.register('foodName')} />
-        {form.formState.errors.foodName && (
-          <span className="text-xs text-destructive">
-            {form.formState.errors.foodName.message}
-          </span>
-        )}
+    <form className="flex flex-col gap-5" onSubmit={form.handleSubmit(onSave)} noValidate>
+      <fieldset className="flex flex-col gap-2">
+        <legend className="mb-2 text-base font-medium">{copy.meal}</legend>
+        <div className="grid grid-cols-2 gap-2">
+          {MEAL_TYPES.map((meal) => (
+            <label key={meal} className={cn('flex min-h-12 cursor-pointer items-center justify-center rounded-lg border text-base font-semibold',
+              'has-focus-visible:outline-2 has-focus-visible:outline-ring',
+              mealType === meal ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:bg-accent')}>
+              <input type="radio" value={meal} {...form.register('mealType')} className="sr-only" />
+              {FOOD_COPY.meals[meal]}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <label className="flex flex-col gap-2 text-base font-medium">
+        {copy.name}
+        <Input maxLength={120} placeholder={copy.namePlaceholder} {...form.register('foodName')} aria-invalid={Boolean(errors.foodName)} />
+        {errors.foodName && <span role="alert" className="text-base text-destructive">{errors.foodName.message}</span>}
       </label>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="grid gap-2 text-sm font-medium">
-          Meal
-          <select
-            {...form.register('mealType')}
-            className="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-          >
-            <option value="breakfast">Breakfast</option>
-            <option value="lunch">Lunch</option>
-            <option value="dinner">Dinner</option>
-            <option value="snack">Snack</option>
-          </select>
-        </label>
-        <label className="grid gap-2 text-sm font-medium">
-          Date
-          <Input type="date" {...form.register('date')} />
-          {form.formState.errors.date && (
-            <span className="text-xs text-destructive">
-              {form.formState.errors.date.message}
-            </span>
-          )}
-        </label>
+      <div className="flex flex-col gap-3">
+        <p className="text-base text-muted-foreground">{copy.numbersHelp}</p>
+        <div className="grid grid-cols-2 gap-3">
+          {NUMBER_FIELDS.map((field) => (
+            <label key={field.name} className={cn('flex flex-col gap-2 text-base font-medium', 'wide' in field && 'col-span-2')}>
+              {field.label}
+              <Input type="text" inputMode="decimal" autoComplete="off" className="text-lg tabular-nums" {...form.register(field.name)}
+                aria-invalid={Boolean(errors[field.name])} />
+              {errors[field.name]?.message && <span role="alert" className="text-base text-destructive">{errors[field.name]?.message}</span>}
+            </label>
+          ))}
+        </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {MACRO_FIELDS.map(({ name, label, min, max }) => (
-          <label key={name} className="grid gap-2 text-sm font-medium">
-            {label}
-            <Input
-              type="number"
-              min={min}
-              max={max}
-              step="any"
-              {...form.register(name)}
-              aria-invalid={Boolean(form.formState.errors[name])}
-            />
-            {form.formState.errors[name]?.message && (
-              <span className="text-xs text-destructive">
-                {form.formState.errors[name]?.message}
-              </span>
-            )}
-          </label>
-        ))}
-      </div>
+      <Disclosure summary={copy.notes} defaultOpen={Boolean(initialValues?.notes) || undefined}>
+        <label className="flex flex-col gap-2 text-base font-medium">
+          {copy.notesLabel}
+          <textarea maxLength={500} rows={2} {...form.register('notes')}
+            className="w-full rounded-lg border border-input bg-card px-3 py-2 text-base font-normal focus-visible:outline-2 focus-visible:outline-ring" />
+        </label>
+      </Disclosure>
 
-      <label className="grid gap-2 text-sm font-medium">
-        Notes (optional)
-        <textarea
-          maxLength={500}
-          rows={2}
-          {...form.register('notes')}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-        />
-      </label>
-
-      <div className="flex gap-2">
-        <Button type="submit" disabled={saving}>
-          {saving ? 'Saving...' : 'Save food entry'}
-        </Button>
-        {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-        )}
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Button type="submit" size="lg" disabled={saving} className="sm:flex-1">{saving ? copy.saving : copy.save}</Button>
+        {onCancel && <Button type="button" size="lg" variant="outline" onClick={onCancel}>{COMMON_COPY.cancel}</Button>}
       </div>
     </form>
   );

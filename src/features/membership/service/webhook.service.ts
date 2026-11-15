@@ -1,5 +1,5 @@
 import { userRepository } from '@/features/auth/repository/user.repository';
-import { coachRepository } from '@/features/coaches/repository/coach.repository';
+import { notifyOwnerService } from '@/features/email/service/owner-notification.service';
 import { purchaseRepository } from '@/features/membership/repository/purchase.repository';
 import { BillingUserIdSchema } from '@/features/membership/validations/membership-payments.validation';
 import { dodoPayments } from '@/shared/lib/dodo-payments';
@@ -33,6 +33,13 @@ async function syncSubscription(subscriptionId: string, timestamp: Date) {
     environment: dodoPayments.config.environment,
     refundedPeriodEnd: purchase.refundedPeriodEnd ?? undefined,
   });
+  // Only real status changes notify, so duplicate webhook deliveries stay silent.
+  if (purchase.subscriptionStatus === subscription.status) return;
+  if (subscription.status === 'active') {
+    await notifyOwnerService({ subject: 'Premium started', lines: [`${subscription.customer.email} started Premium (${dodoPayments.config.environment}).`] });
+  } else if (['cancelled', 'expired'].includes(subscription.status)) {
+    await notifyOwnerService({ subject: `Premium ${subscription.status}`, lines: [`${subscription.customer.email}'s Premium is now ${subscription.status}.`] });
+  }
 }
 
 async function syncPayment(paymentId: string, timestamp: Date) {
@@ -61,7 +68,6 @@ async function syncPayment(paymentId: string, timestamp: Date) {
   await purchaseRepository.applyEvent(purchaseId, timestamp, {
     status, paymentId: payment.payment_id, customerId: payment.customer.customer_id,
   });
-  if (refunded) await coachRepository.cancelRequestsForPurchase(purchaseId);
 }
 
 export async function handleWebhookService(body: string, headers: Record<string, string>): Promise<ServiceResult<{ received: true }>> {

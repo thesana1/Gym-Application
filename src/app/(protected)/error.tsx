@@ -1,7 +1,9 @@
 'use client';
+import Link from 'next/link';
 import { useEffect } from 'react';
 
 import { Button } from '@/shared/components/ui/button';
+import { COMMON_COPY } from '@/shared/const/copy-common.const';
 
 type ErrorProps = {
   error: Error & { digest?: string };
@@ -14,10 +16,13 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-96 gap-4">
-      <h2 className="text-2xl font-bold">Something went wrong</h2>
-      <p className="text-muted-foreground">{error.message || 'An unexpected error occurred.'}</p>
-      <Button onClick={reset}>Try again</Button>
+    <div className="mx-auto flex min-h-96 max-w-md flex-col items-start justify-center gap-4 px-4">
+      <h2 className="text-2xl font-semibold">{COMMON_COPY.errorTitle}</h2>
+      <p className="text-lg text-muted-foreground">{COMMON_COPY.somethingWentWrong}</p>
+      <div className="flex flex-wrap gap-3">
+        <Button onClick={reset}>{COMMON_COPY.tryAgain}</Button>
+        <Button asChild variant="outline"><Link href="/dashboard">{COMMON_COPY.goHome}</Link></Button>
+      </div>
     </div>
   );
 }

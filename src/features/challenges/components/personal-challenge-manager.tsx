@@ -3,33 +3,18 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import type { PersonalChallenge } from '@/features/challenges/service/challenge.service';
+import { PageHeader } from '@/shared/components/layout/page-header';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
+import { EmptyState } from '@/shared/components/ui/empty-state';
+import { Meter } from '@/shared/components/ui/meter';
+import { CHALLENGES_COPY } from '@/shared/const/copy-account.const';
 import { http } from '@/shared/lib/http';
 
-const STATUS_LABELS: Record<PersonalChallenge['status'], string> = {
-  'not-joined': 'Not joined',
-  'in-progress': 'In progress',
-  completed: 'Completed',
-  expired: 'Challenge period ended',
-};
+const copy = CHALLENGES_COPY;
 
-const ERROR_MESSAGES: Record<string, string> = {
-  NOT_FOUND: 'This enrollment is no longer active. Refresh the page and try again.',
-  UNAUTHORIZED: 'Sign in to manage your personal challenges.',
-  VALIDATION_ERROR: 'That challenge is not available.',
-};
+const getErrorMessage = (error: unknown) => (error instanceof Error ? copy.errors[error.message] : undefined) ?? copy.errors.default;
 
-const getErrorMessage = (error: unknown) =>
-  error instanceof Error
-    ? ERROR_MESSAGES[error.message] ?? 'Could not update challenge.'
-    : 'Could not update challenge.';
+const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '');
 
 export const PersonalChallengeManager = () => {
   const [challenges, setChallenges] = useState<PersonalChallenge[]>([]);
@@ -67,6 +52,7 @@ export const PersonalChallengeManager = () => {
   };
 
   const leaveChallenge = async (challengeId: string) => {
+    if (!window.confirm(copy.confirmLeave)) return;
     setSavingId(challengeId);
     setError(null);
     try {
@@ -82,97 +68,50 @@ export const PersonalChallengeManager = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Your pace, your choice
-        </p>
-        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">
-          Personal challenges
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Optional workout-log milestones. Your participation and progress are
-          private to your account. Rest days are part of training; these are
-          motivational prompts, not prescriptions.
-        </p>
-      </header>
-
-      {error && (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
-      )}
+    <div className="flex animate-rise flex-col gap-4">
+      <PageHeader title={copy.title} description={copy.description} className="mb-2" />
+      {error && <p className="text-base text-destructive" role="alert">{error}</p>}
       {loading ? (
-        <p className="text-sm text-muted-foreground" role="status">
-          Loading challenges…
-        </p>
+        <div className="h-40 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
+      ) : challenges.length === 0 ? (
+        <EmptyState message={copy.empty} />
       ) : (
-        <section aria-label="Available personal challenges" className="grid gap-4">
-          {challenges.map((challenge) => {
+        <ul className="flex flex-col gap-3">
+          {challenges.map((challenge, index) => {
+            const suggested = challenges.findIndex(({ status }) => status === 'not-joined') === index;
             const joined = challenge.status !== 'not-joined';
-
+            const busy = savingId === challenge.id;
             return (
-              <Card key={challenge.id}>
-                <CardHeader>
-                  <CardTitle className="text-base">{challenge.title}</CardTitle>
-                  <CardDescription>{challenge.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-4">
-                  {joined ? (
-                    <>
-                      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                        <span>
-                          {Math.min(
-                            challenge.completedWorkouts,
-                            challenge.targetWorkouts
-                          )}{' '}
-                          of {challenge.targetWorkouts} workouts toward milestone
-                        </span>
-                        <span className="text-muted-foreground">
-                          {STATUS_LABELS[challenge.status]}
-                        </span>
-                      </div>
-                      <progress
-                        className="h-2 w-full accent-primary"
-                        max={challenge.targetWorkouts}
-                        value={Math.min(
-                          challenge.completedWorkouts,
-                          challenge.targetWorkouts
-                        )}
-                        aria-label={`${challenge.title} progress`}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Started {new Date(challenge.joinedAt ?? '').toLocaleDateString()}.
-                        {' '}Ends {new Date(challenge.endsAt ?? '').toLocaleDateString()}.
-                        Challenge progress is based on your existing workout logs
-                        within the {challenge.durationDays}-day period.
-                      </p>
-                      <Button
-                        className="w-fit"
-                        variant="outline"
-                        disabled={savingId === challenge.id}
-                        onClick={() => void leaveChallenge(challenge.id)}
-                      >
-                        {savingId === challenge.id
-                          ? 'Updating…'
-                          : 'Leave and remove progress'}
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      className="w-fit"
-                      disabled={savingId === challenge.id}
-                      onClick={() => void joinChallenge(challenge.id)}
-                    >
-                      {savingId === challenge.id ? 'Joining…' : 'Join challenge'}
+              <li key={challenge.id} className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
+                <div>
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                    <h2 className="text-xl font-semibold">{challenge.title}</h2>
+                    {joined && <span className="text-base font-semibold text-primary">{copy.status[challenge.status]}</span>}
+                  </div>
+                  <p className="mt-1 text-lg">{challenge.description}</p>
+                </div>
+                {joined ? (
+                  <>
+                    <Meter label={copy.workouts} value={Math.min(challenge.completedWorkouts, challenge.targetWorkouts)}
+                      target={challenge.targetWorkouts} unit="" />
+                    <p className="text-base text-muted-foreground">{copy.dates(formatDate(challenge.joinedAt), formatDate(challenge.endsAt))}</p>
+                    <Button variant="ghost" className="w-full text-muted-foreground sm:w-fit" disabled={busy}
+                      onClick={() => void leaveChallenge(challenge.id)}>
+                      {busy ? copy.updating : copy.leave}
                     </Button>
-                  )}
-                </CardContent>
-              </Card>
+                  </>
+                ) : (
+                  <Button size="lg" variant={suggested ? 'default' : 'outline'} className="w-full sm:w-fit" disabled={busy}
+                    onClick={() => void joinChallenge(challenge.id)}>
+                    {busy ? copy.updating : copy.join}
+                  </Button>
+                )}
+              </li>
             );
           })}
-        </section>
+        </ul>
       )}
+      <p className="text-base text-muted-foreground">{copy.privateNote} {copy.rest}</p>
     </div>
   );
 };

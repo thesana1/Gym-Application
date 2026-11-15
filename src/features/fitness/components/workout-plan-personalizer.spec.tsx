@@ -13,6 +13,9 @@ vi.mock('@/features/fitness/components/weekly-workout-schedule', () => ({
 vi.mock('@/features/fitness/components/workout-log-manager', () => ({
   WorkoutLogManager: () => <div>Workout logs</div>,
 }));
+vi.mock('@/features/fitness/components/workout-history-panel', () => ({
+  WorkoutHistoryPanel: () => <div>Workout history</div>,
+}));
 
 import { WorkoutPlanPersonalizer } from '@/features/fitness/components/workout-plan-personalizer';
 import type { FitnessProfile } from '@/features/fitness/service/fitness-profile.service';
@@ -53,14 +56,15 @@ describe('WorkoutPlanPersonalizer', () => {
     mockGet.mockResolvedValueOnce(customization());
     mockPut.mockResolvedValueOnce(customization());
 
-    render(<WorkoutPlanPersonalizer initialPlan={basePlan} />);
+    render(<WorkoutPlanPersonalizer initialPlan={basePlan} initialTab="plan" />);
 
+    fireEvent.click(screen.getByText('Swap exercises'));
     const exerciseSelectors = await screen.findAllByLabelText('Exercise 1');
     fireEvent.change(exerciseSelectors[0], {
       target: { value: 'reverse-lunge' },
     });
     fireEvent.click(
-      screen.getByRole('button', { name: 'Save exercise choices' })
+      screen.getByRole('button', { name: 'Save changes' })
     );
 
     await waitFor(() => {
@@ -76,7 +80,7 @@ describe('WorkoutPlanPersonalizer', () => {
         ],
       });
     });
-    expect(await screen.findByText('Exercise choices saved.')).toBeInTheDocument();
+    expect(await screen.findByText('Changes saved.')).toBeInTheDocument();
   });
 
   it('restores the generated plan by saving an empty override list', async () => {
@@ -101,15 +105,16 @@ describe('WorkoutPlanPersonalizer', () => {
     mockGet.mockResolvedValueOnce(customization(changedPlan));
     mockPut.mockResolvedValueOnce(customization());
 
-    render(<WorkoutPlanPersonalizer initialPlan={basePlan} />);
+    render(<WorkoutPlanPersonalizer initialPlan={basePlan} initialTab="plan" />);
 
+    fireEvent.click(screen.getByText('Swap exercises'));
     fireEvent.click(
-      await screen.findByRole('button', { name: 'Restore generated plan' })
+      await screen.findByRole('button', { name: 'Go back to the first plan' })
     );
 
     await waitFor(() => {
       expect(mockPut).toHaveBeenCalledWith('/fitness/plan', { overrides: [] });
     });
-    expect(await screen.findByText('Exercise choices saved.')).toBeInTheDocument();
+    expect(await screen.findByText('Changes saved.')).toBeInTheDocument();
   });
 });

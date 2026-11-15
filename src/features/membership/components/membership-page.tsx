@@ -1,97 +1,75 @@
 'use client';
 
-import { Check, CreditCard, Loader2 } from 'lucide-react';
+import { Check, CreditCard, Loader2, RefreshCw } from 'lucide-react';
 
 import { useBilling } from '@/features/membership/hooks/use-billing';
+import { PageHeader } from '@/shared/components/layout/page-header';
 import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { PLAN_COPY } from '@/shared/const/copy-account.const';
 import { BILLING_PRODUCTS, PREMIUM_BENEFITS } from '@/shared/const/membership-payments.const';
 
 type MembershipPageProps = { checkoutStatus?: string; testMode: boolean };
+
+const copy = PLAN_COPY;
+const formatPrice = (cents: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
+const formatDate = (value: string) => new Date(value).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
 
 export function MembershipPage({ checkoutStatus, testMode }: MembershipPageProps) {
   const { access, busy, error, runAction } = useBilling(checkoutStatus === 'returned');
   const premium = access?.plan === 'premium';
   const disabled = !!busy || !access;
-  const formatPrice = (cents: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Membership</p>
-          <h1 className="mt-1 text-3xl font-bold">Plans & billing</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Your fitness, without limits. Cancel your subscription anytime.</p>
-        </div>
-        {testMode && <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold">Test payments</span>}
-      </header>
+    <div className="flex animate-rise flex-col gap-4">
+      <PageHeader title={copy.title} description={copy.description} className="mb-2">
+        {testMode && <span className="w-fit rounded-full bg-muted px-3 py-1 text-base font-semibold">{copy.testMode}</span>}
+      </PageHeader>
 
-      {checkoutStatus === 'returned' && (
-        <p role="status" className="rounded-lg border border-border bg-muted p-4 text-sm">
-          Your checkout has returned. Payment confirmation can take a moment; your verified access is shown below.
-        </p>
-      )}
-      {checkoutStatus === 'cancelled' && <p role="status" className="text-sm text-muted-foreground">You left checkout. Your access is shown below.</p>}
-      {error && <p role="alert" className="rounded-lg border border-destructive p-4 text-sm text-destructive">{error}</p>}
+      {checkoutStatus === 'returned' && <p role="status" className="rounded-xl bg-primary/10 p-4 text-base">{copy.returned}</p>}
+      {checkoutStatus === 'cancelled' && <p role="status" className="rounded-xl bg-muted p-4 text-base">{copy.cancelled}</p>}
+      {error && <p role="alert" className="rounded-xl border border-destructive/40 p-4 text-base text-destructive">{error}</p>}
 
-      <Card>
-        <CardHeader><CardTitle>Your membership</CardTitle></CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <p className="text-lg font-semibold">{access ? premium ? 'Premium — unlimited access' : 'Free plan' : 'Loading membership…'}</p>
-          {access?.subscriptionStatus && <p className="text-sm text-muted-foreground">Subscription status: {access.subscriptionStatus.replaceAll('_', ' ')}</p>}
-          {access?.currentPeriodEnd && (
-            <p className="text-sm text-muted-foreground">
-              {access.cancelAtPeriodEnd ? 'Scheduled to end' : 'Current period ends'}: {new Date(access.currentPeriodEnd).toLocaleDateString()}
-            </p>
+      <section aria-labelledby="current-plan" className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5">
+        <h2 id="current-plan" className="text-base font-medium text-muted-foreground">{copy.current}</h2>
+        <p className="font-heading text-4xl font-semibold">{access ? (premium ? copy.premium : copy.free) : copy.loading}</p>
+        {access?.subscriptionStatus && <p className="text-base text-muted-foreground">{copy.status(access.subscriptionStatus.replaceAll('_', ' '))}</p>}
+        {access?.currentPeriodEnd && (
+          <p className="text-base text-muted-foreground">
+            {access.cancelAtPeriodEnd ? copy.ends(formatDate(access.currentPeriodEnd)) : copy.renews(formatDate(access.currentPeriodEnd))}
+          </p>
+        )}
+        <div className="flex flex-wrap gap-2">
+          {access?.canManageBilling && (
+            <Button variant="outline" disabled={disabled} onClick={() => void runAction('portal')}>
+              <CreditCard className="size-5" aria-hidden="true" />{copy.manage}
+            </Button>
           )}
-          {access && <p className="text-sm">{premium ? 'Coach consultations are included.' : `Consultation credits: ${access.consultationCredits}`}</p>}
-          <div className="flex flex-wrap gap-3">
-            {access?.canManageBilling && (
-              <Button variant="outline" disabled={disabled} onClick={() => void runAction('portal')}>
-                <CreditCard className="size-4" /> Manage billing
-              </Button>
-            )}
-            <Button variant="ghost" disabled={!!busy} onClick={() => void runAction('refresh')}>Refresh status</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <section aria-label="Payment options" className="grid gap-6 md:grid-cols-2">
-        <Card className="border-primary">
-          <CardHeader>
-            <CardTitle>Premium</CardTitle>
-            <p className="text-3xl font-bold">
-              {formatPrice(BILLING_PRODUCTS.premium.price)}<span className="text-sm font-normal text-muted-foreground"> / month</span>
-            </p>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-6">
-            <ul className="flex flex-col gap-3">
-              {PREMIUM_BENEFITS.map((benefit) => (
-                <li key={benefit} className="flex gap-2 text-sm"><Check className="size-4 shrink-0 text-primary" />{benefit}</li>
-              ))}
-            </ul>
-            <Button disabled={disabled || premium} onClick={() => void runAction('premium')}>
-              {busy === 'premium' && <Loader2 className="size-4 animate-spin" />}
-              {premium ? 'Premium is active' : 'Get Premium'}
-            </Button>
-            <p className="text-xs text-muted-foreground">Renews monthly. Applicable taxes are calculated at checkout.</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Coach consultation</CardTitle>
-            <p className="text-3xl font-bold">{premium ? 'Included' : formatPrice(BILLING_PRODUCTS.consultation.price)}</p>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-6">
-            <p className="text-sm text-muted-foreground">Purchase one individual consultation, or join Premium for consultations and unlimited features.</p>
-            <Button variant="outline" disabled={disabled || premium} onClick={() => void runAction('consultation')}>
-              {busy === 'consultation' && <Loader2 className="size-4 animate-spin" />}
-              {premium ? 'Included in your membership' : 'Buy a consultation'}
-            </Button>
-            <p className="text-xs text-muted-foreground">One-time payment. A consultation credit is added after payment is confirmed.</p>
-          </CardContent>
-        </Card>
+          <Button variant="ghost" disabled={!!busy} onClick={() => void runAction('refresh')}>
+            <RefreshCw className="size-5" aria-hidden="true" />{copy.refresh}
+          </Button>
+        </div>
       </section>
+
+      {!premium && (
+        <section aria-labelledby="premium-title" className="flex flex-col gap-4 rounded-2xl border-2 border-primary bg-card p-5">
+          <div>
+            <h2 id="premium-title" className="text-2xl font-semibold">{copy.premiumTitle}</h2>
+            <p className="mt-1 font-heading text-3xl font-semibold tabular-nums">
+              {formatPrice(BILLING_PRODUCTS.premium.price)}<span className="ml-1 text-lg font-normal text-muted-foreground">{copy.perMonth}</span>
+            </p>
+          </div>
+          <h3 className="text-base font-semibold">{copy.includes}</h3>
+          <ul className="flex flex-col gap-2">
+            {PREMIUM_BENEFITS.map((benefit) => (
+              <li key={benefit} className="flex gap-2 text-lg"><Check className="mt-1 size-5 shrink-0 text-primary" aria-hidden="true" />{benefit}</li>
+            ))}
+          </ul>
+          <Button size="lg" disabled={disabled} onClick={() => void runAction('premium')}>
+            {busy === 'premium' && <Loader2 className="size-5 animate-spin" aria-hidden="true" />}{copy.get}
+          </Button>
+          <p className="text-base text-muted-foreground">{copy.renewNote}</p>
+        </section>
+      )}
     </div>
   );
 }

@@ -1,10 +1,11 @@
+import { COMMON_COPY } from '@/shared/const/copy-common.const';
+
 export default function Loading() {
   return (
-    <div className="flex items-center justify-center min-h-96">
-      <div className="flex flex-col items-center gap-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        <p className="text-muted-foreground text-sm">Loading...</p>
-      </div>
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pt-5" role="status" aria-label={COMMON_COPY.loading}>
+      <div className="h-10 w-48 animate-pulse rounded-lg bg-muted" />
+      <div className="h-44 animate-pulse rounded-2xl bg-muted" />
+      <div className="h-36 animate-pulse rounded-2xl bg-muted" />
     </div>
   );
 }

@@ -1,141 +1,106 @@
-import Link from 'next/link';
+'use client';
 
-import type {
-  WorkoutPlan,
-  WorkoutSession,
-} from '@/features/fitness/service/workout-plan.service';
+import { Play, TriangleAlert } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+
+import type { WorkoutPlan, WorkoutSession } from '@/features/fitness/service/workout-plan.service';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
-import { FITNESS_GOALS } from '@/shared/const/fitness.const';
+import { Disclosure } from '@/shared/components/ui/disclosure';
+import { EmptyState } from '@/shared/components/ui/empty-state';
+import { WORKOUTS_COPY } from '@/shared/const/copy-workouts.const';
+import { cn } from '@/shared/lib/utils';
 
 type WorkoutPlanViewProps = {
   plan: WorkoutPlan | null;
+  initialSessionIndex?: number;
+  onLogSession?: (index: number) => void;
 };
 
-const ExerciseDetails = ({
-  exercise,
-}: {
-  exercise: WorkoutSession['exercises'][number];
-}) => (
-  <li className="rounded-md border border-border p-4">
-    <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
-      <div>
-        <h3 className="font-semibold">{exercise.name}</h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Targets: {exercise.targetMuscles}
-        </p>
-      </div>
-      <p className="shrink-0 rounded-md bg-muted px-3 py-1.5 text-sm font-medium">
-        {exercise.sets} sets · {exercise.repetitions} reps · {exercise.restSeconds}s rest
+const copy = WORKOUTS_COPY.view;
+
+const ExerciseDetails = ({ exercise }: { exercise: WorkoutSession['exercises'][number] }) => (
+  <li className="flex flex-col gap-3 py-5 first:pt-0 last:pb-0">
+    <div>
+      <h3 className="text-xl font-semibold">{exercise.name}</h3>
+      <p className="mt-1 text-lg font-medium tabular-nums">
+        {copy.setsReps(exercise.sets, exercise.repetitions)}
+        <span className="text-muted-foreground"> · {copy.rest(exercise.restSeconds)}</span>
       </p>
+      <p className="mt-1 text-base text-muted-foreground">{copy.works(exercise.targetMuscles)}</p>
     </div>
-    <ol className="mt-4 list-inside list-decimal space-y-2 text-sm text-muted-foreground">
-      {exercise.instructions.map((instruction) => (
-        <li key={instruction}>{instruction}</li>
-      ))}
-    </ol>
-    <details className="mt-4 border-t border-border pt-3">
-      <summary className="cursor-pointer text-sm font-medium">
-        Form and safety notes
-      </summary>
-      <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+    <Disclosure summary={copy.howTo} className="bg-background">
+      <ol className="list-decimal space-y-2 pl-5 text-base">
+        {exercise.instructions.map((instruction) => <li key={instruction}>{instruction}</li>)}
+      </ol>
+      <dl className="mt-4 grid gap-3 text-base">
         <div>
-          <dt className="font-medium">Common mistake</dt>
-          <dd className="mt-1 text-muted-foreground">{exercise.commonMistake}</dd>
+          <dt className="font-semibold">{copy.easier}</dt>
+          <dd className="text-muted-foreground">{exercise.regression}</dd>
         </div>
         <div>
-          <dt className="font-medium">Easier variation</dt>
-          <dd className="mt-1 text-muted-foreground">{exercise.regression}</dd>
+          <dt className="font-semibold">{copy.mistake}</dt>
+          <dd className="text-muted-foreground">{exercise.commonMistake}</dd>
         </div>
         <div>
-          <dt className="font-medium">Safety cue</dt>
-          <dd className="mt-1 text-muted-foreground">{exercise.safetyCue}</dd>
+          <dt className="font-semibold">{copy.safe}</dt>
+          <dd className="text-muted-foreground">{exercise.safetyCue}</dd>
         </div>
       </dl>
-    </details>
+    </Disclosure>
   </li>
 );
 
-export const WorkoutPlanView = ({ plan }: WorkoutPlanViewProps) => {
+export const WorkoutPlanView = ({ plan, initialSessionIndex, onLogSession }: WorkoutPlanViewProps) => {
+  const [sessionIndex, setSessionIndex] = useState(
+    initialSessionIndex !== undefined && plan?.sessions[initialSessionIndex] ? initialSessionIndex : 0
+  );
   if (!plan) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Set up a fitness profile first</CardTitle>
-          <CardDescription>
-            Choose a goal and experience level to see a starting workout plan.
-            Measurements are optional.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button asChild>
-            <Link href="/dashboard/profile">Set up fitness profile</Link>
-          </Button>
-        </CardContent>
-      </Card>
+      <EmptyState message={WORKOUTS_COPY.noPlan.message} action={
+        <Button asChild><Link href="/dashboard/profile">{WORKOUTS_COPY.noPlan.action}</Link></Button>
+      } />
     );
   }
 
-  const goalLabel =
-    FITNESS_GOALS.find(({ value }) => value === plan.goal)?.label ?? 'your goal';
-
+  const session = plan.sessions[sessionIndex];
   return (
     <div className="flex flex-col gap-5">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">A starting point for {goalLabel.toLowerCase()}</CardTitle>
-          <CardDescription>
-            A conservative, general template based on your experience and saved
-            equipment. Adjust the plan to your comfort and schedule.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>
-            This plan includes up to {plan.weeklySessionLimit} sessions. It
-            supports a maximum of three sessions weekly; extra available days are
-            not a recommendation to train every day.
-          </p>
-          <p>
-            {plan.equipmentPersonalized
-              ? 'Bodyweight movements and exercises matching your selected equipment are included.'
-              : 'No equipment preference is saved, so this plan uses bodyweight movements. Add equipment in your profile to tailor it.'}
-          </p>
-          <p>
-            General fitness information only, not medical advice. Warm up, use
-            controlled movements, and stop if you feel pain, dizziness, or
-            unusual discomfort. Ask a qualified professional for guidance,
-            especially if you have an injury or health concern.
-          </p>
-        </CardContent>
-      </Card>
+      {plan.sessions.length > 1 && (
+        <div role="group" aria-label={copy.pickWorkout} className="grid grid-flow-col gap-2">
+          {plan.sessions.map((item, index) => (
+            <button key={`${item.title}-${index}`} type="button" aria-pressed={index === sessionIndex} onClick={() => setSessionIndex(index)}
+              className={cn('min-h-12 rounded-lg border px-2 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-ring',
+                index === sessionIndex ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:bg-accent')}>
+              {copy.workoutNumber(index)}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {plan.sessions.map((session, index) => (
-        <Card key={`${session.title}-${index}`}>
-          <CardHeader>
-            <CardTitle className="text-base">
-              Session {index + 1}: {session.title}
-            </CardTitle>
-            <CardDescription>
-              Leave recovery time between harder sessions and keep at least one
-              rest day each week. Prioritize controlled technique over adding
-              weight or repetitions.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-3">
-              {session.exercises.map((exercise) => (
-                <ExerciseDetails key={exercise.id} exercise={exercise} />
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      ))}
+      <section aria-labelledby="session-title" className="rounded-2xl border border-border bg-card p-5">
+        <h2 id="session-title" className="text-2xl font-semibold">{session.title}</h2>
+        <p className="mt-2 flex items-center gap-2 text-base text-muted-foreground">
+          <TriangleAlert className="size-5 shrink-0" aria-hidden="true" />{copy.safety}
+        </p>
+        <ul className="mt-5 divide-y divide-border">
+          {session.exercises.map((exercise) => <ExerciseDetails key={exercise.id} exercise={exercise} />)}
+        </ul>
+      </section>
+
+      {onLogSession && (
+        <Button size="lg" asChild className="sticky bottom-24 z-10 w-full shadow-lg lg:bottom-6">
+          <button type="button" onClick={() => onLogSession(sessionIndex)}><Play className="size-5" aria-hidden="true" />{copy.start}</button>
+        </Button>
+      )}
+
+      <Disclosure summary={copy.about}>
+        <div className="space-y-2 text-base text-muted-foreground">
+          <p>{copy.aboutBody(plan.weeklySessionLimit)}</p>
+          <p>{copy.equipment(plan.equipmentPersonalized)}</p>
+          <p>{copy.notMedical}</p>
+        </div>
+      </Disclosure>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CheckoutSchema = z.object({ kind: z.enum(['premium', 'consultation']) }).strict();
+export const CheckoutSchema = z.object({ kind: z.enum(['premium']) }).strict();
 export type CheckoutType = z.infer<typeof CheckoutSchema>;
 export const BillingActionSchema = z.object({}).strict();
 export const BillingUserIdSchema = z.string().min(24).max(24).regex(/^[a-f\d]+$/i);
@@ -12,3 +12,5 @@ export const DodoConfigSchema = z.object({
     .transform((value) => value === 'test' || value === 'test_mode' ? 'test_mode' as const : 'live_mode' as const),
   appUrl: z.string().url(),
 });
+
+export const PaymentProviderErrorSchema = z.object({ error: z.object({ code: z.string() }) });

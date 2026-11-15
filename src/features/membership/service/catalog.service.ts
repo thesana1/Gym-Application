@@ -1,5 +1,6 @@
 import { catalogRepository } from '@/features/membership/repository/catalog.repository';
 import type { PurchaseKind } from '@/features/membership/types/payment.types';
+import { PaymentProviderErrorSchema } from '@/features/membership/validations/membership-payments.validation';
 import { CATALOG_LEASE_MS } from '@/shared/const/membership-payments.const';
 import { dodoPayments } from '@/shared/lib/dodo-payments';
 import type { ServiceResult } from '@/shared/types/common';
@@ -16,8 +17,12 @@ export async function getProductService(kind: PurchaseKind): Promise<ServiceResu
     const productId = await dodoPayments.findOrCreateProduct(kind);
     await catalogRepository.complete(key, leaseUntil, productId);
     return { data: { productId }, status: 200 };
-  } catch {
+  } catch (error) {
     await catalogRepository.complete(key, leaseUntil, '');
+    const providerError = PaymentProviderErrorSchema.safeParse(error);
+    if (providerError.success && providerError.data.error.code === 'UNSUPPORTED_TAX_CATEGORY') {
+      return { data: { error: 'PRODUCT_CATEGORY_NOT_ENABLED' }, status: 503 };
+    }
     return { data: { error: 'PAYMENT_PROVIDER_UNAVAILABLE' }, status: 502 };
   }
 }

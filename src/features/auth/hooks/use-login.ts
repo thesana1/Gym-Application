@@ -5,9 +5,12 @@ import { getSession, signIn } from 'next-auth/react';
 import { useAuthStore } from '@/features/auth/hooks/useAuthStore';
 import { User } from '@/features/auth/types/auth.types';
 import { LoginType } from '@/features/auth/validations/auth.validation';
+import { AUTH_ERROR_MESSAGES } from '@/shared/const/auth.const';
+import { getAuthRedirect } from '@/shared/utils/auth-redirect';
 
 
-export const useLogin = () => {
+export const useLogin = (redirectTo?: string) => {
+  const destination = getAuthRedirect(redirectTo);
   const { setUser, setLoading, setError } = useAuthStore();
   const router = useRouter();
 
@@ -15,7 +18,7 @@ export const useLogin = () => {
     const session = await getSession();
     const sessionUser = session?.user as User | undefined;
     if (!sessionUser) {
-      setError('Your account session could not be loaded. Please try again.');
+      setError(AUTH_ERROR_MESSAGES.SESSION_FAILED);
       return;
     }
 
@@ -27,7 +30,7 @@ export const useLogin = () => {
       avatar: sessionUser.avatar ?? '',
     });
 
-    router.replace('/dashboard');
+    router.replace(destination);
   };
 
   const login = async (data: LoginType) => {
@@ -38,22 +41,19 @@ export const useLogin = () => {
         email: data.email,
         password: data.password,
         redirect: false,
+        redirectTo: destination,
       });
 
       if (result?.error) {
-        setError(
-          result.error === 'Configuration'
-            ? 'Sign-in is temporarily unavailable. Check the server Auth.js and database configuration.'
-            : 'Invalid email or password'
-        );
+        setError(result.error === 'Configuration' ? AUTH_ERROR_MESSAGES.Configuration : AUTH_ERROR_MESSAGES.CredentialsSignin);
         return;
       }
 
       if (result?.ok) {
         await handleSession(setUser);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+    } catch {
+      setError(AUTH_ERROR_MESSAGES.SESSION_FAILED);
     } finally {
       setLoading(false);
     }

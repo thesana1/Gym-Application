@@ -74,9 +74,15 @@ describe('useLogin', () => {
       });
     });
 
-    expect(mocks.setError).toHaveBeenCalledWith(
-      'Sign-in is temporarily unavailable. Check the server Auth.js and database configuration.'
-    );
+    expect(mocks.setError).toHaveBeenCalledWith('Sign in is not working right now. Please try later.');
     expect(mocks.replace).not.toHaveBeenCalled();
   });
+});
+
+it('returns to the requested workout session after authentication', async () => {
+  mocks.signIn.mockResolvedValueOnce({ ok: true, error: null });
+  mocks.getSession.mockResolvedValueOnce({ user: { id: 'member', name: 'Member', email: 'member@example.com', role: 'user' } });
+  const { result } = renderHook(() => useLogin('/dashboard/workouts?session=1'));
+  await act(async () => result.current.login({ email: 'member@example.com', password: 'password123' }));
+  expect(mocks.replace).toHaveBeenLastCalledWith('/dashboard/workouts?session=1');
 });

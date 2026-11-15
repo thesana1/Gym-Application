@@ -1,18 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { AiMealIdeas } from '@/features/nutrition/components/ai-meal-ideas';
+import { LibraryRecipeCard } from '@/features/nutrition/components/library-recipe-card';
+import { useAiMealIdeas } from '@/features/nutrition/hooks/use-ai-meal-ideas';
 import type { GeneratedMeal } from '@/features/nutrition/service/meal-generator.service';
+import { MealGeneratorSchema, type MealGeneratorType } from '@/features/nutrition/validations/meal-generator.validation';
+import { PageHeader } from '@/shared/components/layout/page-header';
+import { SectionTabs } from '@/shared/components/layout/section-tabs';
 import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { MEAL_PREFERENCES } from '@/shared/const/nutrition.const';
-import { FOOD_ALLERGENS } from '@/shared/const/nutrition.const';
+import { Disclosure } from '@/shared/components/ui/disclosure';
+import { Select } from '@/shared/components/ui/select';
+import { FOOD_COPY } from '@/shared/const/copy-food.const';
+import { FOOD_TABS } from '@/shared/const/navigation.const';
+import { FOOD_ALLERGENS, MEAL_PREFERENCES } from '@/shared/const/nutrition.const';
 import { http } from '@/shared/lib/http';
+import { cn } from '@/shared/lib/utils';
 
-type Suggestions = {
-  recipes: GeneratedMeal[];
-  message?: string;
-};
+const copy = FOOD_COPY.ideas;
+
+type Suggestions = { recipes: GeneratedMeal[] };
 
 export const MealGenerator = () => {
   const [ingredientText, setIngredientText] = useState('');
@@ -21,188 +29,109 @@ export const MealGenerator = () => {
   const [suggestions, setSuggestions] = useState<Suggestions | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const ai = useAiMealIdeas();
+  const { loadSaved } = ai;
+
+  useEffect(() => {
+    void loadSaved();
+  }, [loadSaved]);
+
+  const buildInput = (): MealGeneratorType | null => {
+    const parsed = MealGeneratorSchema.safeParse({
+      ingredients: ingredientText.split(',').map((ingredient) => ingredient.trim()).filter(Boolean),
+      preference,
+      excludedAllergens,
+    });
+    if (!parsed.success) {
+      setError(copy.needOne);
+      return null;
+    }
+    setError(null);
+    return parsed.data;
+  };
 
   const generate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const input = buildInput();
+    if (!input) return;
     setLoading(true);
-    setError(null);
     setSuggestions(null);
-
-    const ingredients = ingredientText
-      .split(',')
-      .map((ingredient) => ingredient.trim())
-      .filter(Boolean);
-
     try {
-      const result = await http.post<Suggestions>('/nutrition/recipes', {
-        ingredients,
-        preference,
-        excludedAllergens,
-      });
-      setSuggestions(result);
+      setSuggestions(await http.post<Suggestions>('/nutrition/recipes', input));
     } catch {
-      setError('We could not generate meal ideas. Please check your ingredients and try again.');
+      setError(copy.failed);
     } finally {
       setLoading(false);
     }
   };
 
+  const askAi = () => {
+    const input = buildInput();
+    if (input) void ai.generate(input);
+  };
+
   const toggleAllergen = (value: string, checked: boolean) => {
-    setExcludedAllergens((current) =>
-      checked ? [...current, value] : current.filter((allergen) => allergen !== value)
-    );
+    setExcludedAllergens((current) => (checked ? [...current, value] : current.filter((allergen) => allergen !== value)));
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Make something with what you have
-        </p>
-        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Meal ideas</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Enter ingredients you have on hand and choose what matters for this meal.
-        </p>
-      </header>
+    <div className="flex animate-rise flex-col gap-5">
+      <PageHeader title={FOOD_COPY.title} description={copy.description} className="mb-1">
+        <SectionTabs tabs={FOOD_TABS} />
+      </PageHeader>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Your ingredients and preferences</CardTitle>
-          <CardDescription>
-            This is a small curated recipe library. Suggestions appear only when
-            all listed ingredients are in your input. Nutrition values are
-            rough estimates for generic portions, not database-verified facts.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-5" onSubmit={generate}>
-            <label className="grid gap-2 text-sm font-medium">
-              Ingredients (comma-separated)
-              <textarea
-                value={ingredientText}
-                onChange={(event) => setIngredientText(event.target.value)}
-                placeholder="chicken breast, rice, tomato, olive oil"
-                rows={3}
-                maxLength={1000}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                required
-              />
-              <span className="text-xs font-normal text-muted-foreground">
-                Add the full ingredient names. Quantities are included with each
-                recipe.
-              </span>
+      <form className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5" onSubmit={generate} noValidate>
+        <label className="flex flex-col gap-2 text-lg font-semibold">
+          {copy.ingredients}
+          <textarea value={ingredientText} onChange={(event) => setIngredientText(event.target.value)} placeholder={copy.placeholder} rows={3}
+            maxLength={1000} aria-describedby="ingredients-help" aria-invalid={Boolean(error)}
+            className="w-full rounded-lg border border-input bg-background px-3 py-3 text-lg font-normal focus-visible:outline-2 focus-visible:outline-ring" />
+          <span id="ingredients-help" className="text-base font-normal text-muted-foreground">{copy.ingredientsHelp}</span>
+        </label>
+
+        <Disclosure summary={copy.more} className="bg-background">
+          <div className="flex flex-col gap-5">
+            <label className="flex flex-col gap-2 text-base font-medium">
+              {copy.mealType}
+              <Select value={preference} onChange={(event) => setPreference(event.target.value)}>
+                {MEAL_PREFERENCES.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
+              </Select>
             </label>
-
-            <label className="grid max-w-md gap-2 text-sm font-medium">
-              Meal preference
-              <select
-                value={preference}
-                onChange={(event) => setPreference(event.target.value)}
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-              >
-                {MEAL_PREFERENCES.map(({ value, label }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-              <span className="text-xs font-normal text-muted-foreground">
-                Preferences filter rough recipe values; they do not guarantee
-                fitness or weight outcomes.
-              </span>
-            </label>
-
-            <fieldset>
-              <legend className="text-sm font-medium">Exclude listed allergens</legend>
-              <p className="mt-1 text-xs text-muted-foreground">
-                The tags below are not a safety guarantee. Always check product
-                labels and prevent cross-contact.
-              </p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                {FOOD_ALLERGENS.map(({ value, label }) => (
-                  <label key={value} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={excludedAllergens.includes(value)}
-                      onChange={(event) => toggleAllergen(value, event.target.checked)}
-                      className="size-4 accent-primary"
-                    />
-                    {label}
-                  </label>
-                ))}
+            <fieldset className="flex flex-col gap-2">
+              <legend className="text-base font-medium">{copy.allergens}</legend>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {FOOD_ALLERGENS.map(({ value, label }) => {
+                  const checked = excludedAllergens.includes(value);
+                  return (
+                    <label key={value} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-3 text-base font-medium',
+                      'has-focus-visible:outline-2 has-focus-visible:outline-ring',
+                      checked ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card')}>
+                      <input type="checkbox" checked={checked} onChange={(event) => toggleAllergen(value, event.target.checked)} className="size-5" />
+                      {label}
+                    </label>
+                  );
+                })}
               </div>
+              <p className="text-base text-muted-foreground">{copy.allergensHelp}</p>
             </fieldset>
+          </div>
+        </Disclosure>
 
-            {error && (
-              <p className="text-sm text-destructive" role="alert">
-                {error}
-              </p>
-            )}
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Finding ideas...' : 'Find meal ideas'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+        {error && <p className="text-base text-destructive" role="alert">{error}</p>}
+        <Button type="submit" size="lg" disabled={loading}>{loading ? copy.finding : copy.find}</Button>
+        <Button type="button" variant="outline" disabled={ai.loading} onClick={askAi}>{ai.loading ? copy.asking : copy.askAi}</Button>
+        {ai.usage && <p className="text-center text-base text-muted-foreground">{copy.aiLeft(ai.usage.used, ai.usage.limit)}</p>}
+      </form>
 
       {suggestions && (
-        <section aria-label="Meal suggestions" className="space-y-4">
-          <h2 className="text-lg font-semibold">Meal suggestions</h2>
-          {suggestions.message && (
-            <p className="text-sm text-muted-foreground" role="status">
-              {suggestions.message}
-            </p>
-          )}
-          {suggestions.recipes.map((recipe) => (
-            <Card key={recipe.id}>
-              <CardHeader>
-                <CardTitle className="text-base">{recipe.name}</CardTitle>
-                <CardDescription>
-                  Estimated nutrition per recipe serving ·{' '}
-                  {recipe.nutritionEstimate.calories} kcal ·{' '}
-                  {recipe.nutritionEstimate.proteinGrams} g protein ·{' '}
-                  {recipe.nutritionEstimate.carbohydrateGrams} g carbs ·{' '}
-                  {recipe.nutritionEstimate.fatGrams} g fat ·{' '}
-                  {recipe.nutritionEstimate.fiberGrams} g fiber
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-semibold">Ingredients</h3>
-                  <ul className="mt-2 list-inside list-disc text-sm text-muted-foreground">
-                    {recipe.ingredients.map((ingredient) => (
-                      <li key={ingredient.name}>
-                        {ingredient.amount} {ingredient.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold">Steps</h3>
-                  <ol className="mt-2 list-inside list-decimal space-y-1 text-sm text-muted-foreground">
-                    {recipe.steps.map((step) => (
-                      <li key={step}>{step}</li>
-                    ))}
-                  </ol>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold">Possible substitutions</h3>
-                  <ul className="mt-2 list-inside list-disc text-sm text-muted-foreground">
-                    {recipe.substitutions.map((substitution) => (
-                      <li key={substitution}>{substitution}</li>
-                    ))}
-                  </ul>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Allergens tagged: {recipe.allergens.length ? recipe.allergens.join(', ') : 'none in listed ingredients'}.
-                  Check every package for allergens and cross-contact warnings.
-                  Nutrition estimates vary by portion, brand, and preparation.
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+        <section aria-labelledby="meal-results" className="flex flex-col gap-4">
+          <h2 id="meal-results" className="text-xl font-semibold">{copy.results}</h2>
+          {suggestions.recipes.length === 0 && <p className="text-base text-muted-foreground" role="status">{copy.noLibrary}</p>}
+          {suggestions.recipes.map((recipe) => <LibraryRecipeCard key={recipe.id} recipe={recipe} />)}
         </section>
       )}
+
+      <AiMealIdeas result={ai.result} saved={ai.saved} loading={ai.loading} error={ai.error} />
     </div>
   );
 };

@@ -1,26 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { WorkoutLogEditorCard } from '@/features/fitness/components/workout-log-editor-card';
-import { WorkoutLogFilters } from '@/features/fitness/components/workout-log-filters';
-import { WorkoutLogHistory } from '@/features/fitness/components/workout-log-history';
+import { WorkoutLogForm } from '@/features/fitness/components/workout-log-form';
 import { useWorkoutLogs } from '@/features/fitness/hooks/use-workout-logs';
 import type { WorkoutLog } from '@/features/fitness/service/workout-log.service';
 import type { WorkoutSession } from '@/features/fitness/service/workout-plan.service';
 import type { WorkoutLogInput, WorkoutLogType } from '@/features/fitness/validations/workout-log.validation';
+import { WORKOUTS_COPY } from '@/shared/const/copy-workouts.const';
 import { WORKOUT_EXERCISE_LIBRARY } from '@/shared/const/workout.const';
 
-const NEW_WORKOUT: WorkoutLogInput = {
-  title: 'Workout',
+const copy = WORKOUTS_COPY.log;
+
+export const NEW_WORKOUT: WorkoutLogInput = {
+  title: copy.defaultName,
   completedAt: '',
   notes: '',
-  exercises: [
-    {
-      exerciseId: WORKOUT_EXERCISE_LIBRARY[0]?.id ?? '',
-      sets: [{ repetitions: '10', weightKg: '' }],
-    },
-  ],
+  exercises: [{ exerciseId: WORKOUT_EXERCISE_LIBRARY[0]?.id ?? '', sets: [{ repetitions: '', weightKg: '' }] }],
 };
 
 const toPlannedSessionInput = (session: WorkoutSession): WorkoutLogInput => ({
@@ -29,14 +25,17 @@ const toPlannedSessionInput = (session: WorkoutSession): WorkoutLogInput => ({
   notes: '',
   exercises: session.exercises.map((exercise) => ({
     exerciseId: exercise.id,
-    sets: Array.from({ length: exercise.sets }, () => ({
-      repetitions: '',
-      weightKg: '',
-    })),
+    sets: Array.from({ length: exercise.sets }, () => ({ repetitions: '', weightKg: '' })),
   })),
 });
 
-const toInputValues = (workout: WorkoutLog): WorkoutLogInput => ({
+const toLocalDateTime = (value: string) => {
+  const date = new Date(value);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 16);
+};
+
+export const toInputValues = (workout: WorkoutLog): WorkoutLogInput => ({
   title: workout.title,
   completedAt: toLocalDateTime(workout.completedAt),
   notes: workout.notes ?? '',
@@ -49,106 +48,34 @@ const toInputValues = (workout: WorkoutLog): WorkoutLogInput => ({
   })),
 });
 
-const toLocalDateTime = (value: string) => {
-  const date = new Date(value);
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  return date.toISOString().slice(0, 16);
-};
-
 type WorkoutLogManagerProps = {
   startSession?: WorkoutSession;
+  onDone?: (saved: boolean) => void;
 };
 
-export const WorkoutLogManager = ({
-  startSession,
-}: WorkoutLogManagerProps = {}) => {
-  const {
-    workouts,
-    loading,
-    saving,
-    error,
-    loadWorkouts,
-    saveWorkout,
-    deleteWorkout,
-    setError,
-  } = useWorkoutLogs();
-  const [appliedFilters, setAppliedFilters] = useState<{
-    from?: string;
-    to?: string;
-    exerciseId?: string;
-  }>({});
-  const [isFormOpen, setIsFormOpen] = useState(Boolean(startSession));
-  const [editingWorkout, setEditingWorkout] = useState<WorkoutLog | null>(null);
-
-  const refresh = useCallback(() => {
-    void loadWorkouts(appliedFilters);
-  }, [appliedFilters, loadWorkouts]);
+// The save form for a finished workout: the chosen plan session prefilled, or a free workout.
+export const WorkoutLogManager = ({ startSession, onDone }: WorkoutLogManagerProps = {}) => {
+  const { saving, error, saveWorkout } = useWorkoutLogs();
+  const errorRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (error) errorRef.current?.focus();
+  }, [error]);
 
   const handleSave = async (value: WorkoutLogType) => {
-    if (await saveWorkout(editingWorkout?.id ?? null, value)) {
-      setEditingWorkout(null);
-      setIsFormOpen(false);
-      refresh();
-    }
-  };
-
-  const handleDelete = async (workout: WorkoutLog) => {
-    if (!window.confirm(`Delete "${workout.title}" from your history?`)) return;
-    if (await deleteWorkout(workout.id)) refresh();
-  };
-
-  const startEditing = (workout: WorkoutLog) => {
-    setEditingWorkout(workout);
-    setIsFormOpen(true);
-    setError(null);
-  };
-
-  const cancelForm = () => {
-    setIsFormOpen(false);
-    setEditingWorkout(null);
-    setError(null);
+    if (await saveWorkout(null, value)) onDone?.(true);
   };
 
   return (
-    <section className="flex flex-col gap-5" aria-label="Workout log">
-      <WorkoutLogEditorCard
-        startSession={startSession}
-        editingWorkout={editingWorkout}
-        formOpen={isFormOpen}
-        initialValues={
-          editingWorkout
-            ? toInputValues(editingWorkout)
-            : startSession
-              ? toPlannedSessionInput(startSession)
-              : NEW_WORKOUT
-        }
-        saving={saving}
-        onOpen={() => {
-          setEditingWorkout(null);
-          setIsFormOpen(true);
-          setError(null);
-        }}
-        onCancel={cancelForm}
-        onSubmit={handleSave}
-      />
-
-      <WorkoutLogFilters
-        loading={loading}
-        onApply={setAppliedFilters}
-        onClear={() => setAppliedFilters({})}
-      />
-
-      <WorkoutLogHistory
-        workouts={workouts}
-        loading={loading}
-        error={error}
-        onEdit={startEditing}
-        onDelete={handleDelete}
-      />
+    <section id="workout-log" tabIndex={-1} aria-labelledby="workout-log-title" className="scroll-mt-24 rounded-2xl border border-border bg-card p-5">
+      <h2 id="workout-log-title" className="text-2xl font-semibold">{startSession?.title ?? copy.title}</h2>
+      <p className="mt-1 text-lg text-muted-foreground">{copy.help}</p>
+      {error && <p ref={errorRef} tabIndex={-1} role="alert" className="mt-4 text-base text-destructive">{error}</p>}
+      <div className="mt-5">
+        <WorkoutLogForm key={startSession ? `planned-${startSession.title}` : 'new-workout'}
+          initialValues={startSession ? toPlannedSessionInput(startSession) : NEW_WORKOUT}
+          saving={saving} onCancel={() => onDone?.(false)} onSubmit={handleSave} />
+      </div>
     </section>
   );
 };

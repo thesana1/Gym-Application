@@ -17,7 +17,7 @@ export function useBilling(returned: boolean) {
       setAccess(result);
       setError(null);
     } catch {
-      setError('Unable to load your billing status. Please refresh to try again.');
+      setError('We could not load your plan. Please reload the page.');
     }
   }, []);
 
@@ -50,7 +50,7 @@ export function useBilling(returned: boolean) {
       }
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : '';
-      setError(BILLING_ERRORS[message] ?? 'Unable to open billing. Please try again later.');
+      setError(BILLING_ERRORS[message] ?? 'We could not open payments. Please try later.');
     } finally {
       setBusy(null);
     }

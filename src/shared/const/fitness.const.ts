@@ -24,3 +24,9 @@ export const AVAILABLE_EQUIPMENT = [
 export type FitnessGoal = (typeof FITNESS_GOALS)[number]['value'];
 export type TrainingExperience = (typeof TRAINING_EXPERIENCE_LEVELS)[number]['value'];
 export type AvailableEquipment = (typeof AVAILABLE_EQUIPMENT)[number]['value'];
+
+export const PROFILE_MEASUREMENT_FIELDS = [
+  { name: 'age', label: 'Age', min: '13', max: '100', step: '1' },
+  { name: 'heightCm', label: 'Height (cm)', min: '100', max: '250', step: '0.1' },
+  { name: 'weightKg', label: 'Weight (kg)', min: '30', max: '350', step: '0.1' },
+] as const;

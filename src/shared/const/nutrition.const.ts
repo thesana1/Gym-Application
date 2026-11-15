@@ -2,7 +2,7 @@ export const FOOD_ALLERGENS = [
   { value: 'milk', label: 'Milk' },
   { value: 'eggs', label: 'Eggs' },
   { value: 'fish', label: 'Fish' },
-  { value: 'crustaceans', label: 'Crustaceans' },
+  { value: 'crustaceans', label: 'Shellfish' },
   { value: 'tree-nuts', label: 'Tree nuts' },
   { value: 'peanuts', label: 'Peanuts' },
   { value: 'wheat', label: 'Wheat' },
@@ -15,9 +15,9 @@ export const MEAL_PREFERENCES = [
   { value: 'high-protein', label: 'Higher protein' },
   { value: 'lower-calorie', label: 'Lower calorie' },
   { value: 'high-fiber', label: 'Higher fiber' },
-  { value: 'post-workout', label: 'Post-workout idea' },
-  { value: 'muscle-building', label: 'Muscle-building goal' },
-  { value: 'weight-loss', label: 'Weight-loss goal' },
+  { value: 'post-workout', label: 'After a workout' },
+  { value: 'muscle-building', label: 'Build muscle' },
+  { value: 'weight-loss', label: 'Lose weight' },
 ] as const;
 
 export type FoodAllergen = (typeof FOOD_ALLERGENS)[number]['value'];

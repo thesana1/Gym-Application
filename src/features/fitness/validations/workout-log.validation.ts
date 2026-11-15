@@ -52,6 +52,15 @@ export const WorkoutLogSchema = z.strictObject({
     .max(20),
 });
 
+const localCompletionDate = z.string()
+  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?$/, 'Enter a valid completion time')
+  .refine((value) => !Number.isNaN(new Date(value).getTime()), 'Enter a valid completion time')
+  .transform((value) => new Date(value).toISOString());
+
+export const WorkoutLogFormSchema = WorkoutLogSchema.extend({
+  completedAt: z.union([optionalDate, localCompletionDate]),
+});
+
 export type WorkoutLogInput = z.input<typeof WorkoutLogSchema>;
 export type WorkoutLogType = z.infer<typeof WorkoutLogSchema>;
 

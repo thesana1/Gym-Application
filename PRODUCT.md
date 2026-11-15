@@ -9,7 +9,7 @@ This product is a private, personal fitness operating system for a gym-goer who 
 - log training sessions and review progress
 - manage nutrition and daily intake targets
 - track body measurements and record trends
-- discover nearby gyms, coaches, and equipment guidance
+- ask an AI fitness assistant general training and nutrition questions
 - participate in optional private challenges and personal check-ins
 
 The experience should feel like a grounded personal training dashboard: calm, honest, and action-oriented.
@@ -42,10 +42,8 @@ The experience should feel like a grounded personal training dashboard: calm, ho
    - personal records derived from logged workouts only
    - rolling seven-day summary of activity and nutrition
 
-6. Use supporting discovery tools
-   - nearby gym search with clear attribution
-   - coach directory and consultation request flow
-   - equipment guides with safe educational text-based content
+6. Get support
+   - AI fitness assistant for general training and nutrition questions, with health disclaimers
 
 ## Product goals
 
@@ -86,10 +84,8 @@ The experience should feel like a grounded personal training dashboard: calm, ho
 - measurement history and recent comparisons
 - progress summaries for today and rolling windows
 
-### 6. Discovery and support
-- gym search and local discovery
-- coach discovery and consultation requests
-- equipment tutorials and safe usage guidance
+### 6. Support
+- AI fitness assistant with health disclaimers
 - optionally private challenges without public social ranking pressure
 
 ## Non-goals and guardrails
@@ -118,11 +114,9 @@ The experience should feel like a grounded personal training dashboard: calm, ho
 - nutrition tracking
 - progress summaries
 
-### Phase 2: supporting discovery and coaching
-- gyms
-- coaches
-- equipment tutorials
-- consultation requesting
+### Phase 2: support
+- AI fitness assistant
+- AI meal ideas
 
 ### Phase 3: habits and personal accountability
 - weekly scheduling
@@ -144,10 +138,7 @@ The current roadmap is organized as incremental tickets such as:
 - FIT-006: nutrition tracking
 - FIT-007: meal generation
 - FIT-008: body analysis
-- FIT-009: gym discovery
-- FIT-010: coach directory
 - FIT-012: private opt-in fitness challenges
-- FIT-013: equipment guide
 - FIT-014: personal records
 - FIT-015: today overview
 - FIT-016: rolling training activity
@@ -172,10 +163,13 @@ This is the current target product definition for the repository and is the basi
 ## Confirmed payment decision
 
 The product owner has explicitly requested real Dodo Payments billing: Premium
-costs USD 20/month and includes unlimited photo uploads, all existing fitness
-features without usage quotas, and coach consultation requests. Non-members may
-purchase one consultation credit for USD 20. Products are provisioned dynamically.
-Premium upload and consultation access are checked by the server. Other existing
-fitness features retain their free access until specific free-plan limits are
-agreed. Image-size constraints and coach acceptance still apply. Test and live
+costs USD 20/month and includes unlimited photo uploads and all existing fitness
+features without usage quotas. Products are provisioned dynamically. Premium
+upload access is checked by the server. Other existing fitness features retain
+their free access until specific free-plan limits are agreed. Test and live
 billing records are separate; only verified provider state grants paid access.
+
+The coach directory, coach applications, and paid coach consultations were
+removed at the owner's request for this stage. Past consultation purchases stay
+readable in the database but grant nothing. Nearby gym search and the
+equipment guide (including the AI exercise explainer) were also removed.

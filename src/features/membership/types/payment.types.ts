@@ -6,12 +6,10 @@ export type BillingAccess = {
   plan: 'free' | 'premium';
   unlimitedPhotoUploads: boolean;
   unlimitedFeatures: boolean;
-  coachConsultationsIncluded: boolean;
-  consultationCredits: number;
   subscriptionStatus: string | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
   canManageBilling: boolean;
 };
 
-export type CheckoutResponse = { checkoutUrl: string } | { included: true };
+export type CheckoutResponse = { checkoutUrl: string };

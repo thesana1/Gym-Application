@@ -136,7 +136,10 @@ export async function POST(request: NextRequest) {
       url: result.secure_url,
     });
   } catch (error) {
-    console.error('Image upload to Cloudinary failed:', error);
+    if (typeof error === 'object' && error !== null && 'http_code' in error && error.http_code === 401) {
+      return NextResponse.json({ error: 'CLOUDINARY_AUTH_FAILED' }, { status: 503 });
+    }
+    console.error('Image upload provider failed to accept the image.');
     return NextResponse.json({ error: 'IMAGE_UPLOAD_FAILED' }, { status: 502 });
   }
 }

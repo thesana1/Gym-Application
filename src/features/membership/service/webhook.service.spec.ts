@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { notifyOwnerService } from '@/features/email/service/owner-notification.service';
 import { purchaseRepository } from '@/features/membership/repository/purchase.repository';
 import { handleWebhookService } from '@/features/membership/service/webhook.service';
 import { dodoPayments } from '@/shared/lib/dodo-payments';
 
+vi.mock('@/features/email/service/owner-notification.service', () => ({ notifyOwnerService: vi.fn() }));
 vi.mock('@/features/auth/repository/user.repository', () => ({ userRepository: { updateMembershipById: vi.fn(), recordMembershipRefund: vi.fn() } }));
-vi.mock('@/features/coaches/repository/coach.repository', () => ({ coachRepository: { cancelRequestsForPurchase: vi.fn() } }));
 vi.mock('@/features/membership/repository/purchase.repository', () => ({ purchaseRepository: {
   findById: vi.fn(), applyEvent: vi.fn(), recordRefund: vi.fn(),
 } }));
@@ -28,7 +29,7 @@ describe('handleWebhookService', () => {
     } as never);
     vi.mocked(dodoPayments.client.subscriptions.retrieve).mockResolvedValue({
       metadata, subscription_id: 'sub_1', product_id: 'pdt_premium', status: 'active',
-      next_billing_date: periodEnd, cancel_at_next_billing_date: false, customer: { customer_id: 'cus_owner' },
+      next_billing_date: periodEnd, cancel_at_next_billing_date: false, customer: { customer_id: 'cus_owner', email: 'member@example.com' },
     } as never);
     vi.mocked(dodoPayments.client.payments.retrieve).mockResolvedValue({
       metadata, payment_id: 'pay_1', subscription_id: 'sub_1', subscription_ids: ['sub_1'],
@@ -49,6 +50,19 @@ describe('handleWebhookService', () => {
     expect(purchaseRepository.applyEvent).toHaveBeenCalledWith(purchaseId, new Date(timestamp), expect.objectContaining({
       subscriptionStatus: 'active', currentPeriodEnd: new Date(periodEnd), customerId: 'cus_owner', status: 'paid',
     }));
+  });
+
+  it('notifies the owner once when Premium becomes active, not on duplicate deliveries', async () => {
+    vi.mocked(dodoPayments.verifyWebhook).mockReturnValue(event('subscription.active', { subscription_id: 'sub_1' }) as never);
+    await handleWebhookService('raw', {});
+    expect(notifyOwnerService).toHaveBeenCalledWith(expect.objectContaining({ subject: 'Premium started' }));
+
+    vi.mocked(notifyOwnerService).mockClear();
+    vi.mocked(purchaseRepository.findById).mockResolvedValue({
+      userId: 'owner', kind: 'premium', productId: 'pdt_premium', subscriptionStatus: 'active',
+    } as never);
+    await handleWebhookService('raw', {});
+    expect(notifyOwnerService).not.toHaveBeenCalled();
   });
 
   it('does not attach a subscription with another product or owner', async () => {

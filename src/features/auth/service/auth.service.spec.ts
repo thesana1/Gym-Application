@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('@/features/email/service/owner-notification.service', () => ({ notifyOwnerService: vi.fn() }));
 vi.mock('@/features/auth/repository/user.repository', () => ({
   userRepository: {
     findByEmail: vi.fn(),

@@ -1,6 +1,7 @@
 import { userRepository } from '@/features/auth/repository/user.repository';
 import { User } from '@/features/auth/types/auth.types';
 import { LoginType, SignUpType } from '@/features/auth/validations/auth.validation';
+import { notifyOwnerService } from '@/features/email/service/owner-notification.service';
 import { ServiceResult } from '@/shared/types/common';
 import { hashPassword } from '@/shared/utils/password';
 
@@ -17,6 +18,7 @@ export async function registerService(
     role: 'user',
   });
 
+  await notifyOwnerService({ subject: 'New member signed up', lines: [`${input.fullName} (${input.email}) created an account with email and password.`] });
   return { data: { message: 'Account created' }, status: 201 };
 }
 
@@ -77,5 +79,6 @@ export async function upsertOAuthUserService(data: {
     role: 'user',
     avatar: data.avatar ?? undefined,
   });
+  await notifyOwnerService({ subject: 'New member signed up', lines: [`${data.name} (${data.email}) created an account with Google.`] });
   return { isNew: true };
 }

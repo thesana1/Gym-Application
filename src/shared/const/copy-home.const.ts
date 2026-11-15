@@ -1,0 +1,35 @@
+export const HOME_COPY = {
+  greeting: (name: string) => (name ? `Hi, ${name.split(' ')[0]}` : 'Hi there'),
+  description: 'Here is your day.',
+  loading: 'Getting your day ready…',
+  loadError: 'We could not load your day.',
+  setup: {
+    title: 'Let’s make your plan',
+    body: 'Answer 5 quick questions to get your workouts.',
+    action: 'Get started',
+  },
+  workout: {
+    title: 'Today’s workout',
+    start: 'Start workout',
+    doneTitle: 'Done for today',
+    done: (count: number) => `Great job! You saved ${count} workout${count === 1 ? '' : 's'} today.`,
+    seeWorkouts: 'See my workouts',
+    restTitle: 'Rest day',
+    next: (session: string, day: string) => `Next workout: ${session} on ${day}.`,
+    noDays: 'Pick your training days to see your next workout.',
+    pickDays: 'Pick my days',
+    anyway: 'Work out anyway',
+  },
+  food: {
+    title: 'Today’s food',
+    calories: 'Calories',
+    caloriesUnit: 'kcal',
+    nothingYet: 'Nothing added yet today.',
+    noGoal: 'Set a calorie goal to see how close you are.',
+    add: 'Add food',
+  },
+  week: {
+    label: 'Workouts in the last 7 days',
+    seeProgress: 'See my progress',
+  },
+} as const;

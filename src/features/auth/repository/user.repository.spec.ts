@@ -35,7 +35,7 @@ const fakeUser = {
 };
 
 function makeLeanQuery<T>(result: T) {
-  return { lean: () => ({ exec: () => Promise.resolve(result) }) };
+  return { collation: vi.fn().mockReturnThis(), lean: () => ({ exec: () => Promise.resolve(result) }) };
 }
 
 describe('userRepository', () => {

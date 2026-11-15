@@ -1,10 +1,14 @@
 'use client';
 
+import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
+import { ImageUpload } from '@/features/dashboard/components/image-upload';
 import { MeasurementWindowSummary } from '@/features/fitness/components/measurement-window-summary';
+import { ProgressHeader } from '@/features/fitness/components/progress-header';
 import { ProgressMeasurementForm } from '@/features/fitness/components/progress-measurement-form';
 import { ProgressMeasurementHistory } from '@/features/fitness/components/progress-measurement-history';
+import { formatMeasurementDate } from '@/features/fitness/components/progress-measurement-history';
 import { useProgressMeasurements } from '@/features/fitness/hooks/use-progress-measurements';
 import type { ProgressMeasurement } from '@/features/fitness/service/progress-measurement.service';
 import type {
@@ -12,7 +16,9 @@ import type {
   ProgressMeasurementType,
 } from '@/features/fitness/validations/progress-measurement.validation';
 import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Disclosure } from '@/shared/components/ui/disclosure';
+import { EmptyState } from '@/shared/components/ui/empty-state';
+import { PROGRESS_COPY } from '@/shared/const/copy-progress.const';
 
 const getToday = () => {
   const today = new Date();
@@ -44,17 +50,22 @@ const toFormValues = (
   notes: measurement.notes ?? '',
 });
 
+const copy = PROGRESS_COPY.body;
+
+const LatestWeight = ({ measurements }: { measurements: ProgressMeasurement[] }) => {
+  const latest = measurements.find(({ weightKg }) => weightKg !== undefined);
+  if (!latest) return <EmptyState message={copy.empty} />;
+  return (
+    <section aria-labelledby="latest-weight" className="rounded-2xl border border-border bg-card p-5">
+      <h2 id="latest-weight" className="text-base font-medium text-muted-foreground">{copy.latest}</h2>
+      <p className="font-heading text-5xl font-semibold tabular-nums">{latest.weightKg}<span className="ml-1 text-2xl text-muted-foreground">kg</span></p>
+      <p className="mt-1 text-base text-muted-foreground">{copy.savedOn(formatMeasurementDate(latest.date))}</p>
+    </section>
+  );
+};
+
 export const ProgressDashboard = () => {
-  const {
-    measurements,
-    loading,
-    saving,
-    error,
-    loadMeasurements,
-    saveMeasurement,
-    deleteMeasurement,
-    setError,
-  } = useProgressMeasurements();
+  const { measurements, loading, saving, error, loadMeasurements, saveMeasurement, deleteMeasurement, setError } = useProgressMeasurements();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<ProgressMeasurement | null>(null);
 
@@ -66,89 +77,56 @@ export const ProgressDashboard = () => {
     refresh();
   }, [refresh]);
 
+  const closeForm = () => {
+    setFormOpen(false);
+    setEditing(null);
+    setError(null);
+  };
+
   const handleSave = async (value: ProgressMeasurementType) => {
     if (await saveMeasurement(editing?.id ?? null, value)) {
-      setFormOpen(false);
-      setEditing(null);
+      closeForm();
       refresh();
     }
   };
 
   const handleDelete = async (measurement: ProgressMeasurement) => {
-    if (
-      !window.confirm(
-        `Delete the measurement record from ${measurement.date}?`
-      )
-    ) {
-      return;
-    }
+    if (!window.confirm(copy.confirmDelete(formatMeasurementDate(measurement.date)))) return;
     if (await deleteMeasurement(measurement.id)) refresh();
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Your progress
-        </p>
-        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Measurements</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          See changes across your own records. Tracking is optional and
-          measurements are not medical assessments.
-        </p>
-      </header>
-
-      {error && (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
-      )}
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-4">
-          <CardTitle className="text-base">
-            {editing ? 'Edit measurement record' : 'Record measurements'}
-          </CardTitle>
-          {!formOpen && (
-            <Button
-              onClick={() => {
-                setEditing(null);
-                setFormOpen(true);
-                setError(null);
-              }}
-            >
-              Add record
+    <div className="animate-rise">
+      <ProgressHeader />
+      <div className="flex flex-col gap-4">
+        {error && <p className="text-base text-destructive" role="alert">{error}</p>}
+        {formOpen ? (
+          <section aria-labelledby="measurement-form" className="rounded-2xl border border-border bg-card p-5">
+            <h2 id="measurement-form" className="mb-5 text-2xl font-semibold">{editing ? PROGRESS_COPY.form.editTitle : PROGRESS_COPY.form.addTitle}</h2>
+            <ProgressMeasurementForm key={editing?.id ?? 'new-measurement'} saving={saving} onCancel={closeForm} onSave={handleSave}
+              initialValues={editing ? toFormValues(editing) : { ...EMPTY_MEASUREMENT, date: getToday() }} />
+          </section>
+        ) : (
+          <>
+            {loading
+              ? <div className="h-36 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
+              : <LatestWeight measurements={measurements} />}
+            <Button size="lg" className="sticky bottom-24 z-10 w-full shadow-lg lg:bottom-6"
+              onClick={() => { setEditing(null); setFormOpen(true); setError(null); }}>
+              <Plus className="size-5" aria-hidden="true" />{copy.add}
             </Button>
-          )}
-        </CardHeader>
-        {formOpen && (
-          <CardContent>
-            <ProgressMeasurementForm
-              key={editing?.id ?? 'new-measurement'}
-              initialValues={editing ? toFormValues(editing) : EMPTY_MEASUREMENT}
-              saving={saving}
-              onCancel={() => {
-                setFormOpen(false);
-                setEditing(null);
-                setError(null);
-              }}
-              onSave={handleSave}
-            />
-          </CardContent>
+            <Disclosure summary={copy.compare}><MeasurementWindowSummary measurements={measurements} /></Disclosure>
+            {measurements.length > 0 && (
+              <Disclosure summary={copy.all}>
+                <ProgressMeasurementHistory measurements={measurements} onDelete={handleDelete}
+                  onEdit={(measurement) => { setEditing(measurement); setFormOpen(true); setError(null); }} />
+              </Disclosure>
+            )}
+            <Disclosure summary={copy.photos}><ImageUpload /></Disclosure>
+            <p className="text-base text-muted-foreground">{copy.note}</p>
+          </>
         )}
-      </Card>
-
-      <ProgressMeasurementHistory
-        measurements={measurements}
-        loading={loading}
-        onEdit={(measurement) => {
-          setEditing(measurement);
-          setFormOpen(true);
-          setError(null);
-        }}
-        onDelete={handleDelete}
-      />
-      <MeasurementWindowSummary measurements={measurements} />
+      </div>
     </div>
   );
 };

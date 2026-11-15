@@ -15,7 +15,7 @@ const getSuggestions = (result: ServiceResult<MealSuggestions>) => {
 };
 
 describe('generateMealsService', () => {
-  it('suggests only recipes whose listed ingredients are available', () => {
+  it('ranks fully makeable recipes first', () => {
     const input = MealGeneratorSchema.parse({
       ingredients: ['chicken breast', 'rice', 'tomatoes', 'olive oil'],
       excludedAllergens: [],
@@ -24,9 +24,37 @@ describe('generateMealsService', () => {
 
     const result = getSuggestions(generateMealsService(input));
 
-    expect(result.recipes.map(({ id }) => id)).toEqual([
-      'chicken-rice-tomato-bowl',
-    ]);
+    expect(result.recipes[0]).toMatchObject({
+      id: 'chicken-rice-tomato-bowl',
+      missingIngredients: [],
+    });
+  });
+
+  it('suggests partial matches and lists the ingredients still needed', () => {
+    const result = getSuggestions(generateMealsService(
+      MealGeneratorSchema.parse({
+        ingredients: ['egg'],
+        excludedAllergens: [],
+        preference: 'any',
+      })
+    ));
+
+    expect(result.recipes.map(({ id }) => id)).toEqual(['egg-oat-pancakes']);
+    expect(result.recipes[0]?.matchedIngredients).toEqual(['eggs']);
+    expect(result.recipes[0]?.missingIngredients).toEqual(['oats', 'banana']);
+  });
+
+  it('matches a broader ingredient name to a more specific recipe ingredient', () => {
+    const result = getSuggestions(generateMealsService(
+      MealGeneratorSchema.parse({
+        ingredients: ['chicken', 'rice'],
+        excludedAllergens: [],
+        preference: 'any',
+      })
+    ));
+
+    expect(result.recipes[0]?.id).toBe('chicken-rice-tomato-bowl');
+    expect(result.recipes[0]?.matchedIngredients).toEqual(['chicken breast', 'rice']);
   });
 
   it('filters recipes that carry an excluded allergen', () => {
@@ -38,8 +66,8 @@ describe('generateMealsService', () => {
       })
     ));
 
-    expect(result.recipes).toEqual([]);
-    expect(result.message).toContain('No recipe');
+    expect(result.recipes.map(({ id }) => id)).not.toContain('yogurt-oat-bowl');
+    expect(result.recipes.every(({ allergens }) => !allergens.includes('milk'))).toBe(true);
   });
 
   it('filters recipes by the selected preference using labeled estimate fields', () => {
@@ -51,7 +79,8 @@ describe('generateMealsService', () => {
       })
     ));
 
-    expect(result.recipes.map(({ id }) => id)).toEqual(['bean-tomato-rice']);
+    expect(result.recipes[0]?.id).toBe('bean-tomato-rice');
+    expect(result.recipes.every(({ nutritionEstimate }) => nutritionEstimate.fiberGrams >= 8)).toBe(true);
     expect(result.recipes[0]?.nutritionEstimate.fiberGrams).toBeGreaterThanOrEqual(
       8
     );
@@ -60,7 +89,7 @@ describe('generateMealsService', () => {
   it('explains when the small recipe library has no matching result', () => {
     const result = getSuggestions(generateMealsService(
       MealGeneratorSchema.parse({
-        ingredients: ['rice'],
+        ingredients: ['tofu'],
         excludedAllergens: [],
         preference: 'any',
       })

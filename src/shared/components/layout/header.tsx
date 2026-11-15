@@ -1,15 +1,15 @@
 'use client';
+
 import { Dumbbell } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
-import { useLogout } from '@/features/auth/hooks/use-logout';
-import { MembershipBadge } from '@/features/membership/components/membership-badge';
 import type { MembershipSummary } from '@/features/membership/types/membership.types';
-import { ThemeToggle } from '@/shared/components/layout/theme-toggle';
+import { AccountMenu } from '@/shared/components/layout/account-menu';
 import { Button } from '@/shared/components/ui/button';
 import { APP_NAME } from '@/shared/const/app.const';
+import { COMMON_COPY } from '@/shared/const/copy-common.const';
 
 type SessionUser = {
   name?: string | null;
@@ -18,75 +18,36 @@ type SessionUser = {
 };
 
 export const Header = () => {
-  const { data: session } = useSession();
-  const { logout } = useLogout();
-  const sessionUser = session?.user as SessionUser | undefined;
-  const userName = sessionUser?.name ?? '';
-  const initials = userName
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('');
-
+  const { data: session, status } = useSession();
+  const user = session?.user as SessionUser | undefined;
+  const pathname = usePathname();
   return (
-    <header className="flex items-center justify-between px-6 py-5 sm:px-10 border-b border-border">
-      <Link href="/" className="flex items-center gap-2.5">
-        <span
-          aria-hidden="true"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-foreground text-background"
-        >
+    <header className="sticky top-0 z-30 flex min-w-0 items-center justify-between gap-2 border-b border-border bg-background/95 px-4 py-2 backdrop-blur
+      sm:px-6 lg:px-10">
+      <Link href={user ? '/dashboard' : '/'} className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg font-semibold focus-visible:outline-2
+        focus-visible:outline-ring">
+        <span aria-hidden="true" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <Dumbbell className="size-4" />
         </span>
-        <span className="text-sm font-semibold tracking-tight text-foreground">
-          {APP_NAME}
-        </span>
+        <span className="truncate font-heading text-lg tracking-tight">{APP_NAME}</span>
       </Link>
-
-      <div className="flex items-center gap-2">
-        <ThemeToggle />
-
-        {sessionUser ? (
-          <>
-            <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground hover:bg-accent">
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-            <div className="flex items-center gap-3">
-              {sessionUser.avatar ? (
-                <Image
-                  src={sessionUser.avatar}
-                  alt={userName}
-                  width={32}
-                  height={32}
-                  className="size-8 rounded-full border border-border object-cover"
-                />
-              ) : (
-                <div className="size-8 rounded-full border border-border bg-muted flex items-center justify-center text-xs font-semibold text-foreground">
-                  {initials || 'U'}
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <span className="hidden text-sm text-muted-foreground sm:block">{userName}</span>
-                <MembershipBadge membership={sessionUser.membership} />
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={logout}
-              className="text-muted-foreground hover:text-foreground hover:bg-accent"
-            >
-              Sign out
-            </Button>
-          </>
+      <div className="flex shrink-0 items-center gap-2">
+        {status === 'loading' ? (
+          <span className="h-11 w-28" aria-hidden="true" />
+        ) : user ? (
+          <AccountMenu name={user.name ?? ''} avatar={user.avatar} membership={user.membership} />
         ) : (
           <>
-            <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground hover:bg-accent">
-              <Link href="/sign-in">Sign in</Link>
-            </Button>
-            <Button size="sm" asChild className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
-              <Link href="/sign-up">Sign up</Link>
-            </Button>
+            {pathname !== '/sign-in' && (
+              <Button variant="ghost" asChild className="px-3">
+                <Link href="/sign-in">{COMMON_COPY.signIn}</Link>
+              </Button>
+            )}
+            {pathname !== '/sign-up' && (
+              <Button asChild variant={pathname === '/sign-in' ? 'ghost' : 'default'} className={pathname === '/sign-in' ? 'px-3' : 'hidden sm:inline-flex'}>
+                <Link href="/sign-up">{COMMON_COPY.createAccount}</Link>
+              </Button>
+            )}
           </>
         )}
       </div>

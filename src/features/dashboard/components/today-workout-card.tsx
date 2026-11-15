@@ -1,76 +1,69 @@
-import { ArrowRight, Dumbbell } from 'lucide-react';
+import { ArrowRight, CircleCheck, Dumbbell, Moon } from 'lucide-react';
 import Link from 'next/link';
 
+import type { TrainingScheduleAssignment } from '@/features/fitness/service/training-schedule.service';
 import type { WorkoutLog } from '@/features/fitness/service/workout-log.service';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { HOME_COPY } from '@/shared/const/copy-home.const';
+import { WEEKDAYS } from '@/shared/const/weekdays.const';
 
 type TodayWorkoutCardProps = {
   workouts: WorkoutLog[];
-  plannedSession: { sessionTitle: string; sessionIndex: number } | null;
+  assignments: Pick<TrainingScheduleAssignment, 'weekday' | 'sessionIndex' | 'sessionTitle'>[];
+  today?: number;
 };
 
-export const TodayWorkoutCard = ({
-  workouts,
-  plannedSession,
-}: TodayWorkoutCardProps) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2 text-base">
-        <Dumbbell className="size-4 text-primary" />
-        Workout log
-      </CardTitle>
-      <CardDescription>
-        {workouts.length
-          ? `${workouts.length} completed workout${workouts.length === 1 ? '' : 's'} logged today.`
-          : 'No completed workouts logged today.'}
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="grid gap-3">
-      {plannedSession ? (
-        <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-            Planned session · not completed
-          </p>
-          <p className="mt-1 text-sm font-medium">
-            {plannedSession.sessionTitle}
-          </p>
-          <Link
-            href={`/dashboard/workouts?session=${plannedSession.sessionIndex}`}
-            className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
-          >
-            Log completed session <ArrowRight className="size-4" />
+const copy = HOME_COPY.workout;
+
+// The next assigned session after today, counting forward through the week.
+const findNext = (assignments: TodayWorkoutCardProps['assignments'], today: number) =>
+  [...assignments].sort((a, b) => ((a.weekday - today + 7) % 7 || 7) - ((b.weekday - today + 7) % 7 || 7))[0];
+
+export const TodayWorkoutCard = ({ workouts, assignments, today = new Date().getDay() }: TodayWorkoutCardProps) => {
+  const planned = assignments.find(({ weekday }) => weekday === today);
+  const next = findNext(assignments.filter(({ weekday }) => weekday !== today), today);
+
+  if (workouts.length > 0) {
+    return (
+      <section aria-labelledby="today-workout" className="rounded-2xl border border-border bg-card p-5">
+        <h2 id="today-workout" className="flex items-center gap-2 text-xl font-semibold">
+          <CircleCheck className="size-6 text-primary" aria-hidden="true" />{copy.doneTitle}
+        </h2>
+        <p className="mt-2 text-lg text-muted-foreground">{copy.done(workouts.length)}</p>
+        <Button asChild variant="outline" className="mt-5 w-full sm:w-auto">
+          <Link href="/dashboard/workouts">{copy.seeWorkouts}</Link>
+        </Button>
+      </section>
+    );
+  }
+
+  if (planned) {
+    return (
+      <section aria-labelledby="today-workout" className="rounded-2xl bg-primary p-5 text-primary-foreground">
+        <h2 id="today-workout" className="flex items-center gap-2 text-base font-semibold text-primary-foreground/85">
+          <Dumbbell className="size-5" aria-hidden="true" />{copy.title}
+        </h2>
+        <p className="mt-2 text-balance font-heading text-3xl font-semibold leading-tight">{planned.sessionTitle}</p>
+        <Button asChild size="lg" variant="secondary" className="mt-6 w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+          <Link href={`/dashboard/workouts?session=${planned.sessionIndex}`}>
+            {copy.start}<ArrowRight className="size-5" aria-hidden="true" />
           </Link>
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          No session is scheduled for today.
-        </p>
-      )}
-      {workouts.length > 0 && (
-        <ul className="grid gap-2">
-          {workouts.map((workout) => (
-            <li key={workout.id} className="rounded-md border p-3">
-              <p className="text-sm font-medium">{workout.title}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {workout.exercises.length} exercise
-                {workout.exercises.length === 1 ? '' : 's'} recorded
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-      <Link
-        href="/dashboard/workouts"
-        className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
-      >
-        View workout plan and logs <ArrowRight className="size-4" />
-      </Link>
-    </CardContent>
-  </Card>
-);
+        </Button>
+      </section>
+    );
+  }
+
+  return (
+    <section aria-labelledby="today-workout" className="rounded-2xl border border-border bg-card p-5">
+      <h2 id="today-workout" className="flex items-center gap-2 text-xl font-semibold">
+        <Moon className="size-5 text-primary" aria-hidden="true" />{copy.restTitle}
+      </h2>
+      <p className="mt-2 text-lg text-muted-foreground">
+        {next ? copy.next(next.sessionTitle, WEEKDAYS[next.weekday].label) : copy.noDays}
+      </p>
+      <Button asChild variant={next ? 'outline' : 'default'} className="mt-5 w-full sm:w-auto">
+        <Link href={next ? '/dashboard/workouts' : '/dashboard/workouts?tab=plan'}>{next ? copy.anyway : copy.pickDays}</Link>
+      </Button>
+    </section>
+  );
+};

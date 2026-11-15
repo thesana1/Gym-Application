@@ -1,3 +1,5 @@
+import dns from 'node:dns';
+
 import mongoose from 'mongoose';
 
 const MAX_RETRIES = 5;
@@ -14,6 +16,10 @@ class MongoClientManager {
         'MONGO_URI is not configured. Set it in the environment before using database-backed features.'
       );
     }
+
+    // Optional: some networks (e.g. phone hotspots) return malformed SRV answers for mongodb+srv URIs.
+    const dnsServers = (process.env.MONGO_DNS_SERVERS ?? '').split(',').map((server) => server.trim()).filter(Boolean);
+    if (dnsServers.length > 0) dns.setServers(dnsServers);
 
     try {
       await mongoose.connect(uri);

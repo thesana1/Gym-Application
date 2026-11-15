@@ -1,3 +1,5 @@
+import { Select } from '@/shared/components/ui/select';
+import { WORKOUTS_COPY } from '@/shared/const/copy-workouts.const';
 import { WEEKDAYS } from '@/shared/const/weekdays.const';
 
 type TrainingScheduleEditorProps = {
@@ -7,51 +9,20 @@ type TrainingScheduleEditorProps = {
   onAssignmentChange: (sessionIndex: number, weekday: number | '') => void;
 };
 
-export const TrainingScheduleEditor = ({
-  sessions,
-  assignments,
-  saving,
-  onAssignmentChange,
-}: TrainingScheduleEditorProps) => {
-  const assignedWeekdays = new Set(
-    Object.values(assignments).filter((weekday) => weekday !== '')
-  );
-
+export const TrainingScheduleEditor = ({ sessions, assignments, saving, onAssignmentChange }: TrainingScheduleEditorProps) => {
+  const assignedWeekdays = new Set(Object.values(assignments).filter((weekday) => weekday !== ''));
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-4 sm:grid-cols-2">
       {sessions.map((session, sessionIndex) => (
-        <label
-          key={`${session.title}-${sessionIndex}`}
-          htmlFor={`training-day-${sessionIndex}`}
-          className="grid gap-1.5 text-sm font-medium"
-        >
-          Session {sessionIndex + 1}: {session.title}
-          <select
-            id={`training-day-${sessionIndex}`}
-            value={assignments[sessionIndex] ?? ''}
-            disabled={saving}
-            onChange={(event) =>
-              onAssignmentChange(
-                sessionIndex,
-                event.target.value === '' ? '' : Number(event.target.value)
-              )
-            }
-            className="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm font-normal"
-          >
-            <option value="">Not scheduled</option>
+        <label key={`${session.title}-${sessionIndex}`} htmlFor={`training-day-${sessionIndex}`} className="flex flex-col gap-2 text-base font-medium">
+          {WORKOUTS_COPY.view.workoutNumber(sessionIndex)}: {session.title}
+          <Select id={`training-day-${sessionIndex}`} value={assignments[sessionIndex] ?? ''} disabled={saving}
+            onChange={(event) => onAssignmentChange(sessionIndex, event.target.value === '' ? '' : Number(event.target.value))}>
+            <option value="">{WORKOUTS_COPY.schedule.notScheduled}</option>
             {WEEKDAYS.map(({ value, label }) => (
-              <option
-                key={value}
-                value={value}
-                disabled={
-                  assignedWeekdays.has(value) &&
-                  assignments[sessionIndex] !== value
-                }
-              >
-                {label}
-              </option>
+              <option key={value} value={value} disabled={assignedWeekdays.has(value) && assignments[sessionIndex] !== value}>{label}</option>
             ))}
-          </select>
+          </Select>
         </label>
       ))}
     </div>

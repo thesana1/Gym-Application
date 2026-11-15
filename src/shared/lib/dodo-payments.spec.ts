@@ -61,13 +61,13 @@ describe('DodoPaymentsClient', () => {
     vi.restoreAllMocks();
   });
 
-  it.each(['premium', 'consultation'] as const)('creates the %s product with server-owned pricing', async (kind) => {
+  it('creates the Premium product with server-owned pricing', async () => {
     const create = vi.fn().mockResolvedValue({ product_id: 'pdt_new' });
     vi.spyOn(client, 'client', 'get').mockReturnValue({ products: { list: () => [], create } } as never);
-    expect(await client.findOrCreateProduct(kind)).toBe('pdt_new');
+    expect(await client.findOrCreateProduct('premium')).toBe('pdt_new');
     const input = create.mock.calls[0][0];
-    expect(input.price).toMatchObject({ price: 2000, currency: 'USD', type: kind === 'premium' ? 'recurring_price' : 'one_time_price' });
-    if (kind === 'premium') expect(input.price).toMatchObject({
+    expect(input.price).toMatchObject({ price: 2000, currency: 'USD', type: 'recurring_price' });
+    expect(input.price).toMatchObject({
       payment_frequency_count: 1, payment_frequency_interval: 'Month', subscription_period_count: 20, subscription_period_interval: 'Year',
     });
     vi.restoreAllMocks();

@@ -33,25 +33,25 @@ describe('SevenDayNutritionSummary', () => {
     ]);
 
     render(
-      <SevenDayNutritionSummary
-        targets={{
-          calories: 2000,
-          proteinGrams: 100,
-          carbohydrateGrams: 240,
-          fatGrams: 65,
-          fiberGrams: 30,
-          waterMl: 2200,
-        }}
-      />
+      <SevenDayNutritionSummary />
     );
 
-    expect(await screen.findByText('650 kcal')).toBeInTheDocument();
-    expect(screen.getAllByText('No entries logged')).toHaveLength(6);
-    expect(screen.getByText(/not recommendations/)).toBeInTheDocument();
+    expect(await screen.findByText(/650 kcal/)).toBeInTheDocument();
+    expect(screen.getAllByText('Nothing added')).toHaveLength(6);
+    expect(screen.getByText(/not that you ate nothing/)).toBeInTheDocument();
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith('/nutrition/entries', {
         params: getLocalNutritionDateRange(),
       });
     });
   });
+});
+
+it('reloads the real summary after the food log changes', async () => {
+  mockGet.mockResolvedValue([]);
+  const { rerender } = render(<SevenDayNutritionSummary refreshKey={0} />);
+  await waitFor(() => expect(mockGet).toHaveBeenCalled());
+  const calls = mockGet.mock.calls.length;
+  rerender(<SevenDayNutritionSummary refreshKey={1} />);
+  await waitFor(() => expect(mockGet).toHaveBeenCalledTimes(calls + 1));
 });

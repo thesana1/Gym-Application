@@ -1,16 +1,12 @@
 'use client';
 
-import { ImagePlus, LoaderCircle, Upload } from 'lucide-react';
+import { ImagePlus, LoaderCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
+import { PROGRESS_COPY } from '@/shared/const/copy-progress.const';
+
+const copy = PROGRESS_COPY.photos;
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024;
 
@@ -39,13 +35,13 @@ export function ImageUpload() {
 
     const invalidFiles = files.filter((file) => !file.type.startsWith('image/'));
     if (invalidFiles.length > 0) {
-      setMessage('Select image files only.');
+      setMessage(copy.onlyImages);
       return;
     }
 
     const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
     if (oversizedFiles.length > 0) {
-      setMessage(`${oversizedFiles.map((file) => file.name).join(', ')} exceed the 3 MB limit.`);
+      setMessage(copy.tooBig(oversizedFiles.map((file) => file.name).join(', ')));
       return;
     }
 
@@ -65,15 +61,13 @@ export function ImageUpload() {
 
         if (!response.ok || !result.url) {
           const errorMessage =
-            result.error === 'PREMIUM_REQUIRED'
-              ? 'Photo uploads are included with Premium. Open Membership to upgrade.'
-              : result.error === 'CLOUDINARY_NOT_CONFIGURED'
-                ? 'Cloudinary credentials are missing. Configure them in the environment.'
+            result.error === 'CLOUDINARY_AUTH_FAILED' || result.error === 'CLOUDINARY_NOT_CONFIGURED'
+              ? copy.unavailable
+              : result.error === 'PREMIUM_REQUIRED'
+                ? copy.premium
                 : result.error === 'INVALID_IMAGE'
-                  ? `${file.name} is not a supported image.`
-                  : result.error === 'IMAGE_UPLOAD_FAILED'
-                    ? `Could not upload ${file.name}. Please try again.`
-                    : result.error ?? 'IMAGE_UPLOAD_FAILED';
+                  ? copy.notImage(file.name)
+                  : copy.failed(file.name);
           throw new Error(errorMessage);
         }
 
@@ -82,72 +76,32 @@ export function ImageUpload() {
         setUploadedImages((current) => [...current, { name: file.name, url }]);
       }
 
-      setMessage(`${results.length} image${results.length === 1 ? '' : 's'} uploaded.`);
+      setMessage(copy.done(results.length));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'IMAGE_UPLOAD_FAILED');
+      setMessage(error instanceof Error ? error.message : copy.unavailable);
     } finally {
       setIsUploading(false);
     }
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <ImagePlus className="size-4" />
-          Upload images
-        </CardTitle>
-        <CardDescription>
-          Images are resized, converted to WebP, and saved to Cloudinary. Maximum 3 MB per image.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        <input
-          ref={inputRef}
-          accept="image/*"
-          className="sr-only"
-          disabled={isUploading}
-          multiple
-          onChange={handleFilesSelected}
-          type="file"
-        />
-        <Button
-          className="w-fit"
-          disabled={isUploading}
-          onClick={() => inputRef.current?.click()}
-          type="button"
-        >
-          {isUploading ? (
-            <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
-          ) : (
-            <Upload aria-hidden="true" className="size-4" />
-          )}
-          {isUploading ? 'Uploading...' : 'Choose images'}
-        </Button>
-
-        {message && (
-          <p aria-live="polite" className="text-sm text-muted-foreground" role="status">
-            {message}
-          </p>
-        )}
-
-        {uploadedImages.length > 0 && (
-          <ul className="flex flex-col gap-2">
-            {uploadedImages.map(({ name, url }) => (
-              <li key={url} className="text-sm">
-                <a
-                  className="text-primary underline underline-offset-4"
-                  href={url}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  {name} (WebP)
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-4">
+      <p className="text-base text-muted-foreground">{copy.help}</p>
+      <input ref={inputRef} accept="image/*" className="sr-only" disabled={isUploading} multiple onChange={handleFilesSelected} type="file" />
+      <Button variant="outline" className="w-full sm:w-fit" disabled={isUploading} onClick={() => inputRef.current?.click()} type="button">
+        {isUploading ? <LoaderCircle aria-hidden="true" className="size-5 animate-spin" /> : <ImagePlus aria-hidden="true" className="size-5" />}
+        {isUploading ? copy.uploading : copy.choose}
+      </Button>
+      {message && <p aria-live="polite" className="text-base" role="status">{message}</p>}
+      {uploadedImages.length > 0 && (
+        <ul className="flex flex-col gap-2">
+          {uploadedImages.map(({ name, url }) => (
+            <li key={url} className="text-base">
+              <a className="text-primary underline underline-offset-4" href={url} rel="noreferrer" target="_blank">{name}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

@@ -10,7 +10,7 @@ import { StoreProvider } from '@/shared/providers/store-provider';
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
   const session = await auth();
 
-  if (!session) redirect('/');
+  if (!session) redirect('/sign-in');
 
   return (
     <SessionProvider>

@@ -33,3 +33,10 @@ describe('getProductService', () => {
     expect(catalogRepository.complete).toHaveBeenLastCalledWith('test_mode:premium-2000', expect.any(Date), '');
   });
 });
+
+it('reports provider category approval separately from temporary outages', async () => {
+  vi.mocked(catalogRepository.find).mockResolvedValue(null);
+  vi.mocked(catalogRepository.claim).mockResolvedValue({} as never);
+  vi.mocked(dodoPayments.findOrCreateProduct).mockRejectedValueOnce({ error: { code: 'UNSUPPORTED_TAX_CATEGORY' } });
+  expect(await getProductService('premium')).toEqual({ data: { error: 'PRODUCT_CATEGORY_NOT_ENABLED' }, status: 503 });
+});

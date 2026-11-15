@@ -4,7 +4,8 @@ import { Pencil, Trash2 } from 'lucide-react';
 
 import type { NutritionEntry } from '@/features/nutrition/service/nutrition.service';
 import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { EmptyState } from '@/shared/components/ui/empty-state';
+import { FOOD_COPY } from '@/shared/const/copy-food.const';
 
 type NutritionEntryHistoryProps = {
   entries: NutritionEntry[];
@@ -13,81 +14,37 @@ type NutritionEntryHistoryProps = {
   onDelete: (entry: NutritionEntry) => void;
 };
 
-const MEAL_LABELS = {
-  breakfast: 'Breakfast',
-  lunch: 'Lunch',
-  dinner: 'Dinner',
-  snack: 'Snack',
-};
+const copy = FOOD_COPY.list;
 
-export const NutritionEntryHistory = ({
-  entries,
-  loading,
-  onEdit,
-  onDelete,
-}: NutritionEntryHistoryProps) => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Food log</CardTitle>
-      <CardDescription>
-        {entries.length
-          ? `${entries.length} entries recorded for this day.`
-          : 'Nutrition totals use only the entries you record.'}
-      </CardDescription>
-    </CardHeader>
-    <CardContent>
-      {loading ? (
-        <p className="text-sm text-muted-foreground" role="status">
-          Loading food log...
-        </p>
-      ) : entries.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No food entries for this date yet. Add a meal or snack to begin
-          tracking.
-        </p>
-      ) : (
-        <ul className="space-y-3">
-          {entries.map((entry) => (
-            <li key={entry.id} className="rounded-md border border-border p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="font-semibold">{entry.foodName}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {MEAL_LABELS[entry.mealType]}
-                  </p>
-                </div>
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`Edit ${entry.foodName}`}
-                    onClick={() => onEdit(entry)}
-                  >
-                    <Pencil className="size-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`Delete ${entry.foodName}`}
-                    onClick={() => onDelete(entry)}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                {entry.calories} kcal · {entry.proteinGrams} g protein ·{' '}
-                {entry.carbohydrateGrams} g carbs · {entry.fatGrams} g fat ·{' '}
-                {entry.fiberGrams} g fiber
-                {entry.waterMl ? ` · ${entry.waterMl} ml water` : ''}
-              </p>
-              {entry.notes && (
-                <p className="mt-2 text-sm text-muted-foreground">{entry.notes}</p>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </CardContent>
-  </Card>
+export const NutritionEntryHistory = ({ entries, loading, onEdit, onDelete }: NutritionEntryHistoryProps) => (
+  <section aria-labelledby="food-list-title" className="flex flex-col gap-3">
+    <h2 id="food-list-title" className="text-xl font-semibold">{copy.title}</h2>
+    {loading ? (
+      <div className="h-24 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
+    ) : entries.length === 0 ? (
+      <EmptyState message={copy.empty} />
+    ) : (
+      <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
+        {entries.map((entry) => (
+          <li key={entry.id} className="flex flex-col gap-3 p-4">
+            <div>
+              <p className="text-base font-medium text-muted-foreground">{FOOD_COPY.meals[entry.mealType]}</p>
+              <h3 className="text-lg font-semibold">{entry.foodName}</h3>
+              <p className="text-base tabular-nums text-muted-foreground">{copy.line(entry.calories, entry.proteinGrams)}</p>
+              {entry.notes && <p className="mt-1 text-base text-muted-foreground">{entry.notes}</p>}
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" aria-label={copy.editLabel(entry.foodName)} onClick={() => onEdit(entry)}>
+                <Pencil className="size-4" aria-hidden="true" />{copy.edit}
+              </Button>
+              <Button variant="ghost" size="sm" aria-label={copy.deleteLabel(entry.foodName)} onClick={() => onDelete(entry)}
+                className="text-destructive hover:text-destructive">
+                <Trash2 className="size-4" aria-hidden="true" />{copy.delete}
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
 );

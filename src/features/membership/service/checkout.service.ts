@@ -19,9 +19,7 @@ export async function createCheckoutService(userId: string, input: CheckoutType)
   const access = await getBillingAccessService(userId);
   if ('error' in access.data) return { data: access.data, status: access.status };
   if (access.data.plan === 'premium') {
-    return input.kind === 'consultation'
-      ? { data: { included: true }, status: 200 }
-      : { data: { error: 'ALREADY_PREMIUM' }, status: 409 };
+    return { data: { error: 'ALREADY_PREMIUM' }, status: 409 };
   }
   const environment = dodoPayments.config.environment;
   await purchaseRepository.expirePending(userId, environment, new Date());

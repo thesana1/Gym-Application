@@ -1,200 +1,64 @@
+import { type ReactNode } from 'react';
+import { useController, type Control } from 'react-hook-form';
 
-import {
-  FitnessProfileInput,
-  FitnessProfileType,
-} from '@/features/fitness/validations/fitness-profile.validation';
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/shared/components/ui/form';
-import { Input } from '@/shared/components/ui/input';
-import {
-  AVAILABLE_EQUIPMENT,
-  FITNESS_GOALS,
-  TRAINING_EXPERIENCE_LEVELS,
-} from '@/shared/const/fitness.const';
+import type { FitnessProfileInput, FitnessProfileType } from '@/features/fitness/validations/fitness-profile.validation';
+import { PROFILE_COPY } from '@/shared/const/copy-account.const';
+import { FITNESS_GOALS, TRAINING_EXPERIENCE_LEVELS } from '@/shared/const/fitness.const';
+import { cn } from '@/shared/lib/utils';
 
-import type { Control } from 'react-hook-form';
+export type ProfileControl = Control<FitnessProfileInput, undefined, FitnessProfileType>;
 
-type FitnessProfileFieldsProps = {
-  control: Control<FitnessProfileInput, undefined, FitnessProfileType>;
+type OptionCardProps = {
+  type: 'radio' | 'checkbox';
+  name: string;
+  checked: boolean;
+  onChange: () => void;
+  label: string;
+  help?: string;
 };
 
-export const FitnessProfileFields = ({ control }: FitnessProfileFieldsProps) => (
-  <>
-    <FormField
-      control={control}
-      name="goal"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Fitness goal</FormLabel>
-          <FormControl>
-            <select
-              {...field}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="" disabled>
-                Choose a goal
-              </option>
-              {FITNESS_GOALS.map(({ value, label }) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-
-    <FormField
-      control={control}
-      name="experience"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Training experience</FormLabel>
-          <FormControl>
-            <select
-              {...field}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="" disabled>
-                Choose your experience
-              </option>
-              {TRAINING_EXPERIENCE_LEVELS.map(({ value, label }) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-
-    <div className="grid gap-5 sm:grid-cols-2">
-      <FormField
-        control={control}
-        name="age"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Age (optional)</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                min="13"
-                max="100"
-                step="1"
-                {...field}
-                value={field.value ?? ''}
-              />
-            </FormControl>
-            <FormDescription>Used only to tailor general guidance.</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={control}
-        name="trainingDaysPerWeek"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Training days per week (optional)</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                min="1"
-                max="7"
-                step="1"
-                {...field}
-                value={field.value ?? ''}
-              />
-            </FormControl>
-            <FormDescription>How many days you can usually train.</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={control}
-        name="heightCm"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Height in cm (optional)</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                min="100"
-                max="250"
-                step="0.1"
-                {...field}
-                value={field.value ?? ''}
-              />
-            </FormControl>
-            <FormDescription>Used only for relevant estimates.</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={control}
-        name="weightKg"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Weight in kg (optional)</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                min="30"
-                max="350"
-                step="0.1"
-                {...field}
-                value={field.value ?? ''}
-              />
-            </FormControl>
-            <FormDescription>Used only for relevant estimates.</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </div>
-
-    <FormField
-      control={control}
-      name="availableEquipment"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Equipment you can use (optional)</FormLabel>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {AVAILABLE_EQUIPMENT.map(({ value, label }) => (
-              <label key={value} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={field.value.includes(value)}
-                  onChange={(event) => {
-                    const nextValue = event.target.checked
-                      ? [...field.value, value]
-                      : field.value.filter((item) => item !== value);
-                    field.onChange(nextValue);
-                  }}
-                  className="size-4 accent-primary"
-                />
-                {label}
-              </label>
-            ))}
-          </div>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  </>
+// A big tappable choice: the whole card is the label for a hidden native input.
+export const OptionCard = ({ type, name, checked, onChange, label, help }: OptionCardProps) => (
+  <label className={cn('flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 transition-colors',
+    'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring',
+    checked ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-accent')}>
+    <input type={type} name={name} checked={checked} onChange={onChange} className="size-5 shrink-0" />
+    <span className="flex flex-col">
+      <span className="text-lg font-semibold">{label}</span>
+      {help && <span className="text-base text-muted-foreground">{help}</span>}
+    </span>
+  </label>
 );
+
+export const StepShell = ({ title, help, error, children }: { title: string; help: string; error?: string; children: ReactNode }) => (
+  <fieldset className="flex flex-col gap-3">
+    <legend className="mb-1 text-balance font-heading text-2xl font-semibold">{title}</legend>
+    <p className="text-lg text-muted-foreground">{help}</p>
+    {children}
+    {error && <p role="alert" className="text-base text-destructive">{error}</p>}
+  </fieldset>
+);
+
+export const GoalStep = ({ control }: { control: ProfileControl }) => {
+  const { field, fieldState } = useController({ control, name: 'goal' });
+  return (
+    <StepShell title={PROFILE_COPY.steps.goal.title} help={PROFILE_COPY.steps.goal.help} error={fieldState.error && PROFILE_COPY.errors.goal}>
+      {FITNESS_GOALS.map(({ value, label }) => (
+        <OptionCard key={value} type="radio" name="goal" label={label} checked={field.value === value} onChange={() => field.onChange(value)} />
+      ))}
+    </StepShell>
+  );
+};
+
+export const ExperienceStep = ({ control }: { control: ProfileControl }) => {
+  const { field, fieldState } = useController({ control, name: 'experience' });
+  return (
+    <StepShell title={PROFILE_COPY.steps.experience.title} help={PROFILE_COPY.steps.experience.help}
+      error={fieldState.error && PROFILE_COPY.errors.experience}>
+      {TRAINING_EXPERIENCE_LEVELS.map(({ value, label }) => (
+        <OptionCard key={value} type="radio" name="experience" label={label} help={PROFILE_COPY.experienceHelp[value]}
+          checked={field.value === value} onChange={() => field.onChange(value)} />
+      ))}
+    </StepShell>
+  );
+};

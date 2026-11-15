@@ -20,13 +20,13 @@ describe('MeasurementWindowSummary', () => {
   it('renders a neutral self-entered comparison and switches ranges', () => {
     render(<MeasurementWindowSummary measurements={measurements} />);
 
-    expect(screen.getByText('-1.0 kg')).toBeInTheDocument();
-    expect(screen.getByText(/descriptive only/)).toBeInTheDocument();
+    expect(screen.getByText('Down 1.0 kg')).toBeInTheDocument();
+    expect(screen.getByText('75 → 74 kg')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: '8 weeks' }));
 
-    expect(screen.getByText(/8 weeks/)).toBeInTheDocument();
-    expect(screen.getByText('-1.0 kg')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '8 weeks' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Down 1.0 kg')).toBeInTheDocument();
   });
 
   it('explains when no same-type comparison can be made', () => {
@@ -37,7 +37,7 @@ describe('MeasurementWindowSummary', () => {
     );
 
     expect(
-      screen.getByText(/At least two dated values of the same measurement type/)
+      screen.getByText('Save the same thing at least twice to compare.')
     ).toBeInTheDocument();
   });
 });

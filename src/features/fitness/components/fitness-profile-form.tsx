@@ -1,39 +1,29 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { ArrowLeft, ArrowRight, CircleCheck } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useForm, useWatch, type FieldErrors } from 'react-hook-form';
 
-import { FitnessProfileFields } from '@/features/fitness/components/fitness-profile-fields';
+import { ExperienceStep, GoalStep } from '@/features/fitness/components/fitness-profile-fields';
+import { BodyStep, DaysStep, EquipmentStep } from '@/features/fitness/components/fitness-profile-options';
+import { FitnessProfileSummary, PROFILE_STEPS, type ProfileStep } from '@/features/fitness/components/fitness-profile-summary';
 import { useFitnessProfile } from '@/features/fitness/hooks/use-fitness-profile';
-import {
-  FitnessProfileInput,
-  FitnessProfileSchema,
-  FitnessProfileType,
-} from '@/features/fitness/validations/fitness-profile.validation';
+import { FitnessProfileInput, FitnessProfileSchema, FitnessProfileType } from '@/features/fitness/validations/fitness-profile.validation';
+import { PageHeader } from '@/shared/components/layout/page-header';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
-import { Form } from '@/shared/components/ui/form';
+import { PROFILE_COPY } from '@/shared/const/copy-account.const';
 
 const EMPTY_PROFILE: FitnessProfileInput = {
-  goal: '',
-  experience: '',
-  age: '',
-  heightCm: '',
-  weightKg: '',
-  trainingDaysPerWeek: '',
-  availableEquipment: [],
+  goal: '', experience: '', age: '', heightCm: '', weightKg: '', trainingDaysPerWeek: '', availableEquipment: [],
 };
 
-const toFormValues = (
-  profile: FitnessProfileInput | FitnessProfileType | null
-): FitnessProfileInput => ({
+const STEP_FIELDS: Record<ProfileStep, (keyof FitnessProfileInput)[]> = {
+  goal: ['goal'], experience: ['experience'], days: ['trainingDaysPerWeek'], equipment: ['availableEquipment'], body: ['age', 'heightCm', 'weightKg'],
+};
+
+const toFormValues = (profile: FitnessProfileInput | FitnessProfileType | null): FitnessProfileInput => ({
   ...EMPTY_PROFILE,
   ...profile,
   goal: profile?.goal ?? '',
@@ -45,87 +35,119 @@ const toFormValues = (
   availableEquipment: profile?.availableEquipment ?? [],
 });
 
-type FitnessProfileFormProps = {
-  userName: string;
-};
+const copy = PROFILE_COPY;
 
-export const FitnessProfileForm = ({ userName }: FitnessProfileFormProps) => {
+// First visit: one question per screen. Later visits: a summary where each answer can be changed on its own.
+export const FitnessProfileForm = () => {
   const { loading, saving, error, loadProfile, saveProfile } = useFitnessProfile();
+  const [hasProfile, setHasProfile] = useState(false);
+  const [view, setView] = useState<'summary' | 'step' | 'done'>('step');
+  const [step, setStep] = useState(0);
   const form = useForm<FitnessProfileInput, undefined, FitnessProfileType>({
     resolver: zodResolver(FitnessProfileSchema),
     defaultValues: EMPTY_PROFILE,
   });
-  const { handleSubmit, reset } = form;
+  const values = useWatch({ control: form.control }) as FitnessProfileInput;
+  const { reset } = form;
 
   useEffect(() => {
     let active = true;
-
-    const load = async () => {
-      const profile = await loadProfile();
+    void loadProfile().then((profile) => {
       if (!active) return;
       reset(toFormValues(profile));
-    };
-
-    void load();
+      setHasProfile(profile !== null);
+      setView(profile ? 'summary' : 'step');
+    });
     return () => {
       active = false;
     };
   }, [loadProfile, reset]);
 
   const onSubmit = async (profile: FitnessProfileType) => {
-    if (await saveProfile(profile)) {
-      reset(toFormValues(profile));
-    }
+    if (!(await saveProfile(profile))) return;
+    reset(toFormValues(profile));
+    setView(hasProfile ? 'summary' : 'done');
+    setHasProfile(true);
   };
 
-  return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Your starting point
-        </p>
-        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Fitness profile</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {userName ? `Hi ${userName}, ` : ''}
-          share only what you are comfortable sharing. You can update your goals
-          or clear optional details at any time.
-        </p>
-      </header>
+  const onInvalid = (errors: FieldErrors<FitnessProfileInput>) => {
+    const first = PROFILE_STEPS.findIndex((name) => STEP_FIELDS[name].some((field) => errors[field]));
+    if (first >= 0) setStep(first);
+    setView('step');
+  };
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Goals and experience</CardTitle>
-          <CardDescription>
-            A goal and experience level help shape future training guidance.
-            Measurements and equipment are optional.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <p className="text-sm text-muted-foreground" role="status">
-              Loading your profile...
-            </p>
-          ) : (
-            <Form {...form}>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                <FitnessProfileFields control={form.control} />
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  Your profile is private to your account. Fitness guidance is
-                  general information, not medical advice.
-                </p>
-                {error && (
-                  <p className="text-sm font-medium text-destructive" role="alert">
-                    {error}
-                  </p>
-                )}
-                <Button type="submit" disabled={saving}>
-                  {saving ? 'Saving profile...' : 'Save profile'}
-                </Button>
-              </form>
-            </Form>
+  const next = async () => {
+    if (await form.trigger(STEP_FIELDS[PROFILE_STEPS[step]])) setStep((current) => current + 1);
+  };
+
+  const isLast = step === PROFILE_STEPS.length - 1;
+  const control = form.control;
+  const stepView = { goal: <GoalStep control={control} />, experience: <ExperienceStep control={control} />, days: <DaysStep control={control} />,
+    equipment: <EquipmentStep control={control} />, body: <BodyStep control={control} /> }[PROFILE_STEPS[step]];
+
+  if (loading) return <div className="h-72 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />;
+
+  if (view === 'done') {
+    return (
+      <section role="status" className="flex animate-rise flex-col items-start gap-4 rounded-2xl bg-primary p-6 text-primary-foreground">
+        <CircleCheck className="size-10" aria-hidden="true" />
+        <h1 className="font-heading text-3xl font-semibold">{copy.doneTitle}</h1>
+        <p className="text-lg">{copy.doneBody}</p>
+        <Button asChild size="lg" variant="secondary" className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+          <Link href="/dashboard/workouts">{copy.seeWorkouts}<ArrowRight className="size-5" aria-hidden="true" /></Link>
+        </Button>
+      </section>
+    );
+  }
+
+  return (
+    <div className="flex animate-rise flex-col gap-5">
+      <PageHeader title={hasProfile ? copy.title : copy.setupTitle} description={hasProfile ? copy.description : copy.setupDescription} className="mb-1" />
+      {view === 'summary' ? (
+        <>
+          <FitnessProfileSummary values={values} onChange={(name) => { setStep(PROFILE_STEPS.indexOf(name)); setView('step'); }} />
+          <p className="text-base text-muted-foreground">{copy.privacy}</p>
+        </>
+      ) : (
+        <form noValidate onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="flex flex-col gap-6">
+          {!hasProfile && (
+            <div className="flex flex-col gap-2">
+              <p className="text-base font-semibold text-muted-foreground">{copy.stepOf(step + 1, PROFILE_STEPS.length)}</p>
+              <div className="grid grid-cols-5 gap-1" aria-hidden="true">
+                {PROFILE_STEPS.map((name, index) => (
+                  <span key={name} className={index <= step ? 'h-2 rounded-full bg-primary' : 'h-2 rounded-full bg-muted'} />
+                ))}
+              </div>
+            </div>
           )}
-        </CardContent>
-      </Card>
+          {stepView}
+          {error && <p className="text-base text-destructive" role="alert">{error}</p>}
+          <div className="sticky bottom-24 z-10 flex gap-3 bg-background/95 py-2 lg:bottom-0">
+            {hasProfile ? (
+              <>
+                <Button type="button" size="lg" variant="outline" onClick={() => { reset(); setView('summary'); }}>{copy.backToSummary}</Button>
+                <Button type="submit" size="lg" className="flex-1" disabled={saving}>{saving ? copy.saving : copy.save}</Button>
+              </>
+            ) : (
+              <>
+                {step > 0 && (
+                  <Button type="button" size="lg" variant="outline" onClick={() => setStep((current) => current - 1)}>
+                    <ArrowLeft className="size-5" aria-hidden="true" />{copy.back}
+                  </Button>
+                )}
+                {isLast ? (
+                  // A separate key stops React reusing the Next button, so the tap that reveals this button cannot submit.
+                  <Button key="finish" type="submit" size="lg" className="flex-1" disabled={saving}>{saving ? copy.saving : copy.finish}</Button>
+                ) : (
+                  <Button key="next" type="button" size="lg" className="flex-1" onClick={() => void next()}>
+                    {copy.next}<ArrowRight className="size-5" aria-hidden="true" />
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
+        </form>
+      )}
     </div>
   );
 };

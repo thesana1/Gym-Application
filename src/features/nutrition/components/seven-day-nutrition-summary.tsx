@@ -2,18 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import type {
-  NutritionEntry,
-  NutritionTargets,
-} from '@/features/nutrition/service/nutrition.service';
+import type { NutritionEntry } from '@/features/nutrition/service/nutrition.service';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
+import { COMMON_COPY } from '@/shared/const/copy-common.const';
+import { FOOD_COPY } from '@/shared/const/copy-food.const';
 import { http } from '@/shared/lib/http';
 
 type DailyNutritionSummary = {
@@ -29,9 +21,7 @@ type DailyNutritionSummary = {
   };
 };
 
-type SevenDayNutritionSummaryProps = {
-  targets: NutritionTargets | null;
-};
+type SevenDayNutritionSummaryProps = { refreshKey?: number };
 
 const toDateString = (date: Date) =>
   [
@@ -85,41 +75,23 @@ export const summarizeNutritionByLocalDay = (
 };
 
 const formatDay = (date: string) =>
-  new Intl.DateTimeFormat(undefined, {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-  }).format(new Date(`${date}T12:00:00`));
+  new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(`${date}T12:00:00`));
 
-const METRICS = [
-  { key: 'calories', label: 'Calories', unit: 'kcal' },
-  { key: 'proteinGrams', label: 'Protein', unit: 'g' },
-  { key: 'carbohydrateGrams', label: 'Carbs', unit: 'g' },
-  { key: 'fatGrams', label: 'Fat', unit: 'g' },
-  { key: 'fiberGrams', label: 'Fiber', unit: 'g' },
-  { key: 'waterMl', label: 'Water', unit: 'ml' },
-] as const;
+const copy = FOOD_COPY.week;
 
-export const SevenDayNutritionSummary = ({
-  targets,
-}: SevenDayNutritionSummaryProps) => {
+export const SevenDayNutritionSummary = ({ refreshKey = 0 }: SevenDayNutritionSummaryProps) => {
   const [entries, setEntries] = useState<NutritionEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   const loadEntries = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
-      const range = getLocalNutritionDateRange();
-      setEntries(
-        await http.get<NutritionEntry[]>('/nutrition/entries', {
-          params: range,
-        })
-      );
+      setEntries(await http.get<NutritionEntry[]>('/nutrition/entries', { params: getLocalNutritionDateRange() }));
     } catch {
       setEntries([]);
-      setError('Could not load the past seven days of nutrition entries.');
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -127,76 +99,31 @@ export const SevenDayNutritionSummary = ({
 
   useEffect(() => {
     void loadEntries();
-  }, [loadEntries]);
+  }, [loadEntries, refreshKey]);
 
-  const days = summarizeNutritionByLocalDay(entries);
+  if (loading) return <p className="text-base text-muted-foreground" role="status">{copy.loading}</p>;
+  if (error) {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="text-base text-destructive" role="alert">{copy.error}</p>
+        <Button variant="outline" onClick={() => void loadEntries()}>{COMMON_COPY.tryAgain}</Button>
+      </div>
+    );
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Past seven days</CardTitle>
-        <CardDescription>
-          Daily totals from your food and water entries, using local calendar
-          days. Values are self-entered and may be approximate.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {targets && (
-          <p className="text-xs text-muted-foreground">
-            Your chosen daily reference targets: {targets.calories} kcal,{' '}
-            {targets.proteinGrams} g protein, {targets.carbohydrateGrams} g
-            carbs, {targets.fatGrams} g fat, {targets.fiberGrams} g fiber, and{' '}
-            {targets.waterMl} ml water. These are your entries, not
-            recommendations.
-          </p>
-        )}
-        {loading ? (
-          <p className="text-sm text-muted-foreground" role="status">
-            Loading the past seven days…
-          </p>
-        ) : error ? (
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-sm text-destructive" role="alert">{error}</p>
-            <Button variant="outline" onClick={() => void loadEntries()}>
-              Try again
-            </Button>
-          </div>
-        ) : (
-          <ul className="grid gap-3">
-            {days.map(({ date, entryCount, totals }) => (
-              <li
-                key={date}
-                className="rounded-md border border-border p-4"
-              >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h3 className="text-sm font-semibold">{formatDay(date)}</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {entryCount
-                      ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} logged`
-                      : 'No entries logged'}
-                  </p>
-                </div>
-                {entryCount > 0 && (
-                  <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-                    {METRICS.map(({ key, label, unit }) => (
-                      <div key={key}>
-                        <dt className="text-xs text-muted-foreground">{label}</dt>
-                        <dd className="mt-1 text-sm font-medium">
-                          {totals[key]} {unit}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-        <p className="text-xs text-muted-foreground">
-          Days without entries are unlogged, not zero intake. This history does
-          not assess nutritional adequacy or provide health recommendations.
-        </p>
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-3">
+      <ul className="flex flex-col divide-y divide-border">
+        {summarizeNutritionByLocalDay(entries).reverse().map(({ date, entryCount, totals }) => (
+          <li key={date} className="flex flex-wrap items-baseline justify-between gap-x-3 py-3 first:pt-0">
+            <span className="text-base font-semibold">{formatDay(date)}</span>
+            <span className="text-base tabular-nums text-muted-foreground">
+              {entryCount ? copy.day(totals.calories, entryCount) : copy.nothing}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="text-base text-muted-foreground">{copy.note}</p>
+    </div>
   );
 };

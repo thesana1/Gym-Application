@@ -42,23 +42,20 @@ describe('TrainingActivityHistory', () => {
 
     render(<TrainingActivityHistory />);
 
-    expect(await screen.findByText('7')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(
-      screen.getByText(/not training quality, health outcomes, or a recommended schedule/)
-    ).toBeInTheDocument();
+    expect(await screen.findByText('7 sets · 3 exercises')).toBeInTheDocument();
+    expect(screen.getByText('2 workouts')).toBeInTheDocument();
     expect(mockGet).toHaveBeenCalledWith('/fitness/activity', {
       params: { weeks: 4 },
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Past 8 weeks' }));
+    fireEvent.click(screen.getByRole('button', { name: '8 weeks' }));
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith('/fitness/activity', {
         params: { weeks: 8 },
       });
     });
-    expect(await screen.findByText('4')).toBeInTheDocument();
+    expect(await screen.findByText('4 sets · 2 exercises')).toBeInTheDocument();
   });
 
   it('offers retry when activity cannot be loaded', async () => {
@@ -67,9 +64,7 @@ describe('TrainingActivityHistory', () => {
 
     render(<TrainingActivityHistory />);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Could not load your training activity.'
-    );
+    expect(await screen.findByRole('alert')).toHaveTextContent('We could not load your activity.');
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
 
     await waitFor(() => expect(mockGet).toHaveBeenCalledTimes(2));

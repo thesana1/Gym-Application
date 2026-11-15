@@ -10,7 +10,7 @@ export const userRepository = {
 
   async findByEmail(email: string): Promise<UserDocument | null> {
     await mongo.connect();
-    return UserModel.findOne({ email }).lean<UserDocument>().exec();
+    return UserModel.findOne({ email: email.trim() }).collation({ locale: 'en', strength: 2 }).lean<UserDocument>().exec();
   },
 
   async findAll(page = 1, limit = 20): Promise<{ items: UserDocument[] }> {

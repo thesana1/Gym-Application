@@ -1,22 +1,22 @@
 export const PERSONAL_WORKOUT_CHALLENGES = [
   {
     id: 'start-a-routine',
-    title: 'Start a routine',
-    description: 'Log two workouts during your first 7 days.',
+    title: 'Get started',
+    description: 'Save 2 workouts in 7 days.',
     durationDays: 7,
     targetWorkouts: 2,
   },
   {
     id: 'build-consistency',
-    title: 'Build consistency',
-    description: 'Log four workouts over 14 days, at a pace that works for you.',
+    title: 'Keep it going',
+    description: 'Save 4 workouts in 14 days.',
     durationDays: 14,
     targetWorkouts: 4,
   },
   {
     id: 'keep-showing-up',
-    title: 'Keep showing up',
-    description: 'Log eight workouts over 30 days. Rest days are part of training.',
+    title: 'Make it a habit',
+    description: 'Save 8 workouts in 30 days.',
     durationDays: 30,
     targetWorkouts: 8,
   },

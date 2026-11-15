@@ -164,4 +164,16 @@ describe('POST /api/uploads/images', () => {
     expect(response.status).toBe(503);
     expect(mockSharp).not.toHaveBeenCalled();
   });
+  it('reports disabled provider credentials without exposing the key or pretending the image was uploaded', async () => {
+    mockUploadStream.mockImplementationOnce(
+      ((_options: unknown, callback: (error: Error | null) => void) => {
+        callback(Object.assign(new Error('disabled api_key'), { http_code: 401 }));
+        return { end: mockUploadEnd };
+      }) as never
+    );
+    const response = await POST(makeRequest(new File(['photo'], 'photo.png', { type: 'image/png' })));
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: 'CLOUDINARY_AUTH_FAILED' });
+  });
+
 });

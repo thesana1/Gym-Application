@@ -24,7 +24,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await userRepository.findByEmail(credentials.email as string);
+        const user = await userRepository.findByEmail(String(credentials.email).trim());
         if (!user) return null;
 
         const passwordHash = hashPassword(credentials.password as string);
@@ -88,8 +88,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
             : null;
         } else {
-          token.role = 'user';
-          membershipToken.membership = null;
+          return null;
         }
       }
 
