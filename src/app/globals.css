@@ -163,6 +163,14 @@
   .animate-rise {
     animation: rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
   @keyframes pop {
     0% {
       transform: scale(0.6);
@@ -175,6 +183,11 @@
     100% {
       transform: scale(1);
     }
+  }
+  /* Draws an SVG line from start to end; the path needs pathLength="1". */
+  .animate-draw {
+    stroke-dasharray: 1;
+    animation: draw 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .animate-pop {
     animation: pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -194,6 +207,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-draw,
   .animate-pop,
   .animate-rise,
   .animate-rise-1,

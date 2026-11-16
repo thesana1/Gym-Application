@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { ImageUpload } from '@/features/dashboard/components/image-upload';
+import { LiftProgressCard } from '@/features/fitness/components/lift-progress-card';
 import { MeasurementWindowSummary } from '@/features/fitness/components/measurement-window-summary';
 import { ProgressHeader } from '@/features/fitness/components/progress-header';
 import { ProgressMeasurementForm } from '@/features/fitness/components/progress-measurement-form';
@@ -111,6 +112,7 @@ export const ProgressDashboard = () => {
             {loading
               ? <div className="h-36 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
               : <LatestWeight measurements={measurements} />}
+            <LiftProgressCard />
             <Button size="lg" className="sticky bottom-24 z-10 w-full shadow-lg lg:bottom-6"
               onClick={() => { setEditing(null); setFormOpen(true); setError(null); }}>
               <Plus className="size-5" aria-hidden="true" />{copy.add}
