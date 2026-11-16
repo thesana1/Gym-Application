@@ -23,6 +23,8 @@ export const WorkoutLogSchema = z.strictObject({
   title: z.string().trim().min(1).max(80),
   completedAt: optionalDate,
   notes: z.string().trim().max(1000).optional(),
+  // Links a log to the plan workout it completes, so the calendar can tick that day off.
+  planWorkoutId: z.string().trim().min(1).max(40).optional(),
   exercises: z
     .array(
       z.strictObject({

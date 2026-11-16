@@ -5,11 +5,30 @@ import { useCallback, useEffect, useState } from 'react';
 import { WorkoutLogFilters } from '@/features/fitness/components/workout-log-filters';
 import { WorkoutLogForm } from '@/features/fitness/components/workout-log-form';
 import { WorkoutLogHistory } from '@/features/fitness/components/workout-log-history';
-import { toInputValues } from '@/features/fitness/components/workout-log-manager';
 import { useWorkoutLogs } from '@/features/fitness/hooks/use-workout-logs';
 import type { WorkoutLog } from '@/features/fitness/service/workout-log.service';
-import type { WorkoutLogType } from '@/features/fitness/validations/workout-log.validation';
+import type { WorkoutLogInput, WorkoutLogType } from '@/features/fitness/validations/workout-log.validation';
 import { WORKOUTS_COPY } from '@/shared/const/copy-workouts.const';
+
+const toLocalDateTime = (value: string) => {
+  const date = new Date(value);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 16);
+};
+
+const toInputValues = (workout: WorkoutLog): WorkoutLogInput => ({
+  title: workout.title,
+  ...(workout.planWorkoutId ? { planWorkoutId: workout.planWorkoutId } : {}),
+  completedAt: toLocalDateTime(workout.completedAt),
+  notes: workout.notes ?? '',
+  exercises: workout.exercises.map((exercise) => ({
+    exerciseId: exercise.exerciseId,
+    sets: exercise.sets.map((set) => ({
+      repetitions: String(set.repetitions),
+      weightKg: set.weightKg === undefined ? '' : String(set.weightKg),
+    })),
+  })),
+});
 
 type Filters = { from?: string; to?: string; exerciseId?: string };
 

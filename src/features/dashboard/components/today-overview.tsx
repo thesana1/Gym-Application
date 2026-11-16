@@ -6,9 +6,9 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { TodayNutritionCard } from '@/features/dashboard/components/today-nutrition-card';
 import { TodayWorkoutCard } from '@/features/dashboard/components/today-workout-card';
-import type { TrainingSchedule } from '@/features/fitness/service/training-schedule.service';
 import type { WorkoutLog } from '@/features/fitness/service/workout-log.service';
 import type { NutritionEntry, NutritionTargets } from '@/features/nutrition/service/nutrition.service';
+import type { TrainingPlan } from '@/features/training/service/training-plan.service';
 import { Button } from '@/shared/components/ui/button';
 import { COMMON_COPY } from '@/shared/const/copy-common.const';
 import { HOME_COPY } from '@/shared/const/copy-home.const';
@@ -18,7 +18,7 @@ type TodayData = {
   workouts: WorkoutLog[];
   entries: NutritionEntry[];
   targets: NutritionTargets | null;
-  schedule: TrainingSchedule;
+  plan: TrainingPlan | null;
 };
 
 type TodayOverviewProps = { hasProfile: boolean };
@@ -76,13 +76,13 @@ export const TodayOverview = ({ hasProfile }: TodayOverviewProps) => {
     try {
       const day = getLocalDayRange();
       const week = getLocalDayRange(new Date(), 7);
-      const [workouts, entries, targets, schedule] = await Promise.all([
+      const [workouts, entries, targets, plan] = await Promise.all([
         http.get<WorkoutLog[]>('/fitness/workouts', { params: { from: week.from, to: week.to } }),
         http.get<NutritionEntry[]>('/nutrition/entries', { params: { from: day.date, to: day.date } }),
         http.get<NutritionTargets | null>('/nutrition/targets'),
-        http.get<TrainingSchedule>('/fitness/schedule'),
+        http.get<TrainingPlan | null>('/training/plan'),
       ]);
-      setData({ workouts, entries, targets, schedule });
+      setData({ workouts, entries, targets, plan });
     } catch {
       setError(true);
       setData(null);
@@ -113,11 +113,9 @@ export const TodayOverview = ({ hasProfile }: TodayOverviewProps) => {
     );
   }
 
-  const today = getLocalDayRange();
-  const todayWorkouts = data.workouts.filter(({ completedAt }) => completedAt >= today.from && completedAt <= today.to);
   return (
     <div className="flex flex-col gap-4">
-      {hasProfile ? <TodayWorkoutCard workouts={todayWorkouts} assignments={data.schedule.assignments} /> : <SetupCard />}
+      {hasProfile ? <TodayWorkoutCard plan={data.plan} workouts={data.workouts} /> : <SetupCard />}
       <TodayNutritionCard entries={data.entries} targets={data.targets} />
       <WeekNumber count={data.workouts.length} />
     </div>

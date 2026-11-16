@@ -6,6 +6,8 @@ export const BODYWEIGHT_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Bodyweight squat',
     equipment: ['bodyweight'],
     targetMuscles: 'Thighs and glutes',
+    region: 'lower',
+    focus: ['legs', 'glutes'],
     instructions: [
       'Stand with feet about shoulder-width apart.',
       'Sit your hips back and bend your knees while keeping your chest comfortable and upright.',
@@ -20,6 +22,8 @@ export const BODYWEIGHT_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Incline push-up',
     equipment: ['bodyweight'],
     targetMuscles: 'Chest, shoulders, and arms',
+    region: 'upper',
+    focus: ['chest', 'shoulders', 'arms'],
     instructions: [
       'Place your hands on a stable surface and step back into a straight-body position.',
       'Bend your elbows to lower your chest toward your hands.',
@@ -34,6 +38,8 @@ export const BODYWEIGHT_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Glute bridge',
     equipment: ['bodyweight'],
     targetMuscles: 'Glutes and hamstrings',
+    region: 'lower',
+    focus: ['glutes'],
     instructions: [
       'Lie on your back with knees bent and feet flat on the floor.',
       'Brace gently and lift your hips until your body forms a comfortable line.',
@@ -48,6 +54,8 @@ export const BODYWEIGHT_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Bird dog',
     equipment: ['bodyweight'],
     targetMuscles: 'Core and back',
+    region: 'core',
+    focus: ['core', 'back'],
     instructions: [
       'Start on hands and knees with hands below shoulders.',
       'Reach one arm forward and the opposite leg back without twisting your torso.',
@@ -62,6 +70,8 @@ export const BODYWEIGHT_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Reverse lunge',
     equipment: ['bodyweight'],
     targetMuscles: 'Thighs and glutes',
+    region: 'lower',
+    focus: ['legs', 'glutes'],
     instructions: [
       'Stand tall and step one foot back to a comfortable distance.',
       'Bend both knees only as far as you can control comfortably.',
@@ -76,6 +86,8 @@ export const BODYWEIGHT_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Hip hinge',
     equipment: ['bodyweight'],
     targetMuscles: 'Glutes and hamstrings',
+    region: 'lower',
+    focus: ['glutes', 'legs'],
     instructions: [
       'Stand with soft knees and hands resting on your hips.',
       'Push your hips back while keeping your spine comfortable and neutral.',
@@ -90,6 +102,8 @@ export const BODYWEIGHT_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Dead bug',
     equipment: ['bodyweight'],
     targetMuscles: 'Core',
+    region: 'core',
+    focus: ['core'],
     instructions: [
       'Lie on your back with arms reaching upward and knees bent.',
       'Slowly lower one arm and the opposite leg while keeping your torso steady.',

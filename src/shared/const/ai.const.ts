@@ -17,7 +17,7 @@ export const AI_MIN_RETRY_WINDOW_MS = 10_000;
 export const AI_DAILY_LIMITS = { free: 5, premium: 50 } as const;
 export const AI_USAGE_RETENTION_MS = 3 * 24 * 60 * 60 * 1000;
 
-export const AI_REQUEST_KINDS = ['meal-ideas', 'fitness-question'] as const;
+export const AI_REQUEST_KINDS = ['meal-ideas', 'fitness-question', 'workout-plan', 'workout-tip'] as const;
 export type AiRequestKind = (typeof AI_REQUEST_KINDS)[number];
 
 export const AI_ERROR_MESSAGES: Record<string, string> = {
@@ -59,6 +59,23 @@ export const AI_PROMPTS = {
     'Set seeProfessional to true when the question involves pain, injury, illness, medication, pregnancy, or disordered eating.',
     'followUpQuestions are short questions the user might want to ask you next, written in the user\'s own voice',
     '(for example "How do I know if I am resting too little?"), never questions you are asking the user.',
+    SHARED_RULES,
+  ].join(' '),
+  workoutPlan: [
+    'You are a qualified strength coach building a weekly resistance-training plan inside a personal fitness app.',
+    'Use only exercise ids from availableExercises and create exactly the number of workouts given in days.',
+    'Across the week, balance pushing, pulling, legs or hips, and core, and train each major muscle group at least twice a week',
+    'when there are two or more days. Put the user\'s focusAreas first and give them one extra exercise.',
+    'Use 4 to 6 exercises per workout, with big multi-joint exercises first and smaller ones last.',
+    'Give each workout a short friendly name of at most 3 words, such as "Upper push" or "Legs and glutes".',
+    'Do not choose sets, reps or weights; the app sets those from research guidelines.',
+    'summary is one or two plain sentences that explain the plan to a beginner.',
+    SHARED_RULES,
+  ].join(' '),
+  workoutTip: [
+    'You are an encouraging strength coach. The user just finished a workout.',
+    'Using their logged sets and the next-session targets, give one practical tip in at most two short, plain sentences.',
+    'Do not change the target numbers and do not give medical advice.',
     SHARED_RULES,
   ].join(' '),
 } as const;

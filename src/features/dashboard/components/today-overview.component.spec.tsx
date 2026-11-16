@@ -9,9 +9,9 @@ import { getLocalDayRange, TodayOverview } from '@/features/dashboard/components
 import { http } from '@/shared/lib/http';
 
 const mockGet = vi.mocked(http.get);
-const noSchedule = { sessions: [], assignments: [] };
-const respond = (workouts: unknown[], entries: unknown[], schedule: unknown = noSchedule) =>
-  mockGet.mockResolvedValueOnce(workouts).mockResolvedValueOnce(entries).mockResolvedValueOnce(null).mockResolvedValueOnce(schedule);
+const noSchedule = null;
+const respond = (workouts: unknown[], entries: unknown[], plan: unknown = noSchedule) =>
+  mockGet.mockResolvedValueOnce(workouts).mockResolvedValueOnce(entries).mockResolvedValueOnce(null).mockResolvedValueOnce(plan);
 
 describe('TodayOverview', () => {
   beforeEach(() => vi.resetAllMocks());
@@ -20,8 +20,7 @@ describe('TodayOverview', () => {
     respond([], []);
     render(<TodayOverview hasProfile />);
 
-    expect(await screen.findByText('Rest day')).toBeInTheDocument();
-    expect(screen.getByText('Pick your training days to see your next workout.')).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Build my plan' })).toHaveAttribute('href', '/dashboard/workouts');
     expect(mockGet).toHaveBeenCalledWith('/fitness/workouts', {
       params: { from: getLocalDayRange(new Date(), 7).from, to: getLocalDayRange().to },
     });
@@ -29,18 +28,18 @@ describe('TodayOverview', () => {
       params: { from: getLocalDayRange().date, to: getLocalDayRange().date },
     });
     expect(mockGet).toHaveBeenCalledWith('/nutrition/targets');
-    expect(mockGet).toHaveBeenCalledWith('/fitness/schedule');
+    expect(mockGet).toHaveBeenCalledWith('/training/plan');
   });
 
   it('puts today’s planned session first with one Start button', async () => {
     respond([], [], {
-      sessions: [{ sessionIndex: 0, title: 'Full body A' }],
-      assignments: [{ weekday: new Date().getDay(), sessionIndex: 0, sessionTitle: 'Full body A' }],
+      goal: 'general-fitness', focusAreas: [], source: 'manual',
+      workouts: [{ id: 'w1', name: 'Full body A', weekday: new Date().getDay(), exercises: [] }],
     });
     render(<TodayOverview hasProfile />);
 
     expect(await screen.findByText('Full body A')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Start workout' })).toHaveAttribute('href', '/dashboard/workouts?session=0');
+    expect(screen.getByRole('link', { name: 'Start workout' })).toHaveAttribute('href', '/dashboard/workouts/w1');
   });
 
   it('asks new members to set up their plan instead of showing a workout', async () => {
@@ -48,7 +47,7 @@ describe('TodayOverview', () => {
     render(<TodayOverview hasProfile={false} />);
 
     expect(await screen.findByRole('link', { name: 'Get started' })).toHaveAttribute('href', '/dashboard/profile');
-    expect(screen.queryByText('Rest day')).not.toBeInTheDocument();
+    expect(screen.queryByText('Make your workout plan')).not.toBeInTheDocument();
   });
 
   it('shows a retry action when data loading fails', async () => {

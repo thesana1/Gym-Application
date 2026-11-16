@@ -12,6 +12,7 @@ export type WorkoutLog = {
   title: string;
   completedAt: string;
   notes?: string;
+  planWorkoutId?: string;
   exercises: {
     exerciseId: string;
     exerciseName: string;
@@ -24,6 +25,7 @@ const toWorkoutLog = (document: WorkoutLogDocument): WorkoutLog => ({
   title: document.title,
   completedAt: document.completedAt.toISOString(),
   notes: document.notes ?? undefined,
+  ...(document.planWorkoutId ? { planWorkoutId: document.planWorkoutId } : {}),
   exercises: document.exercises.map((exercise) => ({
     exerciseId: exercise.exerciseId,
     exerciseName: exercise.exerciseName,

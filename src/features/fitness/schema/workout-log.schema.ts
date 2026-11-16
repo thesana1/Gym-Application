@@ -28,6 +28,7 @@ const WorkoutLogSchema = new Schema(
     title: { type: String, required: true, maxlength: 80 },
     completedAt: { type: Date, required: true, index: true },
     notes: { type: String, maxlength: 1000 },
+    planWorkoutId: { type: String, maxlength: 40 },
     exercises: { type: [WorkoutExerciseSchema], required: true },
   },
   { timestamps: true }

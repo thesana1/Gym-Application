@@ -6,6 +6,8 @@ export const EQUIPPED_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Supported dumbbell row',
     equipment: ['dumbbells'],
     targetMuscles: 'Upper back and arms',
+    region: 'upper',
+    focus: ['back', 'arms'],
     instructions: [
       'Support one hand on a stable bench and hold a light dumbbell in the other.',
       'Keep your back steady and draw your elbow toward your hip.',
@@ -20,6 +22,8 @@ export const EQUIPPED_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Resistance-band row',
     equipment: ['resistance-bands'],
     targetMuscles: 'Upper back and arms',
+    region: 'upper',
+    focus: ['back', 'arms'],
     instructions: [
       'Secure the band to a stable anchor and hold one end in each hand.',
       'Stand tall and draw your elbows back without leaning.',
@@ -34,6 +38,8 @@ export const EQUIPPED_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Seated machine row',
     equipment: ['gym-machines'],
     targetMuscles: 'Upper back and arms',
+    region: 'upper',
+    focus: ['back', 'arms'],
     instructions: [
       'Adjust the seat so the handles are within a comfortable reach.',
       'Sit upright and draw the handles toward your torso without rocking.',
@@ -48,6 +54,8 @@ export const EQUIPPED_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Light barbell hip hinge',
     equipment: ['barbell'],
     targetMuscles: 'Glutes and hamstrings',
+    region: 'lower',
+    focus: ['glutes', 'legs'],
     instructions: [
       'Start with an unloaded bar and stand with soft knees.',
       'Push your hips back while keeping the bar close to your legs.',
@@ -62,6 +70,8 @@ export const EQUIPPED_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Seated dumbbell press',
     equipment: ['dumbbells'],
     targetMuscles: 'Shoulders and arms',
+    region: 'upper',
+    focus: ['shoulders', 'arms'],
     instructions: [
       'Sit with your back supported and hold light dumbbells near shoulder height.',
       'Press upward without locking your elbows or arching your back.',
@@ -76,6 +86,8 @@ export const EQUIPPED_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Band pull-apart',
     equipment: ['resistance-bands'],
     targetMuscles: 'Upper back and shoulders',
+    region: 'upper',
+    focus: ['back', 'shoulders'],
     instructions: [
       'Hold a light resistance band in front of you with arms comfortably extended.',
       'Draw your hands apart while keeping your shoulders relaxed.',
@@ -90,6 +102,8 @@ export const EQUIPPED_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Seated machine chest press',
     equipment: ['gym-machines'],
     targetMuscles: 'Chest, shoulders, and arms',
+    region: 'upper',
+    focus: ['chest', 'arms'],
     instructions: [
       'Adjust the seat so the handles start near mid-chest.',
       'Press forward smoothly without locking your elbows.',
@@ -104,6 +118,8 @@ export const EQUIPPED_EXERCISES: WorkoutExerciseDefinition[] = [
     name: 'Barbell floor press',
     equipment: ['barbell'],
     targetMuscles: 'Chest, shoulders, and arms',
+    region: 'upper',
+    focus: ['chest', 'arms'],
     instructions: [
       'Lie on the floor beneath a safely racked, unloaded barbell.',
       'Grip evenly and lower the bar with control until your upper arms touch down.',

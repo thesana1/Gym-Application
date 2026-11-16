@@ -1,7 +1,8 @@
 import { useController } from 'react-hook-form';
 
-import { OptionCard, StepShell, type ProfileControl } from '@/features/fitness/components/fitness-profile-fields';
+import { StepShell, type ProfileControl } from '@/features/fitness/components/fitness-profile-fields';
 import { Input } from '@/shared/components/ui/input';
+import { OptionCard } from '@/shared/components/ui/option-card';
 import { PROFILE_COPY } from '@/shared/const/copy-account.const';
 import { AVAILABLE_EQUIPMENT, PROFILE_MEASUREMENT_FIELDS } from '@/shared/const/fitness.const';
 import { cn } from '@/shared/lib/utils';

@@ -2,33 +2,11 @@ import { type ReactNode } from 'react';
 import { useController, type Control } from 'react-hook-form';
 
 import type { FitnessProfileInput, FitnessProfileType } from '@/features/fitness/validations/fitness-profile.validation';
+import { OptionCard } from '@/shared/components/ui/option-card';
 import { PROFILE_COPY } from '@/shared/const/copy-account.const';
 import { FITNESS_GOALS, TRAINING_EXPERIENCE_LEVELS } from '@/shared/const/fitness.const';
-import { cn } from '@/shared/lib/utils';
 
 export type ProfileControl = Control<FitnessProfileInput, undefined, FitnessProfileType>;
-
-type OptionCardProps = {
-  type: 'radio' | 'checkbox';
-  name: string;
-  checked: boolean;
-  onChange: () => void;
-  label: string;
-  help?: string;
-};
-
-// A big tappable choice: the whole card is the label for a hidden native input.
-export const OptionCard = ({ type, name, checked, onChange, label, help }: OptionCardProps) => (
-  <label className={cn('flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 transition-colors',
-    'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring',
-    checked ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-accent')}>
-    <input type={type} name={name} checked={checked} onChange={onChange} className="size-5 shrink-0" />
-    <span className="flex flex-col">
-      <span className="text-lg font-semibold">{label}</span>
-      {help && <span className="text-base text-muted-foreground">{help}</span>}
-    </span>
-  </label>
-);
 
 export const StepShell = ({ title, help, error, children }: { title: string; help: string; error?: string; children: ReactNode }) => (
   <fieldset className="flex flex-col gap-3">

@@ -5,16 +5,6 @@ import {
 import { FitnessProfileType } from '@/features/fitness/validations/fitness-profile.validation';
 import { mongo } from '@/shared/lib/mongo';
 
-type TrainingScheduleAssignment = {
-  weekday: number;
-  sessionIndex: number;
-};
-
-type WorkoutPlanOverride = {
-  sessionIndex: number;
-  exerciseIds: string[];
-};
-
 export const fitnessProfileRepository = {
   async findByUserId(userId: string): Promise<FitnessProfileDocument | null> {
     await mongo.connect();
@@ -41,34 +31,6 @@ export const fitnessProfileRepository = {
         },
       },
       { new: true, upsert: true, runValidators: true }
-    )
-      .lean<FitnessProfileDocument>()
-      .exec();
-  },
-
-  async updateTrainingScheduleByUserId(
-    userId: string,
-    trainingSchedule: TrainingScheduleAssignment[]
-  ): Promise<FitnessProfileDocument | null> {
-    await mongo.connect();
-    return FitnessProfileModel.findOneAndUpdate(
-      { userId },
-      { $set: { trainingSchedule } },
-      { new: true, runValidators: true }
-    )
-      .lean<FitnessProfileDocument>()
-      .exec();
-  },
-
-  async updateWorkoutPlanOverridesByUserId(
-    userId: string,
-    workoutPlanOverrides: WorkoutPlanOverride[]
-  ): Promise<FitnessProfileDocument | null> {
-    await mongo.connect();
-    return FitnessProfileModel.findOneAndUpdate(
-      { userId },
-      { $set: { workoutPlanOverrides } },
-      { new: true, runValidators: true }
     )
       .lean<FitnessProfileDocument>()
       .exec();

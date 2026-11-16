@@ -16,8 +16,11 @@ export const HOME_COPY = {
     seeWorkouts: 'See my workouts',
     restTitle: 'Rest day',
     next: (session: string, day: string) => `Next workout: ${session} on ${day}.`,
-    noDays: 'Pick your training days to see your next workout.',
+    noDays: 'Pick days for your workouts to see what is next.',
     pickDays: 'Pick my days',
+    noPlanTitle: 'Make your workout plan',
+    noPlan: 'Tell us your goal and days. AI will suggest a plan.',
+    buildPlan: 'Build my plan',
     anyway: 'Work out anyway',
   },
   food: {
