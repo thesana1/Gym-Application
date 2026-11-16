@@ -17,8 +17,9 @@ import { AUTH_COPY } from '@/shared/const/copy-public.const';
 const copy = AUTH_COPY;
 
 export const SignUpForm = ({ redirectTo }: { redirectTo?: string }) => {
-  const { register } = useRegister(redirectTo);
-  const { loginWithGoogle } = useGoogleLogin(redirectTo);
+  // New accounts go straight to the profile questions, which end with the Premium offer.
+  const { register } = useRegister(redirectTo ?? '/dashboard/profile');
+  const { loginWithGoogle } = useGoogleLogin(redirectTo ?? '/dashboard/profile');
   const { loading, error } = useAuthStore();
   const form = useForm<SignUpType>({ resolver: zodResolver(SignUpSchema), defaultValues: { fullName: '', email: '', password: '' } });
 

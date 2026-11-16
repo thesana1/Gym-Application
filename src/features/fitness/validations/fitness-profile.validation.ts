@@ -8,27 +8,20 @@ import {
   TRAINING_EXPERIENCE_LEVELS,
 } from '@/shared/const/fitness.const';
 
-const optionalWholeNumber = (min: number, max: number) =>
+// Required during sign-up: an empty answer gets a friendly message instead of a number error.
+const requiredNumber = (min: number, max: number, wholeOnly: boolean, emptyMessage = 'Please fill this in.') =>
   z
-    .union([
-      z.literal(''),
-      z.undefined(),
-      z.string().regex(/^\d+$/, 'Enter a whole number').transform(Number),
-      z.number().int(),
-    ])
-    .transform((value) => (value === '' || value === undefined ? undefined : value))
-    .pipe(z.number().int().min(min).max(max).optional());
-
-const optionalDecimal = (min: number, max: number) =>
-  z
-    .union([
-      z.literal(''),
-      z.undefined(),
-      z.string().regex(/^\d+(\.\d+)?$/, 'Enter a valid number').transform(Number),
-      z.number(),
-    ])
-    .transform((value) => (value === '' || value === undefined ? undefined : value))
-    .pipe(z.number().min(min).max(max).optional());
+    .union([z.string(), z.number()])
+    .transform(String)
+    .pipe(
+      z
+        .string()
+        .trim()
+        .min(1, { error: emptyMessage, abort: true })
+        .regex(wholeOnly ? /^\d+$/ : /^\d+(\.\d+)?$/, wholeOnly ? 'Enter a whole number' : 'Enter a valid number')
+    )
+    .transform(Number)
+    .pipe(z.number().min(min, `Enter at least ${min}`).max(max, `Enter at most ${max}`));
 
 const fitnessGoal = z
   .string()
@@ -64,10 +57,10 @@ export const FitnessProfileSchema = z.strictObject({
       (value): value is TrainingExperience => value !== '',
       'Choose your training experience'
     ),
-  age: optionalWholeNumber(13, 100).optional(),
-  heightCm: optionalDecimal(100, 250).optional(),
-  weightKg: optionalDecimal(30, 350).optional(),
-  trainingDaysPerWeek: optionalWholeNumber(1, 7).optional(),
+  age: requiredNumber(13, 100, true),
+  heightCm: requiredNumber(100, 250, false),
+  weightKg: requiredNumber(30, 350, false),
+  trainingDaysPerWeek: requiredNumber(1, 7, true, 'Please pick a number.'),
   availableEquipment: z.array(availableEquipment).max(AVAILABLE_EQUIPMENT.length),
 });
 

@@ -1,8 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, ArrowRight, CircleCheck } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch, type FieldErrors } from 'react-hook-form';
 
@@ -14,6 +14,7 @@ import { FitnessProfileInput, FitnessProfileSchema, FitnessProfileType } from '@
 import { PageHeader } from '@/shared/components/layout/page-header';
 import { Button } from '@/shared/components/ui/button';
 import { PROFILE_COPY } from '@/shared/const/copy-account.const';
+import { ONBOARDING_ROUTES } from '@/shared/const/routes.const';
 
 const EMPTY_PROFILE: FitnessProfileInput = {
   goal: '', experience: '', age: '', heightCm: '', weightKg: '', trainingDaysPerWeek: '', availableEquipment: [],
@@ -39,9 +40,10 @@ const copy = PROFILE_COPY;
 
 // First visit: one question per screen. Later visits: a summary where each answer can be changed on its own.
 export const FitnessProfileForm = () => {
+  const router = useRouter();
   const { loading, saving, error, loadProfile, saveProfile } = useFitnessProfile();
   const [hasProfile, setHasProfile] = useState(false);
-  const [view, setView] = useState<'summary' | 'step' | 'done'>('step');
+  const [view, setView] = useState<'summary' | 'step'>('step');
   const [step, setStep] = useState(0);
   const form = useForm<FitnessProfileInput, undefined, FitnessProfileType>({
     resolver: zodResolver(FitnessProfileSchema),
@@ -66,8 +68,13 @@ export const FitnessProfileForm = () => {
   const onSubmit = async (profile: FitnessProfileType) => {
     if (!(await saveProfile(profile))) return;
     reset(toFormValues(profile));
-    setView(hasProfile ? 'summary' : 'done');
-    setHasProfile(true);
+    if (!hasProfile) {
+      // First answers saved: refresh the layout (it hid the menu) and show the Premium offer page.
+      router.refresh();
+      router.push(ONBOARDING_ROUTES.welcome);
+      return;
+    }
+    setView('summary');
   };
 
   const onInvalid = (errors: FieldErrors<FitnessProfileInput>) => {
@@ -86,19 +93,6 @@ export const FitnessProfileForm = () => {
     equipment: <EquipmentStep control={control} />, body: <BodyStep control={control} /> }[PROFILE_STEPS[step]];
 
   if (loading) return <div className="h-72 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />;
-
-  if (view === 'done') {
-    return (
-      <section role="status" className="flex animate-rise flex-col items-start gap-4 rounded-2xl bg-primary p-6 text-primary-foreground">
-        <CircleCheck className="size-10" aria-hidden="true" />
-        <h1 className="font-heading text-3xl font-semibold">{copy.doneTitle}</h1>
-        <p className="text-lg">{copy.doneBody}</p>
-        <Button asChild size="lg" variant="secondary" className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-          <Link href="/dashboard/workouts">{copy.seeWorkouts}<ArrowRight className="size-5" aria-hidden="true" /></Link>
-        </Button>
-      </section>
-    );
-  }
 
   return (
     <div className="flex animate-rise flex-col gap-5">

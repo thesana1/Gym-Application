@@ -75,9 +75,6 @@ export const PROFILE_COPY = {
   save: 'Save',
   saving: 'Saving…',
   finish: 'Make my plan',
-  doneTitle: 'All set!',
-  doneBody: 'Your workout plan is ready.',
-  seeWorkouts: 'See my workouts',
   backToSummary: 'Back to my answers',
   change: 'Change',
   changeLabel: (item: string) => `Change ${item}`,
@@ -97,7 +94,7 @@ export const PROFILE_COPY = {
     experience: { title: 'How much have you trained before?', help: 'This helps us pick the right moves.' },
     days: { title: 'How many days a week can you train?', help: 'Pick a number. You can change it later.' },
     equipment: { title: 'What can you use?', help: 'Pick all that you have. Nothing picked? We use bodyweight moves.' },
-    body: { title: 'Tell us about you', help: 'You can skip this.' },
+    body: { title: 'Tell us about you', help: 'We use this to fit your plan and food targets to you.' },
   },
   experienceHelp: {
     beginner: 'New to working out',

@@ -11,7 +11,7 @@ export default async function SignUpPage({ searchParams }: { searchParams: Promi
   if (await auth()) redirect(destination);
   return (
     <AuthPageShell>
-      <SignUpForm redirectTo={destination} />
+      <SignUpForm redirectTo={callbackUrl ? destination : undefined} />
     </AuthPageShell>
   );
 }

@@ -25,17 +25,12 @@ describe('FitnessProfileSchema', () => {
     });
   });
 
-  it('allows measurements to be omitted', () => {
-    expect(
-      FitnessProfileSchema.parse({
-        goal: 'general-fitness',
-        experience: 'beginner',
-        availableEquipment: [],
-      })
-    ).toMatchObject({
-      goal: 'general-fitness',
-      experience: 'beginner',
-      availableEquipment: [],
+  it('requires training days, age, height and weight with a friendly message', () => {
+    const result = FitnessProfileSchema.safeParse({ ...validProfile, age: '', heightCm: '', weightKg: '', trainingDaysPerWeek: '' });
+    expect(result.success).toBe(false);
+    const messages = Object.fromEntries((result.error?.issues ?? []).map(({ path, message }) => [path[0], message]));
+    expect(messages).toEqual({
+      age: 'Please fill this in.', heightCm: 'Please fill this in.', weightKg: 'Please fill this in.', trainingDaysPerWeek: 'Please pick a number.',
     });
   });
 

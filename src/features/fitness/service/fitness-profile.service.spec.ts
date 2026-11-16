@@ -59,10 +59,10 @@ describe('fitness profile service', () => {
     const profile = FitnessProfileSchema.parse({
       goal: 'general-fitness',
       experience: 'beginner',
-      age: '',
-      heightCm: '',
-      weightKg: '',
-      trainingDaysPerWeek: '',
+      age: '30',
+      heightCm: '175',
+      weightKg: '70',
+      trainingDaysPerWeek: '3',
       availableEquipment: [],
     });
     mockRepository.upsertByUserId.mockResolvedValueOnce({
