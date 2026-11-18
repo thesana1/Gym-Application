@@ -27,8 +27,8 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
     <SessionProvider>
       <StoreProvider>
         <div className="flex min-h-screen flex-col">
-          <Header />
-          <DashboardShell locked={onboarding}>{children}</DashboardShell>
+          <Header menu={!onboarding} />
+          <DashboardShell>{children}</DashboardShell>
         </div>
       </StoreProvider>
     </SessionProvider>

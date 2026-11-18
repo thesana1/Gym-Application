@@ -1,5 +1,6 @@
 import { DashboardOverview } from '@/features/dashboard/components/dashboard-overview';
 import { getFitnessProfileService } from '@/features/fitness/service/fitness-profile.service';
+import { recommendFoodService } from '@/features/nutrition/service/food-picks.service';
 import { auth } from '@/shared/lib/auth';
 
 type SessionUser = {
@@ -20,7 +21,12 @@ export default async function DashboardPage() {
     throw new Error('Could not load the fitness profile');
   }
 
+  const foodPicks = recommendFoodService(result.data?.goal);
+  if ('error' in foodPicks.data) {
+    throw new Error('Could not load food picks');
+  }
+
   return (
-    <DashboardOverview userName={user.name ?? ''} profile={result.data} />
+    <DashboardOverview userName={user.name ?? ''} profile={result.data} foodPicks={foodPicks.data} />
   );
 }

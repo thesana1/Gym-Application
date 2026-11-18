@@ -8,7 +8,6 @@ import { DropdownMenu } from 'radix-ui';
 import { useLogout } from '@/features/auth/hooks/use-logout';
 import { MembershipBadge } from '@/features/membership/components/membership-badge';
 import type { MembershipSummary } from '@/features/membership/types/membership.types';
-import { ThemeToggle } from '@/shared/components/layout/theme-toggle';
 import { Button } from '@/shared/components/ui/button';
 import { ACCOUNT_MENU_COPY, COMMON_COPY } from '@/shared/const/copy-common.const';
 
@@ -31,7 +30,7 @@ export const AccountMenu = ({ name, avatar, membership }: AccountMenuProps) => {
           ) : (
             <UserRound className="size-5" aria-hidden="true" />
           )}
-          <span>{COMMON_COPY.account}</span>
+          <span className="sr-only sm:not-sr-only">{COMMON_COPY.account}</span>
           <ChevronDown className="size-4" aria-hidden="true" />
         </Button>
       </DropdownMenu.Trigger>
@@ -50,9 +49,6 @@ export const AccountMenu = ({ name, avatar, membership }: AccountMenuProps) => {
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Separator className="my-2 border-t border-border" />
-          <DropdownMenu.Item asChild onSelect={(event) => event.preventDefault()}>
-            <ThemeToggle className="focus:bg-accent" />
-          </DropdownMenu.Item>
           <DropdownMenu.Item onSelect={() => void logout()} className={`${itemClassName} cursor-pointer gap-3 font-medium`}>
             <LogOut className="size-5" aria-hidden="true" /> {COMMON_COPY.signOut}
           </DropdownMenu.Item>

@@ -10,6 +10,7 @@ import {
   AI_TIMEOUT_MS,
   OPENROUTER_API_URL,
 } from '@/shared/const/ai.const';
+import { APP_NAME } from '@/shared/const/app.const';
 import type { AiErrorCode, AiResult } from '@/shared/types/ai';
 
 type GenerateJsonOptions<T> = {
@@ -80,7 +81,7 @@ class OpenRouterClient {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': process.env.NEXTAUTH_URL ?? 'http://localhost:3001',
-          'X-Title': 'Gym Application',
+          'X-Title': APP_NAME,
         },
         body: JSON.stringify({
           models: this.models,

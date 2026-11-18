@@ -7,9 +7,12 @@ import { useSession } from 'next-auth/react';
 
 import type { MembershipSummary } from '@/features/membership/types/membership.types';
 import { AccountMenu } from '@/shared/components/layout/account-menu';
+import { BurgerMenu } from '@/shared/components/layout/burger-menu';
+import { ThemeToggle } from '@/shared/components/layout/theme-toggle';
 import { Button } from '@/shared/components/ui/button';
 import { APP_NAME } from '@/shared/const/app.const';
 import { COMMON_COPY } from '@/shared/const/copy-common.const';
+import { ONBOARDING_ROUTES } from '@/shared/const/routes.const';
 
 type SessionUser = {
   name?: string | null;
@@ -17,21 +20,29 @@ type SessionUser = {
   membership?: MembershipSummary | null;
 };
 
-export const Header = () => {
+// menu: shows the burger menu for signed-in members who finished onboarding. It stays hidden on the Premium offer page.
+type HeaderProps = { menu?: boolean };
+
+export const Header = ({ menu = false }: HeaderProps) => {
   const { data: session, status } = useSession();
   const user = session?.user as SessionUser | undefined;
   const pathname = usePathname();
+  const showMenu = menu && Boolean(user) && pathname !== ONBOARDING_ROUTES.welcome;
   return (
     <header className="sticky top-0 z-30 flex min-w-0 items-center justify-between gap-2 border-b border-border bg-background/95 px-4 py-2 backdrop-blur
       sm:px-6 lg:px-10">
-      <Link href={user ? '/dashboard' : '/'} className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg font-semibold focus-visible:outline-2
-        focus-visible:outline-ring">
-        <span aria-hidden="true" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <Dumbbell className="size-4" />
-        </span>
-        <span className="truncate font-heading text-lg tracking-tight">{APP_NAME}</span>
-      </Link>
+      <div className="flex min-w-0 items-center gap-1">
+        {showMenu && <BurgerMenu />}
+        <Link href={user ? '/dashboard' : '/'} className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg font-semibold focus-visible:outline-2
+          focus-visible:outline-ring">
+          <span aria-hidden="true" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Dumbbell className="size-4" />
+          </span>
+          <span className="truncate font-heading text-lg tracking-tight">{APP_NAME}</span>
+        </Link>
+      </div>
       <div className="flex shrink-0 items-center gap-2">
+        <ThemeToggle />
         {status === 'loading' ? (
           <span className="h-11 w-28" aria-hidden="true" />
         ) : user ? (
