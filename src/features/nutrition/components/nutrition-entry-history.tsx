@@ -18,18 +18,18 @@ const copy = FOOD_COPY.list;
 
 export const NutritionEntryHistory = ({ entries, loading, onEdit, onDelete }: NutritionEntryHistoryProps) => (
   <section aria-labelledby="food-list-title" className="flex flex-col gap-3">
-    <h2 id="food-list-title" className="text-xl font-semibold">{copy.title}</h2>
+    <h2 id="food-list-title" className="text-xl">{copy.title}</h2>
     {loading ? (
-      <div className="h-24 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
+      <div className="h-24 animate-pulse rounded-lg bg-muted" role="status" aria-label={copy.loading} />
     ) : entries.length === 0 ? (
       <EmptyState message={copy.empty} />
     ) : (
-      <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
+      <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
         {entries.map((entry) => (
           <li key={entry.id} className="flex flex-col gap-3 p-4">
             <div>
               <p className="text-base font-medium text-muted-foreground">{FOOD_COPY.meals[entry.mealType]}</p>
-              <h3 className="text-lg font-semibold">{entry.foodName}</h3>
+              <h3 className="text-lg">{entry.foodName}</h3>
               <p className="text-base tabular-nums text-muted-foreground">{copy.line(entry.calories, entry.proteinGrams)}</p>
               {entry.notes && <p className="mt-1 text-base text-muted-foreground">{entry.notes}</p>}
             </div>

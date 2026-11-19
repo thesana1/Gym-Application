@@ -22,7 +22,7 @@ describe('TodayOverview', () => {
 
     expect(await screen.findByRole('link', { name: 'Build my plan' })).toHaveAttribute('href', '/dashboard/workouts');
     expect(mockGet).toHaveBeenCalledWith('/fitness/workouts', {
-      params: { from: getLocalDayRange(new Date(), 7).from, to: getLocalDayRange().to },
+      params: { from: getLocalDayRange(new Date(), 91).from, to: getLocalDayRange().to },
     });
     expect(mockGet).toHaveBeenCalledWith('/nutrition/entries', {
       params: { from: getLocalDayRange().date, to: getLocalDayRange().date },
@@ -38,7 +38,7 @@ describe('TodayOverview', () => {
     });
     render(<TodayOverview hasProfile />);
 
-    expect(await screen.findByText('Full body A')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Ready for Full body A?' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Start workout' })).toHaveAttribute('href', '/dashboard/workouts/w1');
   });
 

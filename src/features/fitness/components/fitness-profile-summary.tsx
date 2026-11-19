@@ -29,7 +29,7 @@ const describe = (values: FitnessProfileInput): Record<ProfileStep, string> => (
 export const FitnessProfileSummary = ({ values, onChange }: FitnessProfileSummaryProps) => {
   const text = describe(values);
   return (
-    <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
+    <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
       {PROFILE_STEPS.map((step) => (
         <li key={step} className="flex items-center justify-between gap-3 p-4">
           <div className="min-w-0">

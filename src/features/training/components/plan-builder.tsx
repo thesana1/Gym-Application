@@ -26,7 +26,7 @@ const MONDAY_FIRST = [1, 2, 3, 4, 5, 6, 0];
 
 const Step = ({ title, help, children, error }: { title: string; help?: string; children: ReactNode; error?: string }) => (
   <fieldset className="flex flex-col gap-3">
-    <legend className="mb-1 text-balance font-heading text-2xl font-semibold">{title}</legend>
+    <legend className="mb-1 text-balance font-heading text-2xl font-extrabold">{title}</legend>
     {help && <p className="text-lg text-muted-foreground">{help}</p>}
     {children}
     {error && <p role="alert" className="text-base text-destructive">{error}</p>}
@@ -41,7 +41,7 @@ const DayPicker = ({ control }: { control: Control<PlanPrioritiesType> }) => {
         {MONDAY_FIRST.map((day) => {
           const checked = field.value.includes(day);
           return (
-            <label key={day} className={cn('flex min-h-14 cursor-pointer items-center justify-center rounded-xl border-2 text-base font-semibold',
+            <label key={day} className={cn('flex min-h-14 cursor-pointer items-center justify-center rounded-lg border-2 text-base font-semibold',
               'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring',
               checked ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:bg-accent')}>
               <input type="checkbox" className="sr-only" checked={checked}
@@ -96,7 +96,7 @@ export const PlanBuilder = ({ defaults, busy, onSuggest, onManual }: PlanBuilder
       )}
       {step === 2 && <DayPicker control={form.control} />}
 
-      {busy && <p role="status" className="rounded-2xl border border-border bg-card p-4 text-base">{copy.suggesting}</p>}
+      {busy && <p role="status" className="rounded-lg border border-border bg-card p-4 text-base">{copy.suggesting}</p>}
       <div className="sticky bottom-24 z-10 flex flex-col gap-2 bg-background/95 py-2 lg:bottom-0">
         <div className="flex gap-3">
           {step > 0 && (

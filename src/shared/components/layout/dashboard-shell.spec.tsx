@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/dashboard/records' }));
 vi.mock('@/features/auth/hooks/use-logout', () => ({ useLogout: () => ({ logout: vi.fn() }) }));
+vi.mock('next-auth/react', () => ({ useSession: () => ({ data: null }) }));
 vi.mock('next-themes', () => ({ useTheme: () => ({ resolvedTheme: 'light', setTheme: vi.fn() }) }));
 
 import { DashboardShell } from '@/shared/components/layout/dashboard-shell';

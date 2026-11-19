@@ -58,8 +58,8 @@ export const WorkoutHistoryPanel = () => {
 
   if (editing) {
     return (
-      <section aria-labelledby="edit-workout" className="rounded-2xl border border-border bg-card p-5">
-        <h2 id="edit-workout" className="mb-5 text-2xl font-semibold">{copy.editing}</h2>
+      <section aria-labelledby="edit-workout" className="rounded-lg border border-border bg-card p-5">
+        <h2 id="edit-workout" className="mb-5 text-2xl">{copy.editing}</h2>
         {error && <p role="alert" className="mb-4 text-base text-destructive">{error}</p>}
         <WorkoutLogForm key={editing.id} initialValues={toInputValues(editing)} saving={saving}
           onCancel={() => { setEditing(null); setError(null); }} onSubmit={handleSave} />

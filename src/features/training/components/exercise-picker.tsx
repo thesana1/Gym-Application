@@ -22,7 +22,7 @@ export const ExercisePicker = ({ options, exclude, onPick }: ExercisePickerProps
   const [area, setArea] = useState<FocusArea | null>(null);
   const shown = options.filter((exercise) => !exclude.includes(exercise.id) && (!area || exercise.focus.includes(area)));
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-3">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-background p-3">
       <p className="text-base font-semibold">{TRAINING_COPY.editor.pickExercise}</p>
       <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" role="group" aria-label={TRAINING_COPY.editor.pickExercise}>
         <button type="button" aria-pressed={area === null} className={chipClass(area === null)} onClick={() => setArea(null)}>
@@ -39,7 +39,7 @@ export const ExercisePicker = ({ options, exclude, onPick }: ExercisePickerProps
           <li key={exercise.id}>
             <button type="button" onClick={() => onPick(exercise)}
               className="flex min-h-14 w-full items-center gap-3 px-2 py-2 text-left hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring">
-              <Plus className="size-5 shrink-0 text-primary" aria-hidden="true" />
+              <Plus className="size-5 shrink-0 text-primary-ink" aria-hidden="true" />
               <span className="flex flex-col">
                 <span className="text-base font-semibold">{exercise.name}</span>
                 <span className="text-base text-muted-foreground">{exercise.targetMuscles}</span>

@@ -1,6 +1,6 @@
 export const COACH_COPY = {
   title: 'Ask Coach',
-  description: 'Quick answers from our AI coach.',
+  description: 'Ask anything about training or food. I’ll keep it short.',
   question: 'What do you want to know?',
   placeholder: 'For example: How long should I rest between sets?',
   privacy: 'The AI only sees your goal, level, equipment and training days.',
@@ -18,7 +18,7 @@ export const COACH_COPY = {
 
 export const CHALLENGES_COPY = {
   title: 'My challenges',
-  description: 'Pick a small goal and keep going.',
+  description: 'Small goals you set for yourself. No one else sees them.',
   privateNote: 'Only you can see your challenges.',
   loading: 'Loading your challenges…',
   error: 'We could not load your challenges.',
@@ -40,8 +40,8 @@ export const CHALLENGES_COPY = {
 } as const;
 
 export const PLAN_COPY = {
-  title: 'My plan',
-  description: 'See your plan and payments.',
+  title: 'Premium',
+  description: 'Your payments and what Premium adds.',
   testMode: 'Test payments',
   loading: 'Loading your plan…',
   current: 'Your plan now',
@@ -64,9 +64,9 @@ export const PLAN_COPY = {
 
 export const PROFILE_COPY = {
   title: 'My profile',
-  description: 'Your goal, training days and equipment.',
+  description: 'Your goal, your days and your gear.',
   setupTitle: 'Let’s make your plan',
-  setupDescription: 'Answer a few quick questions.',
+  setupDescription: '5 quick questions, then we plan your week.',
   loading: 'Loading your answers…',
   stepOf: (step: number, total: number) => `Question ${step} of ${total}`,
   back: 'Back',

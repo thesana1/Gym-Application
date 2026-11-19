@@ -36,7 +36,7 @@ export const AccountMenu = ({ name, avatar, membership }: AccountMenuProps) => {
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content align="end" sideOffset={8} className="z-50 w-72 rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-lg">
+        <DropdownMenu.Content align="end" sideOffset={8} className="z-50 w-72 rounded-lg border border-border bg-popover p-2 text-popover-foreground shadow-lg">
           <DropdownMenu.Label className="break-words px-3 py-2 text-base font-semibold">{name || COMMON_COPY.accountFallbackName}</DropdownMenu.Label>
           <DropdownMenu.Item asChild>
             <Link href="/dashboard" className={itemClassName}>{ACCOUNT_MENU_COPY.home}</Link>

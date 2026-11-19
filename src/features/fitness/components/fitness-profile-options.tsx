@@ -17,9 +17,9 @@ export const DaysStep = ({ control }: { control: ProfileControl }) => {
         {DAY_OPTIONS.map((days) => {
           const checked = String(field.value) === String(days);
           return (
-            <label key={days} className={cn('flex min-h-14 cursor-pointer items-center justify-center rounded-xl border-2 text-xl font-semibold',
+            <label key={days} className={cn('flex min-h-14 cursor-pointer items-center justify-center rounded-lg border-2 text-xl font-semibold',
               'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring',
-              checked ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:bg-accent')}>
+              checked ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:bg-accent')}>
               <input type="radio" name="trainingDaysPerWeek" className="sr-only" checked={checked} onChange={() => field.onChange(String(days))} />
               {days}
             </label>

@@ -18,12 +18,12 @@ export const AiMealIdeas = ({ result, saved, loading, error }: AiMealIdeasProps)
   <>
     {(loading || error || result) && (
       <section aria-labelledby="ai-meal-ideas-title" className="flex flex-col gap-4">
-        <h2 id="ai-meal-ideas-title" className="text-xl font-semibold">{copy.aiResults}</h2>
-        {loading && <div role="status" className="rounded-2xl border border-border bg-card p-5 text-base">{copy.aiWait}</div>}
+        <h2 id="ai-meal-ideas-title" className="text-xl">{copy.aiResults}</h2>
+        {loading && <div role="status" className="rounded-lg border border-border bg-card p-5 text-base">{copy.aiWait}</div>}
         {error && <p role="alert" className="text-base text-destructive">{error}</p>}
         {result?.source === 'library' && (
           <>
-            <p role="status" className="rounded-xl border border-border bg-card p-4 text-base">
+            <p role="status" className="rounded-lg border border-border bg-card p-4 text-base">
               {AI_ERROR_MESSAGES[result.notice ?? ''] ?? AI_ERROR_MESSAGES.AI_UNAVAILABLE} {copy.fallback}
             </p>
             {result.libraryRecipes.length === 0 && <p className="text-base text-muted-foreground">{copy.noLibrary}</p>}

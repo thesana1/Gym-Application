@@ -1,6 +1,6 @@
 export const FOOD_COPY = {
   title: 'Food',
-  description: 'See what you ate today.',
+  description: 'Add what you eat. Watch your day fill up.',
   day: {
     today: 'Today',
     back: 'Back',
@@ -9,6 +9,7 @@ export const FOOD_COPY = {
     nextLabel: 'Show the next day',
   },
   add: 'Add food',
+  added: (name: string) => `Added ${name}!`,
   summary: {
     calories: 'Calories',
     protein: 'Protein',
@@ -17,6 +18,8 @@ export const FOOD_COPY = {
     fat: 'Fat',
     fiber: 'Fiber',
     more: 'See carbs, fat and fiber',
+    of: (target: number) => `of ${target.toLocaleString()} kcal`,
+    reached: 'Goal reached today. Nice eating!',
     estimate: 'Totals come only from the food you add.',
   },
   units: { kcal: 'kcal', g: 'g', ml: 'ml' },

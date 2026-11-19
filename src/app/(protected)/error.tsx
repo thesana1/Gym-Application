@@ -17,7 +17,7 @@ export default function Error({ error, reset }: ErrorProps) {
 
   return (
     <div className="mx-auto flex min-h-96 max-w-md flex-col items-start justify-center gap-4 px-4">
-      <h2 className="text-2xl font-semibold">{COMMON_COPY.errorTitle}</h2>
+      <h2 className="text-2xl">{COMMON_COPY.errorTitle}</h2>
       <p className="text-lg text-muted-foreground">{COMMON_COPY.somethingWentWrong}</p>
       <div className="flex flex-wrap gap-3">
         <Button onClick={reset}>{COMMON_COPY.tryAgain}</Button>

@@ -23,10 +23,10 @@ export const PlanOverview = ({ plan, onEdit, onNew }: PlanOverviewProps) => (
     <Button size="lg" onClick={onEdit}><Pencil className="size-5" aria-hidden="true" />{copy.edit}</Button>
     <ul className="flex flex-col gap-3">
       {plan.workouts.map((workout) => (
-        <li key={workout.id} className="rounded-2xl border border-border bg-card p-5">
+        <li key={workout.id} className="rounded-lg border border-border bg-card p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-            <h2 className="text-xl font-semibold">{workout.name}</h2>
-            <span className="text-base font-semibold text-primary">
+            <h2 className="text-xl">{workout.name}</h2>
+            <span className="text-base font-semibold text-primary-ink">
               {workout.weekday === null ? copy.noDay : TRAINING_COPY.weekdays[workout.weekday]}
             </span>
           </div>

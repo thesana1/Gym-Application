@@ -44,14 +44,14 @@ export const TrainingActivityHistory = () => {
 
   const periods = activity ? [...activity.periods].reverse() : [];
   return (
-    <div className="animate-rise">
+    <div className="max-w-2xl animate-rise">
       <ProgressHeader />
       <div className="flex flex-col gap-4">
         <div role="group" aria-label={copy.weeksLabel} className="grid grid-cols-2 gap-2">
           {WEEK_OPTIONS.map((option) => (
             <button key={option} type="button" aria-pressed={weeks === option} disabled={loading} onClick={() => setWeeks(option)}
               className={cn('min-h-12 rounded-lg border text-base font-semibold focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60',
-                weeks === option ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:bg-accent')}>
+                weeks === option ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:bg-accent')}>
               {copy.weeks(option)}
             </button>
           ))}
@@ -63,13 +63,13 @@ export const TrainingActivityHistory = () => {
             <Button variant="outline" onClick={() => void loadActivity()}>{COMMON_COPY.tryAgain}</Button>
           </div>
         ) : loading ? (
-          <div className="h-64 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
+          <div className="h-64 animate-pulse rounded-lg bg-muted" role="status" aria-label={copy.loading} />
         ) : (
-          <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
+          <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
             {periods.map((period, index) => (
               <li key={period.start} className="flex flex-col gap-2 p-4">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                  <h2 className="text-base font-semibold">{index === 0 ? copy.thisWeek : formatRange(period.start, period.end)}</h2>
+                  <h2 className="text-base">{index === 0 ? copy.thisWeek : formatRange(period.start, period.end)}</h2>
                   <p className="text-lg font-semibold tabular-nums">{copy.workouts(period.workoutCount)}</p>
                 </div>
                 {period.workoutCount > 0 && (

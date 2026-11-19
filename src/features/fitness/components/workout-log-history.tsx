@@ -23,8 +23,8 @@ export const WorkoutLogHistory = ({ workouts, loading, onEdit, onDelete }: Worko
   if (loading) {
     return (
       <div className="flex flex-col gap-3" role="status" aria-label={copy.loading}>
-        <div className="h-32 animate-pulse rounded-2xl bg-muted" />
-        <div className="h-32 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-32 animate-pulse rounded-lg bg-muted" />
+        <div className="h-32 animate-pulse rounded-lg bg-muted" />
       </div>
     );
   }
@@ -33,8 +33,8 @@ export const WorkoutLogHistory = ({ workouts, loading, onEdit, onDelete }: Worko
   return (
     <ul className="flex flex-col gap-3">
       {workouts.map((workout) => (
-        <li key={workout.id} className="rounded-2xl border border-border bg-card p-5">
-          <h3 className="text-xl font-semibold">{workout.title}</h3>
+        <li key={workout.id} className="rounded-lg border border-border bg-card p-5">
+          <h3 className="text-xl">{workout.title}</h3>
           <p className="mt-1 text-base text-muted-foreground">{formatCompletedAt(workout.completedAt)}</p>
           <ul className="mt-4 flex flex-col gap-2">
             {workout.exercises.map((exercise, index) => (

@@ -92,10 +92,10 @@ export const FitnessProfileForm = () => {
   const stepView = { goal: <GoalStep control={control} />, experience: <ExperienceStep control={control} />, days: <DaysStep control={control} />,
     equipment: <EquipmentStep control={control} />, body: <BodyStep control={control} /> }[PROFILE_STEPS[step]];
 
-  if (loading) return <div className="h-72 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />;
+  if (loading) return <div className="h-72 animate-pulse rounded-lg bg-muted" role="status" aria-label={copy.loading} />;
 
   return (
-    <div className="flex animate-rise flex-col gap-5">
+    <div className="flex max-w-2xl animate-rise flex-col gap-5">
       <PageHeader title={hasProfile ? copy.title : copy.setupTitle} description={hasProfile ? copy.description : copy.setupDescription} className="mb-1" />
       {view === 'summary' ? (
         <>

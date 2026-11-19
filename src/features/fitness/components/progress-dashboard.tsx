@@ -57,9 +57,9 @@ const LatestWeight = ({ measurements }: { measurements: ProgressMeasurement[] })
   const latest = measurements.find(({ weightKg }) => weightKg !== undefined);
   if (!latest) return <EmptyState message={copy.empty} />;
   return (
-    <section aria-labelledby="latest-weight" className="rounded-2xl border border-border bg-card p-5">
+    <section aria-labelledby="latest-weight" className="rounded-lg border border-border bg-card p-5">
       <h2 id="latest-weight" className="text-base font-medium text-muted-foreground">{copy.latest}</h2>
-      <p className="font-heading text-5xl font-semibold tabular-nums">{latest.weightKg}<span className="ml-1 text-2xl text-muted-foreground">kg</span></p>
+      <p className="font-heading text-5xl font-extrabold tabular-nums">{latest.weightKg}<span className="ml-1 text-2xl text-muted-foreground">kg</span></p>
       <p className="mt-1 text-base text-muted-foreground">{copy.savedOn(formatMeasurementDate(latest.date))}</p>
     </section>
   );
@@ -97,22 +97,22 @@ export const ProgressDashboard = () => {
   };
 
   return (
-    <div className="animate-rise">
+    <div className="max-w-2xl animate-rise">
       <ProgressHeader />
       <div className="flex flex-col gap-4">
         {error && <p className="text-base text-destructive" role="alert">{error}</p>}
         {formOpen ? (
-          <section aria-labelledby="measurement-form" className="rounded-2xl border border-border bg-card p-5">
-            <h2 id="measurement-form" className="mb-5 text-2xl font-semibold">{editing ? PROGRESS_COPY.form.editTitle : PROGRESS_COPY.form.addTitle}</h2>
+          <section aria-labelledby="measurement-form" className="rounded-lg border border-border bg-card p-5">
+            <h2 id="measurement-form" className="mb-5 text-2xl">{editing ? PROGRESS_COPY.form.editTitle : PROGRESS_COPY.form.addTitle}</h2>
             <ProgressMeasurementForm key={editing?.id ?? 'new-measurement'} saving={saving} onCancel={closeForm} onSave={handleSave}
               initialValues={editing ? toFormValues(editing) : { ...EMPTY_MEASUREMENT, date: getToday() }} />
           </section>
         ) : (
           <>
-            {loading
-              ? <div className="h-36 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
-              : <LatestWeight measurements={measurements} />}
             <LiftProgressCard />
+            {loading
+              ? <div className="h-36 animate-pulse rounded-lg bg-muted" role="status" aria-label={copy.loading} />
+              : <LatestWeight measurements={measurements} />}
             <Button size="lg" className="sticky bottom-24 z-10 w-full shadow-lg lg:bottom-6"
               onClick={() => { setEditing(null); setFormOpen(true); setError(null); }}>
               <Plus className="size-5" aria-hidden="true" />{copy.add}

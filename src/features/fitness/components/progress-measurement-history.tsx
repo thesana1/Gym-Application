@@ -23,7 +23,7 @@ export const ProgressMeasurementHistory = ({ measurements, onEdit, onDelete }: P
       const date = formatMeasurementDate(measurement.date);
       return (
         <li key={measurement.id} className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
-          <h3 className="text-lg font-semibold">{date}</h3>
+          <h3 className="text-lg">{date}</h3>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
             {MEASUREMENT_KEYS.map((key) => {
               const value = measurement[key];

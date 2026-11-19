@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-16T12:00:00Z",
+  "title": "Design System: Gym Application",
+  "extensions": {
+    "colorMeta": {
+      "lido-yellow": { "role": "primary", "displayName": "Lido Yellow", "canonical": "oklch(0.86 0.16 85)" },
+      "yellow-ink": { "role": "primary", "displayName": "Yellow Ink", "canonical": "oklch(0.47 0.11 70)" },
+      "pool-blue": { "role": "secondary", "displayName": "Pool Blue", "canonical": "oklch(0.56 0.15 248)" },
+      "coral-warning": { "role": "tertiary", "displayName": "Coral Warning", "canonical": "oklch(0.58 0.2 30)" },
+      "sun-deck": { "role": "neutral", "displayName": "Sun Deck", "canonical": "oklch(0.982 0.007 85)" },
+      "warm-ink": { "role": "neutral", "displayName": "Warm Ink", "canonical": "oklch(0.22 0.014 60)" }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "Page titles and the Field question." },
+      "numeral": { "displayName": "Numeral", "purpose": "Calories, counts, finish stats; condensed for timers." }
+    },
+    "shadows": [
+      { "name": "button-lift", "value": "0 1px 3px color-mix(in oklch, var(--primary-ink) 25%, transparent)", "purpose": "Under primary buttons; removed on press." },
+      { "name": "floating", "value": "0 10px 15px -3px rgb(0 0 0 / 0.1)", "purpose": "Sticky action, rest-timer pill, landing demo." }
+    ],
+    "motion": [
+      { "name": "press", "value": "transform 150ms ease-out, scale 0.97", "purpose": "Every tappable element." },
+      { "name": "ripple", "value": "0.7s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "One ripple when a set, meal or workout completes." },
+      { "name": "rise", "value": "0.55s cubic-bezier(0.16, 1, 0.3, 1), from opacity 0.35", "purpose": "Page entrance from an already visible state." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Lane Rope",
+      "kind": "custom",
+      "refersTo": "float-filled",
+      "description": "Row of floats that fill in pool blue; the app's progress language.",
+      "html": "<div class=\"ds-rope\"><span class=\"on\"></span><span class=\"on\"></span><span class=\"now\"></span><span></span><span></span></div>",
+      "css": ".ds-rope{display:flex;gap:6px}.ds-rope span{width:20px;height:20px;border-radius:9999px;border:2px solid oklch(0.56 0.15 248 / .25);background:#fff}.ds-rope .on{background:oklch(0.56 0.15 248);border-color:transparent}.ds-rope .now{background:oklch(0.86 0.16 85);border-color:oklch(0.47 0.11 70)}"
+    },
+    {
+      "name": "Sun Field",
+      "kind": "card",
+      "refersTo": "field-sun",
+      "description": "The one big yellow region per screen with the next action.",
+      "html": "<section class=\"ds-field\"><h2>Ready for Legs and push?</h2><p>5 exercises today</p><button>Start workout</button></section>",
+      "css": ".ds-field{background:oklch(0.86 0.16 85);color:oklch(0.22 0.014 60);border-radius:20.8px;padding:24px;display:flex;flex-direction:column;gap:20px;font-family:Figtree,sans-serif}.ds-field h2{font:800 2.25rem/1 Archivo,sans-serif;letter-spacing:-0.035em;margin:0}.ds-field button{background:oklch(0.22 0.014 60);color:oklch(0.86 0.16 85);border:0;border-radius:9999px;height:56px;font-weight:700;font-size:1.125rem}"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Yellow pill with ink text; scales on press.",
+      "html": "<button class=\"ds-btn\">Add food</button>",
+      "css": ".ds-btn{background:oklch(0.86 0.16 85);color:oklch(0.22 0.014 60);border:0;border-radius:9999px;height:48px;padding:0 20px;font:700 1rem Figtree,sans-serif;transition:transform .15s ease-out}.ds-btn:active{transform:scale(.97)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Swim Club on a Sunny Morning",
+    "overview": "A bright warm deck, one big yellow sign for what's next, and lane ropes you count as you go. Each screen leads with one next thing; pool blue only means done.",
+    "keyCharacteristics": ["One Field per screen", "Lane-rope floats for all progress", "Archivo 800 tight headings over Figtree", "Done and missed stay visible", "One ripple on completion"],
+    "rules": [
+      { "name": "The Blue Means Done Rule", "body": "Pool Blue is only for things that filled up or finished.", "section": "colors" },
+      { "name": "The One Field Rule", "body": "At most one big coloured Field per screen.", "section": "colors" },
+      { "name": "The No Eyebrow Rule", "body": "No label or kicker above a heading.", "section": "typography" }
+    ],
+    "dos": ["Do lead with one next action in a Field", "Do show progress as filling floats", "Do keep copy child-plain"],
+    "donts": ["Don't use blue for decoration", "Don't put white text on yellow", "Don't use identical icon cards"]
+  }
+}

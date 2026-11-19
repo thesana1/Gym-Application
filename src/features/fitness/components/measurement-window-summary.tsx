@@ -98,7 +98,7 @@ export const MeasurementWindowSummary = ({ measurements }: MeasurementWindowSumm
         {WEEK_OPTIONS.map((option) => (
           <button key={option} type="button" aria-pressed={weeks === option} onClick={() => setWeeks(option)}
             className={cn('min-h-12 rounded-lg border text-base font-semibold focus-visible:outline-2 focus-visible:outline-ring',
-              weeks === option ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:bg-accent')}>
+              weeks === option ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:bg-accent')}>
             {copy.weeks(option)}
           </button>
         ))}

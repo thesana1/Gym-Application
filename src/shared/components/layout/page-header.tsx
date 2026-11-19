@@ -12,9 +12,9 @@ type PageHeaderProps = {
 
 export const PageHeader = ({ title, description, children, className }: PageHeaderProps) => (
   <div className={cn('mb-6 flex flex-col gap-4', className)}>
-    <div className="flex flex-col gap-1">
-      <h1 className="text-balance text-3xl font-semibold leading-tight">{title}</h1>
-      {description ? <p className="text-lg text-muted-foreground">{description}</p> : null}
+    <div className="flex flex-col gap-1.5">
+      <h1 className="text-4xl leading-none lg:text-5xl">{title}</h1>
+      {description ? <p className="max-w-prose text-lg text-muted-foreground">{description}</p> : null}
     </div>
     {children}
   </div>

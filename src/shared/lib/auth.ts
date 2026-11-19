@@ -5,6 +5,7 @@ import Google from 'next-auth/providers/google';
 import { userRepository } from '@/features/auth/repository/user.repository';
 import { upsertOAuthUserService } from '@/features/auth/service/auth.service';
 import type { MembershipSummary } from '@/features/membership/types/membership.types';
+import { isAdminEmail } from '@/shared/utils/admin';
 import { isMembershipEntitled } from '@/shared/utils/membership';
 import { hashPassword } from '@/shared/utils/password';
 
@@ -75,7 +76,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.id = dbUser._id.toString();
           token.name = dbUser.name;
           token.avatar = dbUser.avatar ?? (token.avatar as string | null | undefined);
-          token.role = (dbUser.role as 'admin' | 'user') ?? 'user';
+          token.role = isAdminEmail(dbUser.email) ? 'admin' : ((dbUser.role as 'admin' | 'user') ?? 'user');
           membershipToken.membership = dbUser.membership
             ? {
               tier: dbUser.membership.tier,

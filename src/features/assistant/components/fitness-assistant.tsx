@@ -33,9 +33,9 @@ export const FitnessAssistant = () => {
   };
 
   return (
-    <div className="flex animate-rise flex-col gap-5">
+    <div className="flex max-w-2xl animate-rise flex-col gap-5">
       <PageHeader title={copy.title} description={copy.description} className="mb-1" />
-      <form className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5" noValidate
+      <form className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5" noValidate
         onSubmit={(event) => {
           event.preventDefault();
           void submit(question);
@@ -52,12 +52,12 @@ export const FitnessAssistant = () => {
         {usage && <p className="text-center text-base text-muted-foreground">{copy.used(usage.used, usage.limit)}</p>}
       </form>
 
-      {loading && <div role="status" className="rounded-2xl border border-border bg-card p-5 text-base">{copy.wait}</div>}
+      {loading && <div role="status" className="rounded-lg border border-border bg-card p-5 text-base">{copy.wait}</div>}
       {error && <p role="alert" className="text-base text-destructive">{error}</p>}
 
       {latest && (
-        <section aria-labelledby="latest-answer" className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
-          <h2 id="latest-answer" className="text-xl font-semibold">{latest.question}</h2>
+        <section aria-labelledby="latest-answer" className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5">
+          <h2 id="latest-answer" className="text-xl">{latest.question}</h2>
           {latest.source === 'saved' && <p className="text-base text-muted-foreground">{copy.saved}</p>}
           <FitnessAnswerCard answer={latest.answer} onFollowUp={(followUp) => void submit(followUp)} />
           <p className="text-base text-muted-foreground">{AI_DISCLAIMERS.training}</p>

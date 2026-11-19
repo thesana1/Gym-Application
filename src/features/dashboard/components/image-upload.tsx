@@ -97,7 +97,7 @@ export function ImageUpload() {
         <ul className="flex flex-col gap-2">
           {uploadedImages.map(({ name, url }) => (
             <li key={url} className="text-base">
-              <a className="text-primary underline underline-offset-4" href={url} rel="noreferrer" target="_blank">{name}</a>
+              <a className="text-primary-ink underline underline-offset-4" href={url} rel="noreferrer" target="_blank">{name}</a>
             </li>
           ))}
         </ul>

@@ -75,12 +75,12 @@ export const MealGenerator = () => {
   };
 
   return (
-    <div className="flex animate-rise flex-col gap-5">
+    <div className="flex max-w-2xl animate-rise flex-col gap-5">
       <PageHeader title={FOOD_COPY.title} description={copy.description} className="mb-1">
         <SectionTabs tabs={FOOD_TABS} />
       </PageHeader>
 
-      <form className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5" onSubmit={generate} noValidate>
+      <form className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5" onSubmit={generate} noValidate>
         <label className="flex flex-col gap-2 text-lg font-semibold">
           {copy.ingredients}
           <textarea value={ingredientText} onChange={(event) => setIngredientText(event.target.value)} placeholder={copy.placeholder} rows={3}
@@ -105,7 +105,7 @@ export const MealGenerator = () => {
                   return (
                     <label key={value} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-3 text-base font-medium',
                       'has-focus-visible:outline-2 has-focus-visible:outline-ring',
-                      checked ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card')}>
+                      checked ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card')}>
                       <input type="checkbox" checked={checked} onChange={(event) => toggleAllergen(value, event.target.checked)} className="size-5" />
                       {label}
                     </label>
@@ -125,7 +125,7 @@ export const MealGenerator = () => {
 
       {suggestions && (
         <section aria-labelledby="meal-results" className="flex flex-col gap-4">
-          <h2 id="meal-results" className="text-xl font-semibold">{copy.results}</h2>
+          <h2 id="meal-results" className="text-xl">{copy.results}</h2>
           {suggestions.recipes.length === 0 && <p className="text-base text-muted-foreground" role="status">{copy.noLibrary}</p>}
           {suggestions.recipes.map((recipe) => <LibraryRecipeCard key={recipe.id} recipe={recipe} />)}
         </section>

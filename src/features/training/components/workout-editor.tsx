@@ -47,8 +47,8 @@ export const WorkoutEditor = ({ index, control, register, goal, experience, opti
   return (
     // Each workout folds away so a long plan stays easy to scan on a phone; errors force it open.
     <details open={index === 0 || Boolean(workoutErrors)} aria-label={copy.newWorkoutName(index + 1)}
-      className="group rounded-2xl border border-border bg-card">
-      <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 focus-visible:outline-2
+      className="group rounded-lg border border-border bg-card">
+      <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 focus-visible:outline-2
         focus-visible:outline-ring">
         <span className="flex min-w-0 flex-col">
           <span className="truncate text-lg font-semibold">{name || copy.newWorkoutName(index + 1)}</span>
@@ -79,7 +79,7 @@ export const WorkoutEditor = ({ index, control, register, goal, experience, opti
             const exercise = WORKOUT_EXERCISE_LIBRARY.find(({ id }) => id === field.exerciseId);
             const exerciseName = exercise?.name ?? field.exerciseId;
             return (
-              <li key={field.id} className="flex flex-col gap-3 rounded-xl border border-border bg-background p-3">
+              <li key={field.id} className="flex flex-col gap-3 rounded-lg border border-border bg-background p-3">
                 <div>
                   <p className="text-lg font-semibold">{exerciseName}</p>
                   {exercise && <p className="text-base text-muted-foreground">{exercise.targetMuscles}</p>}

@@ -38,8 +38,8 @@ const SuggestionNote = ({ suggestion }: { suggestion?: Omit<PlanSuggestion, 'pla
   if (!suggestion) return null;
   const fromAi = suggestion.source !== 'library';
   return (
-    <section className="flex flex-col gap-2 rounded-2xl bg-primary/10 p-4" role="status">
-      <h2 className="text-xl font-semibold">{fromAi ? copy.suggestion.aiTitle : copy.suggestion.libraryTitle}</h2>
+    <section className="flex flex-col gap-2 rounded-lg border-2 border-primary bg-card p-4" role="status">
+      <h2 className="text-xl">{fromAi ? copy.suggestion.aiTitle : copy.suggestion.libraryTitle}</h2>
       {suggestion.summary && <p className="text-base">{suggestion.summary}</p>}
       {!fromAi && <p className="text-base">{AI_ERROR_MESSAGES[suggestion.notice ?? ''] ?? copy.suggestion.fallback}</p>}
       {suggestion.source === 'saved' && <p className="text-base text-muted-foreground">{copy.suggestion.savedNote}</p>}
@@ -60,7 +60,7 @@ export const TrainingPage = ({ profile, initialTab = 'week' }: TrainingPageProps
       <EmptyState message={copy.needProfile} action={<Button asChild><Link href="/dashboard/profile">{copy.needProfileAction}</Link></Button>} />
     );
   }
-  if (loading) return <div className="h-72 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />;
+  if (loading) return <div className="h-72 animate-pulse rounded-lg bg-muted" role="status" aria-label={copy.loading} />;
   if (error) {
     return (
       <div role="alert" className="flex flex-col items-start gap-3">
@@ -106,7 +106,7 @@ export const TrainingPage = ({ profile, initialTab = 'week' }: TrainingPageProps
 
   if (mode.kind === 'edit') {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex max-w-2xl flex-col gap-4">
         <PageHeader title={copy.editor.edit} className="mb-1" />
         <SuggestionNote suggestion={mode.suggestion} />
         <PlanEditor draft={mode.draft} experience={profile.experience} equipment={profile.availableEquipment} saving={busy} error={actionError}
@@ -117,7 +117,7 @@ export const TrainingPage = ({ profile, initialTab = 'week' }: TrainingPageProps
 
   if (!plan || mode.kind === 'build') {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex max-w-2xl flex-col gap-4">
         <PageHeader title={copy.builder.title} description={copy.builder.help} className="mb-1" />
         {actionError && <p role="alert" className="text-base text-destructive">{actionError}</p>}
         <PlanBuilder defaults={defaults} busy={busy} onSuggest={(value) => void runSuggest(value)}
@@ -128,11 +128,11 @@ export const TrainingPage = ({ profile, initialTab = 'week' }: TrainingPageProps
   }
 
   return (
-    <div className="animate-rise">
+    <div className="max-w-2xl animate-rise">
       <PageHeader title={copy.title} description={copy.description} />
       {savedNote && (
-        <p role="status" className="mb-4 flex items-center gap-2 rounded-xl bg-primary/10 p-4 text-lg font-medium">
-          <CircleCheck className="size-6 text-primary" aria-hidden="true" />{copy.editor.saved}
+        <p role="status" className="mb-4 flex items-center gap-2 rounded-lg bg-pool p-4 text-lg font-bold text-pool-foreground">
+          <CircleCheck className="size-6 animate-pop" aria-hidden="true" />{copy.editor.saved}
         </p>
       )}
       <Tabs defaultValue={initialTab}>

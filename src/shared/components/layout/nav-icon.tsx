@@ -4,7 +4,9 @@ import {
   ChartNoAxesCombined,
   Dumbbell,
   House,
+  Medal,
   MessageCircleQuestion,
+  ShieldCheck,
   Trophy,
   UserRound,
   type LucideIcon,
@@ -22,6 +24,8 @@ const NAV_ICONS: Record<NavIconName, LucideIcon> = {
   trophy: Trophy,
   'user-round': UserRound,
   'badge-check': BadgeCheck,
+  shield: ShieldCheck,
+  medal: Medal,
 };
 
 type NavIconProps = { name: NavIconName; className?: string };

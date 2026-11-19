@@ -39,7 +39,7 @@ export const WorkoutLogForm = ({ initialValues, saving, onCancel, onSubmit }: Wo
     <form noValidate onSubmit={form.handleSubmit(submit)} className="flex flex-col gap-5">
       <ul className="flex flex-col gap-4">
         {fields.map((exercise, exerciseIndex) => (
-          <li key={exercise.id} className="flex flex-col gap-4 rounded-xl border border-border bg-background p-4">
+          <li key={exercise.id} className="flex flex-col gap-4 rounded-lg border border-border bg-background p-4">
             <label className="flex flex-col gap-2">
               <span className="text-base font-medium text-muted-foreground">{copy.exercise}</span>
               <Select {...form.register(`exercises.${exerciseIndex}.exerciseId` as const)} className="text-lg font-semibold">

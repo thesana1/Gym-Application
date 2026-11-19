@@ -11,9 +11,9 @@ import { WorkoutFinish, type FinishedExercise } from '@/features/training/compon
 import { useWorkoutSession } from '@/features/training/hooks/use-workout-session';
 import type { WorkoutSession as Session } from '@/features/training/service/training-plan.service';
 import { Button } from '@/shared/components/ui/button';
+import { LaneRope } from '@/shared/components/ui/lane-rope';
 import { COMMON_COPY } from '@/shared/const/copy-common.const';
 import { TRAINING_COPY } from '@/shared/const/copy-training.const';
-import { cn } from '@/shared/lib/utils';
 
 const copy = TRAINING_COPY.session;
 const WHOLE = /^\d{1,3}$/;
@@ -81,12 +81,8 @@ const SessionBody = ({ session, onFinished, complete }: {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2" role="status" aria-label={copy.progress(done, total)}>
-        <p className="text-base font-semibold">{copy.progress(done, total)}</p>
-        <div className="flex gap-0.5" aria-hidden="true">
-          {Array.from({ length: total }, (_, index) => (
-            <span key={index} className={cn('h-3 flex-1 rounded-full transition-colors duration-300', index < done ? 'bg-primary' : 'bg-muted')} />
-          ))}
-        </div>
+        <p className="font-heading text-lg font-extrabold">{copy.progress(done, total)}</p>
+        <LaneRope total={total} filled={done} label={copy.progress(done, total)} current={done} size={total > 16 ? 'sm' : 'md'} className="flex-wrap" />
       </div>
       {session.exercises.map((exercise, index) => (
         <SessionExerciseCard key={exercise.exerciseId} index={index} exercise={exercise} control={form.control} register={form.register}
@@ -118,7 +114,7 @@ export const WorkoutSession = ({ workoutId }: { workoutId: string }) => {
       <Link href="/dashboard/workouts"><ArrowLeft className="size-5" aria-hidden="true" />{copy.back}</Link>
     </Button>
   );
-  if (loading) return <div className="h-96 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />;
+  if (loading) return <div className="h-96 max-w-2xl animate-pulse rounded-lg bg-muted" role="status" aria-label={copy.loading} />;
   if (error || !session) {
     return (
       <div className="flex flex-col items-start gap-3">
@@ -131,9 +127,9 @@ export const WorkoutSession = ({ workoutId }: { workoutId: string }) => {
   if (finished) return <WorkoutFinish workoutName={session.workout.name} result={finished.result} minutes={finished.minutes} records={records} />;
 
   return (
-    <div className="animate-rise">
+    <div className="max-w-2xl animate-rise">
       {back}
-      <h1 className="mb-4 text-3xl font-semibold">{session.workout.name}</h1>
+      <h1 className="mb-5 text-balance text-4xl leading-none">{session.workout.name}</h1>
       <SessionBody session={session} complete={complete} onFinished={(result, minutes) => { setFinished({ result, minutes }); window.scrollTo({ top: 0 }); }} />
     </div>
   );

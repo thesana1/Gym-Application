@@ -34,7 +34,7 @@ export const PersonalRecords = () => {
   }, [loadRecords]);
 
   return (
-    <div className="animate-rise">
+    <div className="max-w-2xl animate-rise">
       <ProgressHeader />
       {error ? (
         <div className="flex flex-col items-start gap-3" role="alert">
@@ -42,16 +42,16 @@ export const PersonalRecords = () => {
           <Button variant="outline" onClick={() => void loadRecords()}>{COMMON_COPY.tryAgain}</Button>
         </div>
       ) : loading ? (
-        <div className="h-40 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
+        <div className="h-40 animate-pulse rounded-lg bg-muted" role="status" aria-label={copy.loading} />
       ) : records.length === 0 ? (
         <EmptyState message={copy.empty} />
       ) : (
         <div className="flex flex-col gap-3">
-          <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
+          <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
             {records.map((record) => (
               <li key={record.exerciseId} className="flex flex-col gap-1 p-4">
-                <h2 className="text-lg font-semibold">{record.exerciseName}</h2>
-                <p className="text-lg font-semibold tabular-nums text-primary">
+                <h2 className="text-lg">{record.exerciseName}</h2>
+                <p className="text-lg font-semibold tabular-nums text-primary-ink">
                   {record.heaviestSet ? copy.heaviest(record.heaviestSet.weightKg, record.heaviestSet.repetitions) : copy.noWeight}
                 </p>
                 <p className="text-base tabular-nums">{copy.mostReps(record.highestRepSet.repetitions, record.highestRepSet.weightKg)}</p>

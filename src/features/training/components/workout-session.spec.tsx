@@ -49,7 +49,7 @@ describe('WorkoutSession', () => {
       title: 'Upper push', planWorkoutId: 'w1',
       exercises: [{ exerciseId: 'barbell-bench-press', sets: [{ repetitions: 12, weightKg: 42.5 }, { repetitions: 10, weightKg: 42.5 }] }],
     }));
-    expect(await screen.findByText('Workout done!')).toBeInTheDocument();
+    expect(await screen.findByText('You did it!')).toBeInTheDocument();
     expect(screen.getByText('Bench press: 42.5 kg × 12')).toBeInTheDocument();
     expect(screen.getByText('Stay at 42.5 kg and try for 1 more rep per set.')).toBeInTheDocument();
   });

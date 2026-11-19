@@ -1,4 +1,4 @@
-import { Geist_Mono, Inter, Space_Grotesk } from 'next/font/google';
+import { Archivo, Figtree } from 'next/font/google';
 import { type ReactNode } from 'react';
 
 import { APP_DESCRIPTION, APP_NAME } from '@/shared/const/app.const';
@@ -8,22 +8,9 @@ import type { Metadata } from 'next';
 
 import './globals.css';
 
-const inter = Inter({
-  variable: '--font-sans',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: '--font-space-grotesk',
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
+// Figtree reads friendly at small sizes; Archivo's width axis gives condensed numerals like painted pool depth markers.
+const figtree = Figtree({ variable: '--font-figtree', subsets: ['latin'] });
+const archivo = Archivo({ variable: '--font-archivo', subsets: ['latin'], axes: ['wdth'] });
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -34,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${figtree.variable} ${archivo.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

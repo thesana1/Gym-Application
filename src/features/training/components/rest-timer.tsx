@@ -27,11 +27,12 @@ export const RestTimer = ({ seconds, startedAt, onDone }: RestTimerProps) => {
   }, [left, onDone]);
 
   return (
-    <div role="timer" aria-live="off" className="flex items-center justify-between gap-3 rounded-2xl bg-foreground px-4 py-3 text-background shadow-lg">
-      <span className="flex items-center gap-2 font-heading text-2xl font-semibold tabular-nums">
+    <div role="timer" aria-live="off" className="flex animate-rise items-center justify-between gap-3 rounded-full bg-foreground py-2 pl-5 pr-2 text-background
+      shadow-lg">
+      <span className="flex items-center gap-2 font-heading text-3xl font-extrabold font-stretch-condensed">
         <Timer className="size-6" aria-hidden="true" />{TRAINING_COPY.session.restLeft(format(left))}
       </span>
-      <Button type="button" variant="secondary" size="sm" onClick={onDone}>{TRAINING_COPY.session.skipRest}</Button>
+      <Button type="button" size="sm" onClick={onDone}>{TRAINING_COPY.session.skipRest}</Button>
     </div>
   );
 };

@@ -61,7 +61,7 @@ export const NutritionTargetForm = ({ targets, saving, onSave }: NutritionTarget
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={saving}>{saving ? copy.saving : copy.save}</Button>
-        {saved && <p role="status" className="text-base font-medium text-primary">{copy.saved}</p>}
+        {saved && <p role="status" className="text-base font-medium text-primary-ink">{copy.saved}</p>}
       </div>
     </form>
   );

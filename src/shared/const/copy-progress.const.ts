@@ -1,6 +1,6 @@
 export const PROGRESS_COPY = {
   title: 'How I’m doing',
-  description: 'See how your body and lifts change.',
+  description: 'Look how far you’ve come.',
   body: {
     latest: 'Latest weight',
     savedOn: (date: string) => `Saved on ${date}`,
@@ -95,7 +95,7 @@ export const PROGRESS_COPY = {
     onlyImages: 'Please choose photos only.',
     tooBig: (names: string) => `${names} is bigger than 3 MB.`,
     unavailable: 'Photo upload is not working right now. Please try later.',
-    premium: 'Photo upload comes with Premium. Open My plan to get it.',
+    premium: 'Photo upload comes with Premium. Open Premium in More to get it.',
     notImage: (name: string) => `${name} is not a photo we can use.`,
     failed: (name: string) => `We could not upload ${name}. Please try again.`,
     done: (count: number) => `${count} photo${count === 1 ? '' : 's'} uploaded.`,

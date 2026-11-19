@@ -23,11 +23,11 @@ const LiftSummary = ({ lift }: { lift: LiftProgress }) => (
   <div className="flex flex-col gap-1">
     <p className="text-base font-medium text-muted-foreground">{lift.exerciseName}</p>
     {lift.gain > 0 ? (
-      <p className="flex items-center gap-2 font-heading text-4xl font-semibold tabular-nums text-primary">
+      <p className="flex items-center gap-2 font-heading text-4xl font-extrabold tabular-nums text-pool">
         <TrendingUp className="size-8 animate-pop" aria-hidden="true" />{copy.gain(lift.gain, lift.unit)}
       </p>
     ) : (
-      <p className="font-heading text-4xl font-semibold tabular-nums">{lift.best} {lift.unit}</p>
+      <p className="font-heading text-4xl font-extrabold tabular-nums">{lift.best} {lift.unit}</p>
     )}
     {lift.gain > 0 && <p className="text-base font-semibold">{copy.stronger(lift.gainPercent, lift.points.length)}</p>}
     <p className="text-base text-muted-foreground">{cheer(lift)}</p>
@@ -44,12 +44,12 @@ export const LiftProgressCard = () => {
     void loadWorkouts({ from: new Date(Date.now() - HISTORY_DAYS * 24 * 60 * 60 * 1000).toISOString() });
   }, [loadWorkouts]);
 
-  if (loading) return <div className="h-72 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />;
+  if (loading) return <div className="h-72 animate-pulse rounded-lg bg-muted" role="status" aria-label={copy.loading} />;
   if (error) return <p className="text-base text-destructive" role="alert">{copy.error}</p>;
 
   return (
-    <section aria-labelledby="strength-title" className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
-      <h2 id="strength-title" className="text-2xl font-semibold">{copy.title}</h2>
+    <section aria-labelledby="strength-title" className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5">
+      <h2 id="strength-title" className="text-2xl">{copy.title}</h2>
       {!lift ? <EmptyState message={copy.empty} /> : (
         <>
           <LiftSummary lift={lift} />
@@ -65,9 +65,9 @@ export const LiftProgressCard = () => {
                   onClick={() => setSelectedId(option.exerciseId)}
                   className={cn('flex min-h-11 items-center gap-2 rounded-full border px-4 text-base font-medium',
                     'focus-visible:outline-2 focus-visible:outline-ring',
-                    option.exerciseId === lift.exerciseId ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:bg-accent')}>
+                    option.exerciseId === lift.exerciseId ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:bg-accent')}>
                   {option.exerciseName}
-                  {option.gain > 0 && <span className="text-sm font-semibold text-primary">{copy.gain(option.gain, option.unit)}</span>}
+                  {option.gain > 0 && <span className="text-sm font-semibold text-pool">{copy.gain(option.gain, option.unit)}</span>}
                 </button>
               ))}
             </div>

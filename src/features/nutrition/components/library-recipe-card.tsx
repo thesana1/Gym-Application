@@ -9,8 +9,8 @@ export const allergenNames = (values: readonly string[]) =>
   values.map((value) => FOOD_ALLERGENS.find((allergen) => allergen.value === value)?.label ?? value).join(', ');
 
 export const LibraryRecipeCard = ({ recipe }: { recipe: GeneratedMeal }) => (
-  <article className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5">
-    <h3 className="text-xl font-semibold">{recipe.name}</h3>
+  <article className="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
+    <h3 className="text-xl">{recipe.name}</h3>
     <p className="text-base font-medium">
       {recipe.missingIngredients.length === 0 ? copy.haveAll : copy.have(recipe.matchedIngredients.length, recipe.ingredients.length)}
       {recipe.missingIngredients.length > 0 && <span className="block text-muted-foreground">{copy.stillNeed(recipe.missingIngredients.join(', '))}</span>}

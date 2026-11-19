@@ -28,5 +28,5 @@ export const COMMON_COPY = {
 export const ACCOUNT_MENU_COPY = {
   home: 'Home',
   profile: 'My profile',
-  plan: 'My plan',
+  plan: 'Premium',
 } as const;

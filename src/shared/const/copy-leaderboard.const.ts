@@ -1,0 +1,38 @@
+export const LEADERBOARD_COPY = {
+  title: 'Leaderboard',
+  description: 'See where you stand in the club.',
+  loading: 'Loading the leaderboard…',
+  loadError: 'We could not load the leaderboard.',
+  you: 'You',
+  yourPlace: 'Your place',
+  place: (rank: number) => `#${rank}`,
+  of: (total: number) => `of ${total} member${total === 1 ? '' : 's'}`,
+  topLabel: (size: number) => `Top ${size}`,
+  outsideTop: 'Places in between are hidden',
+  rowLabel: (rank: number, name: string, value: string) => `Place ${rank}: ${name}, ${value}`,
+  boards: {
+    progress: {
+      tab: 'Most progress',
+      title: 'Most progress this month',
+      value: (percent: number) => `${percent > 0 ? '+' : ''}${percent}%`,
+      yourScore: (value: string) => `${value} stronger than before`,
+      how: 'How it works: for every lift you did in the last 30 days and before them, we compare your best set. '
+        + 'Your score is how much stronger you got on average.',
+      emptyTitle: 'No place yet',
+      empty: 'Log weights on a lift now, then again later this month. Your place shows up as soon as you get stronger on it.',
+      emptyAction: 'Go to my workouts',
+      nobody: 'Nobody has a score yet. Be the first!',
+    },
+    deadlift: {
+      tab: 'Heaviest deadlift',
+      title: 'Heaviest deadlift',
+      value: (kg: number) => `${kg} kg`,
+      yourScore: (value: string) => `Your best: ${value}`,
+      how: 'How it works: the heaviest weight you have lifted in one set of Deadlift, any number of reps.',
+      emptyTitle: 'No place yet',
+      empty: 'Add Deadlift to your plan and log a set with weight to get on the board.',
+      emptyAction: 'Edit my plan',
+      nobody: 'Nobody has logged a deadlift yet. Be the first!',
+    },
+  },
+} as const;

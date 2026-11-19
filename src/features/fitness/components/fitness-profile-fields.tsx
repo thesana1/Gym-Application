@@ -10,7 +10,7 @@ export type ProfileControl = Control<FitnessProfileInput, undefined, FitnessProf
 
 export const StepShell = ({ title, help, error, children }: { title: string; help: string; error?: string; children: ReactNode }) => (
   <fieldset className="flex flex-col gap-3">
-    <legend className="mb-1 text-balance font-heading text-2xl font-semibold">{title}</legend>
+    <legend className="mb-1 text-balance font-heading text-2xl font-extrabold">{title}</legend>
     <p className="text-lg text-muted-foreground">{help}</p>
     {children}
     {error && <p role="alert" className="text-base text-destructive">{error}</p>}

@@ -28,9 +28,9 @@ export const LoginForm = ({ accountCreated = false, redirectTo, authError }: Log
 
   return (
     <section aria-labelledby="sign-in-title" className="w-full max-w-md animate-rise">
-      <h1 id="sign-in-title" className="text-3xl font-semibold">{copy.signInTitle}</h1>
+      <h1 id="sign-in-title" className="text-3xl">{copy.signInTitle}</h1>
       <p className="mt-1 text-lg text-muted-foreground">{copy.signInDescription}</p>
-      {accountCreated && <p role="status" className="mt-5 rounded-xl bg-primary/10 p-4 text-base">{copy.accountCreated}</p>}
+      {accountCreated && <p role="status" className="mt-5 rounded-lg bg-primary/25 p-4 text-base">{copy.accountCreated}</p>}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(login)} noValidate className="mt-6 flex flex-col gap-5">
           <FormField control={form.control} name="email" render={({ field }) => (
@@ -58,7 +58,7 @@ export const LoginForm = ({ accountCreated = false, redirectTo, authError }: Log
           <p className="text-center text-base text-muted-foreground">
             {copy.noAccount}{' '}
             <Link href={redirectTo ? `/sign-up?${new URLSearchParams({ callbackUrl: redirectTo })}` : '/sign-up'}
-              className="inline-flex min-h-11 items-center font-semibold text-primary underline-offset-4 hover:underline">
+              className="inline-flex min-h-11 items-center font-semibold text-primary-ink underline-offset-4 hover:underline">
               {copy.toSignUp}
             </Link>
           </p>

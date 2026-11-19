@@ -6,15 +6,16 @@ import { useState } from 'react';
 
 import type { PersonalExerciseRecord } from '@/features/fitness/service/personal-record.service';
 import { progressionText } from '@/features/training/components/session-exercise-card';
+import { WeekRope } from '@/features/training/components/week-rope';
 import { useTrainingPlan } from '@/features/training/hooks/use-training-plan';
 import type { WorkoutSession } from '@/features/training/service/training-plan.service';
 import { suggestNextTarget, type SetResult } from '@/features/training/service/training-progression.service';
 import { summarizeWeek } from '@/features/training/service/training-week.service';
 import { Button } from '@/shared/components/ui/button';
+import { Field } from '@/shared/components/ui/field';
 import { AI_DISCLAIMERS, AI_ERROR_MESSAGES } from '@/shared/const/ai.const';
 import { TRAINING_COPY } from '@/shared/const/copy-training.const';
 import { http } from '@/shared/lib/http';
-import { cn } from '@/shared/lib/utils';
 
 export type FinishedExercise = { exercise: WorkoutSession['exercises'][number]; sets: SetResult[] };
 type WorkoutFinishProps = { workoutName: string; result: FinishedExercise[]; minutes: number; records: PersonalExerciseRecord[] };
@@ -61,50 +62,51 @@ export const WorkoutFinish = ({ workoutName, result, minutes, records }: Workout
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <section className="flex flex-col items-center gap-3 rounded-3xl bg-primary px-5 py-8 text-center text-primary-foreground" role="status">
-        <CircleCheck className="size-16 animate-pop" aria-hidden="true" />
-        <h1 className="font-heading text-3xl font-semibold">{copy.title}</h1>
-        <p className="text-lg text-primary-foreground/90">{workoutName}</p>
-        <dl className="mt-2 grid w-full grid-cols-3 gap-2">
+    <div className="flex max-w-2xl flex-col gap-4">
+      <Field tone="pool" role="status" className="gap-6 py-8">
+        <span className="relative flex size-16 items-center justify-center rounded-full bg-pool-foreground text-pool">
+          <span aria-hidden="true" className="absolute inset-0 animate-ripple rounded-full bg-pool-foreground" />
+          <CircleCheck className="size-10 animate-pop" aria-hidden="true" />
+        </span>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-5xl leading-none">{copy.title}</h1>
+          <p className="text-lg font-medium">{copy.subtitle(workoutName)}</p>
+        </div>
+        <dl className="grid grid-cols-3 divide-x divide-pool-foreground/25 border-t border-pool-foreground/25 pt-4">
           {stats.map(([value, label]) => (
-            <div key={label} className="animate-rise rounded-2xl bg-primary-foreground/15 px-2 py-3">
+            <div key={label} className="flex flex-col px-3 first:pl-0">
               <dt className="sr-only">{label}</dt>
-              <dd className="font-heading text-2xl font-semibold tabular-nums">{value}</dd>
-              <dd className="text-base text-primary-foreground/85">{label}</dd>
+              <dd className="font-heading text-4xl font-extrabold tracking-display font-stretch-condensed">{value}</dd>
+              <dd className="text-base">{label}</dd>
             </div>
           ))}
         </dl>
-      </section>
+      </Field>
 
       {bests.length > 0 && (
-        <section aria-labelledby="new-bests" className="rounded-2xl border-2 border-primary bg-card p-5">
-          <h2 id="new-bests" className="flex items-center gap-2 text-xl font-semibold">
-            <Medal className="size-6 animate-pop text-primary" aria-hidden="true" />{copy.newBests}
+        <section aria-labelledby="new-bests" className="animate-rise rounded-lg border-2 border-primary bg-card p-5">
+          <h2 id="new-bests" className="flex items-center gap-2 text-2xl">
+            <Medal className="size-6 animate-pop text-primary-ink" aria-hidden="true" />{copy.newBests}
           </h2>
           <ul className="mt-2 flex flex-col gap-1 text-lg">{bests.map((line) => <li key={line}>{line}</li>)}</ul>
         </section>
       )}
 
       {week && week.planned > 0 && (
-        <section aria-label={copy.weekProgress(week.done, week.planned)} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="text-lg font-semibold">{copy.weekProgress(week.done, week.planned)}</p>
+        <section aria-label={copy.weekProgress(week.done, week.planned)} className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-heading text-xl font-extrabold">{copy.weekProgress(week.done, week.planned)}</p>
             {week.streakWeeks > 0 && (
-              <span className="flex items-center gap-1 text-base font-semibold text-primary"><Flame className="size-4" aria-hidden="true" />
-                {TRAINING_COPY.week.streak(week.streakWeeks)}</span>
+              <span className="flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-base font-bold text-background">
+                <Flame className="size-4 text-primary" aria-hidden="true" />{TRAINING_COPY.week.streak(week.streakWeeks)}</span>
             )}
           </div>
-          <div className="flex gap-1" aria-hidden="true">
-            {Array.from({ length: week.planned }, (_, index) => (
-              <span key={index} className={cn('h-3 flex-1 rounded-full', index < week.done ? 'bg-primary' : 'bg-muted')} />
-            ))}
-          </div>
+          <WeekRope days={week.days} />
         </section>
       )}
 
-      <section aria-labelledby="next-time" className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5">
-        <h2 id="next-time" className="text-xl font-semibold">{copy.nextTime}</h2>
+      <section aria-labelledby="next-time" className="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
+        <h2 id="next-time" className="text-2xl">{copy.nextTime}</h2>
         <ul className="flex flex-col gap-3">
           {next.map(({ exercise, target }) => (
             <li key={exercise.exerciseId}>
@@ -116,13 +118,13 @@ export const WorkoutFinish = ({ workoutName, result, minutes, records }: Workout
           ))}
         </ul>
         {tip ? (
-          <div className="rounded-xl bg-primary/10 p-4">
+          <div className="rounded-lg bg-muted p-4">
             <p className="text-lg">{tip}</p>
             <p className="mt-2 text-base text-muted-foreground">{AI_DISCLAIMERS.training}</p>
           </div>
         ) : (
           <div className="flex flex-col gap-1">
-            <Button variant="outline" disabled={tipState === 'loading'} onClick={() => void askTip()}>
+            <Button variant="ghost" disabled={tipState === 'loading'} onClick={() => void askTip()}>
               <Sparkles className="size-5" aria-hidden="true" />{tipState === 'loading' ? copy.tipLoading : copy.tipButton}
             </Button>
             <p className="text-center text-base text-muted-foreground">{copy.tipNote}</p>

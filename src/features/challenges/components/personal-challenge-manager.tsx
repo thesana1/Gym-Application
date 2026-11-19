@@ -68,11 +68,11 @@ export const PersonalChallengeManager = () => {
   };
 
   return (
-    <div className="flex animate-rise flex-col gap-4">
+    <div className="flex max-w-2xl animate-rise flex-col gap-4">
       <PageHeader title={copy.title} description={copy.description} className="mb-2" />
       {error && <p className="text-base text-destructive" role="alert">{error}</p>}
       {loading ? (
-        <div className="h-40 animate-pulse rounded-2xl bg-muted" role="status" aria-label={copy.loading} />
+        <div className="h-40 animate-pulse rounded-lg bg-muted" role="status" aria-label={copy.loading} />
       ) : challenges.length === 0 ? (
         <EmptyState message={copy.empty} />
       ) : (
@@ -82,11 +82,11 @@ export const PersonalChallengeManager = () => {
             const joined = challenge.status !== 'not-joined';
             const busy = savingId === challenge.id;
             return (
-              <li key={challenge.id} className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
+              <li key={challenge.id} className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5">
                 <div>
                   <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                    <h2 className="text-xl font-semibold">{challenge.title}</h2>
-                    {joined && <span className="text-base font-semibold text-primary">{copy.status[challenge.status]}</span>}
+                    <h2 className="text-xl">{challenge.title}</h2>
+                    {joined && <span className="text-base font-semibold text-primary-ink">{copy.status[challenge.status]}</span>}
                   </div>
                   <p className="mt-1 text-lg">{challenge.description}</p>
                 </div>

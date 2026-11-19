@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { NutritionEntryForm } from '@/features/nutrition/components/nutrition-entry-form';
@@ -40,11 +40,11 @@ const formatDay = (date: string) =>
     : new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(`${date}T12:00:00`));
 
 const DayPicker = ({ date, onChange }: { date: string; onChange: (date: string) => void }) => (
-  <div className="flex items-center justify-between gap-2 rounded-2xl border border-border bg-card p-1">
+  <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-1">
     <Button variant="ghost" aria-label={FOOD_COPY.day.backLabel} onClick={() => onChange(shiftDay(date, -1))}>
       <ChevronLeft className="size-5" aria-hidden="true" />{FOOD_COPY.day.back}
     </Button>
-    <p className="text-center font-heading text-lg font-semibold" aria-live="polite">{formatDay(date)}</p>
+    <p className="text-center font-heading text-lg font-extrabold" aria-live="polite">{formatDay(date)}</p>
     <Button variant="ghost" aria-label={FOOD_COPY.day.nextLabel} disabled={date >= getToday()} onClick={() => onChange(shiftDay(date, 1))}>
       {FOOD_COPY.day.next}<ChevronRight className="size-5" aria-hidden="true" />
     </Button>
@@ -72,6 +72,7 @@ export const NutritionDashboard = ({ startAdding = false }: NutritionDashboardPr
   const [date, setDate] = useState(getToday);
   const [isFormOpen, setIsFormOpen] = useState(startAdding);
   const [editingEntry, setEditingEntry] = useState<NutritionEntry | null>(null);
+  const [added, setAdded] = useState<string | null>(null);
 
   const refreshEntries = useCallback(() => {
     void loadEntries(date);
@@ -93,6 +94,7 @@ export const NutritionDashboard = ({ startAdding = false }: NutritionDashboardPr
 
   const handleSaveEntry = async (value: NutritionEntryType) => {
     if (await saveEntry(editingEntry?.id ?? null, value)) {
+      if (!editingEntry) setAdded(value.foodName);
       closeForm();
       refreshEntries();
       setHistoryVersion((version) => version + 1);
@@ -110,7 +112,7 @@ export const NutritionDashboard = ({ startAdding = false }: NutritionDashboardPr
   const handleSaveTargets = async (value: NutritionTargets) => saveTargets(value);
 
   return (
-    <div className="flex animate-rise flex-col gap-5">
+    <div className="flex max-w-2xl animate-rise flex-col gap-5">
       <PageHeader title={FOOD_COPY.title} description={FOOD_COPY.description} className="mb-1">
         <SectionTabs tabs={FOOD_TABS} />
       </PageHeader>
@@ -118,17 +120,26 @@ export const NutritionDashboard = ({ startAdding = false }: NutritionDashboardPr
       {error && <p className="text-base text-destructive" role="alert">{error}</p>}
 
       {isFormOpen ? (
-        <section aria-labelledby="food-form-title" className="rounded-2xl border border-border bg-card p-5">
-          <h2 id="food-form-title" className="mb-5 text-2xl font-semibold">{editingEntry ? FOOD_COPY.form.editTitle : FOOD_COPY.form.addTitle}</h2>
+        <section aria-labelledby="food-form-title" className="rounded-lg border border-border bg-card p-5">
+          <h2 id="food-form-title" className="mb-5 text-2xl">{editingEntry ? FOOD_COPY.form.editTitle : FOOD_COPY.form.addTitle}</h2>
           <NutritionEntryForm key={editingEntry?.id ?? `new-${date}`} date={date} saving={saving}
             initialValues={editingEntry ? toEntryInput(editingEntry) : undefined} onCancel={closeForm} onSave={handleSaveEntry} />
         </section>
       ) : (
         <>
+          {added && (
+            <p role="status" className="flex animate-rise items-center gap-3 rounded-lg bg-pool p-4 text-lg font-bold text-pool-foreground">
+              <span className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-pool-foreground text-pool">
+                <span aria-hidden="true" className="absolute inset-0 animate-ripple rounded-full bg-pool-foreground" />
+                <Check className="size-5" aria-hidden="true" />
+              </span>
+              {FOOD_COPY.added(added)}
+            </p>
+          )}
           <DayPicker date={date} onChange={setDate} />
           <NutritionSummary entries={entries} targets={targets} />
           <Button size="lg" className="sticky bottom-24 z-10 w-full shadow-lg lg:bottom-6"
-            onClick={() => { setEditingEntry(null); setIsFormOpen(true); setError(null); }}>
+            onClick={() => { setEditingEntry(null); setIsFormOpen(true); setError(null); setAdded(null); }}>
             <Plus className="size-5" aria-hidden="true" />{FOOD_COPY.add}
           </Button>
           <NutritionEntryHistory entries={entries} loading={loading} onDelete={handleDeleteEntry}

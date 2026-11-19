@@ -25,7 +25,7 @@ export const SignUpForm = ({ redirectTo }: { redirectTo?: string }) => {
 
   return (
     <section aria-labelledby="sign-up-title" className="w-full max-w-md animate-rise">
-      <h1 id="sign-up-title" className="text-3xl font-semibold">{copy.signUpTitle}</h1>
+      <h1 id="sign-up-title" className="text-3xl">{copy.signUpTitle}</h1>
       <p className="mt-1 text-lg text-muted-foreground">{copy.signUpDescription}</p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(register)} noValidate className="mt-6 flex flex-col gap-5">
@@ -62,7 +62,7 @@ export const SignUpForm = ({ redirectTo }: { redirectTo?: string }) => {
           <p className="text-center text-base text-muted-foreground">
             {copy.haveAccount}{' '}
             <Link href={redirectTo ? `/sign-in?${new URLSearchParams({ callbackUrl: redirectTo })}` : '/sign-in'}
-              className="inline-flex min-h-11 items-center font-semibold text-primary underline-offset-4 hover:underline">
+              className="inline-flex min-h-11 items-center font-semibold text-primary-ink underline-offset-4 hover:underline">
               {copy.toSignIn}
             </Link>
           </p>

@@ -50,7 +50,7 @@ export const NutritionEntryForm = ({ date, saving, initialValues, onCancel, onSa
           {MEAL_TYPES.map((meal) => (
             <label key={meal} className={cn('flex min-h-12 cursor-pointer items-center justify-center rounded-lg border text-base font-semibold',
               'has-focus-visible:outline-2 has-focus-visible:outline-ring',
-              mealType === meal ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:bg-accent')}>
+              mealType === meal ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:bg-accent')}>
               <input type="radio" value={meal} {...form.register('mealType')} className="sr-only" />
               {FOOD_COPY.meals[meal]}
             </label>

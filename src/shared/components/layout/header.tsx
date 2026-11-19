@@ -1,6 +1,5 @@
 'use client';
 
-import { Dumbbell } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -22,14 +21,16 @@ export const Header = () => {
   const user = session?.user as SessionUser | undefined;
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-30 flex min-w-0 items-center justify-between gap-2 border-b border-border bg-background/95 px-4 py-2 backdrop-blur
+    <header className="sticky top-0 z-30 flex min-w-0 items-center justify-between gap-2 border-b border-border bg-background px-4 py-2
       sm:px-6 lg:px-10">
       <Link href={user ? '/dashboard' : '/'} className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg font-semibold focus-visible:outline-2
         focus-visible:outline-ring">
-        <span aria-hidden="true" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <Dumbbell className="size-4" />
+        {/* Two floats from the lane rope stand in for a logo. */}
+        <span aria-hidden="true" className="flex shrink-0 gap-0.5">
+          <span className="size-3 rounded-full bg-primary" />
+          <span className="size-3 rounded-full bg-pool" />
         </span>
-        <span className="truncate font-heading text-lg tracking-tight">{APP_NAME}</span>
+        <span className="truncate font-heading text-lg font-extrabold tracking-display">{APP_NAME}</span>
       </Link>
       <div className="flex shrink-0 items-center gap-2">
         {status === 'loading' ? (

@@ -11,7 +11,7 @@ type FitnessAnswerCardProps = {
 export const FitnessAnswerCard = ({ answer, onFollowUp }: FitnessAnswerCardProps) => (
   <div className="flex flex-col gap-4">
     {answer.seeProfessional && (
-      <p role="note" className="flex gap-2 rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-base">
+      <p role="note" className="flex gap-2 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-base">
         <TriangleAlert className="mt-0.5 size-5 shrink-0 text-destructive" aria-hidden="true" />{COACH_COPY.seeDoctor}
       </p>
     )}
@@ -24,7 +24,7 @@ export const FitnessAnswerCard = ({ answer, onFollowUp }: FitnessAnswerCardProps
         <p className="text-base font-semibold">{COACH_COPY.askNext}</p>
         {answer.followUpQuestions.map((question) => (
           <button key={question} type="button" onClick={() => onFollowUp(question)}
-            className="min-h-12 rounded-xl border border-border bg-background px-4 py-2 text-left text-base hover:border-primary hover:text-primary
+            className="min-h-12 rounded-lg border border-border bg-background px-4 py-2 text-left text-base hover:border-primary hover:text-primary-ink
               focus-visible:outline-2 focus-visible:outline-ring">
             {question}
           </button>

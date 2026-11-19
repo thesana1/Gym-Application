@@ -304,12 +304,14 @@ Ask these exact axes; each meaningfully changes the design:
 
 ```
 STATUS: locked
-Product:    SaaS dashboard / B2B
-Palette:    Monochrome + electric indigo accent
-            base #FAFAFA (light) / #0A0A0A (dark); accent #5B5BFF
-            tokens: --primary oklch(0.555 0.243 271) light / oklch(0.62 0.21 271) dark
-Type:       Geometric sans — Space Grotesk (display, 500/600/700) + Inter (body) + Geist Mono (data)
-Feel:       Balanced — CSS load-rise stagger + hover micro-interactions; reduced-motion respected
-Signature:  Left-aligned typographic hero with one accent word + honest stat strip;
-            dashboard app-shell with mobile drawer sidebar and segmented indigo channel meters
+Product:    Consumer app (personal gym and food tracker, phone first)
+World:      Outdoor swim club on a sunny morning: bright, clean, encouraging
+Palette:    Warm sun-washed white + lido yellow + deep warm ink; pool blue only for things filling up
+            ground #FBF8F3 (light) / #1C1915 (dark); ink #231E19; lido yellow #F9C440; pool blue #2F6FC6; coral #D9472F (warnings only)
+            tokens: --primary oklch(0.86 0.16 85) yellow with ink --primary-foreground; --primary-ink oklch(0.47 0.11 70) for yellow-family text;
+                    --pool oklch(0.56 0.15 248) light / oklch(0.7 0.13 245) dark; --destructive oklch(0.58 0.2 30)
+Type:       Archivo (display + numerals; heavy, tight tracking-display, condensed numerals via font-stretch) + Figtree (body, humanist)
+Feel:       Balanced and warm — press states on every tap, one ripple when something is completed, floats fill in place; reduced-motion respected
+Signature:  Lane-rope floats: rows of round floats that fill in pool blue one by one for sets, workout days and meals;
+            each screen leads with its single next action in one big yellow field; done and missed items stay visible, marked, never removed
 ```

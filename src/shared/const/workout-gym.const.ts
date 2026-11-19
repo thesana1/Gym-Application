@@ -35,6 +35,17 @@ export const GYM_EXERCISES: WorkoutExerciseDefinition[] = [
     safetyCue: 'Keep your back flat and only go as low as feels good.',
   },
   {
+    id: 'barbell-deadlift', name: 'Deadlift', equipment: ['barbell'], targetMuscles: 'Back, glutes and legs',
+    region: 'lower', focus: ['back', 'glutes', 'legs'],
+    instructions: [
+      'Stand with the bar over the middle of your feet.',
+      'Bend down and grip the bar just outside your legs, back flat.',
+      'Push the floor away and stand up tall, then lower the bar the same way.',
+    ],
+    commonMistake: 'Rounding the back or letting the bar drift away from the legs.', regression: 'Start with a Romanian deadlift or a kettlebell deadlift.',
+    safetyCue: 'Keep the bar close to your body and stop if your lower back hurts.',
+  },
+  {
     id: 'barbell-overhead-press', name: 'Overhead press', equipment: ['barbell'], targetMuscles: 'Shoulders and arms',
     region: 'upper', focus: ['shoulders', 'arms'],
     instructions: [

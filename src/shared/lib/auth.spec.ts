@@ -109,6 +109,14 @@ describe('auth callbacks — jwt', () => {
     expect(token.avatar).toBe('https://example.com/avatar.png');
   });
 
+  it('grants the admin role to emails listed in ADMIN_EMAILS', async () => {
+    vi.stubEnv('ADMIN_EMAILS', 'alice@example.com');
+    mockRepo.findByEmail.mockResolvedValueOnce({ ...fakeUser, role: 'user' } as never);
+    const token = await capturedConfig.callbacks.jwt({ token: { email: 'alice@example.com' }, user: undefined });
+    expect(token.role).toBe('admin');
+    vi.unstubAllEnvs();
+  });
+
   it('invalidates the session when its user no longer exists', async () => {
     mockRepo.findByEmail.mockResolvedValueOnce(null);
     const token = await capturedConfig.callbacks.jwt({

@@ -1,6 +1,6 @@
 'use client';
 
-import { CircleCheck, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
+import { CircleCheck, Loader2, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -34,40 +34,34 @@ export const PremiumPitch = ({ goal, trainingDays }: PremiumPitchProps) => {
 
   return (
     <>
-      <div className="flex animate-rise flex-col gap-6 pb-48 lg:pb-0">
-        <div className="flex flex-col gap-2">
-          <p className="flex items-center gap-2 text-base font-semibold text-primary">
-            <CircleCheck className="size-5 animate-pop" aria-hidden="true" />{goal ? copy.readyGoal(goal) : copy.ready}
-          </p>
-          <div className="h-2 rounded-full bg-primary" aria-hidden="true" />
-        </div>
+      <div className="flex max-w-2xl animate-rise flex-col gap-6 pb-48 lg:pb-0">
 
         <header className="flex flex-col gap-2">
-          <h1 className="text-balance font-heading text-4xl font-semibold">{copy.title}</h1>
+          <h1 className="text-balance text-4xl">{copy.title}</h1>
           <p className="text-lg text-muted-foreground">{copy.subtitle}</p>
+          <p className="flex items-center gap-2 text-base font-bold text-pool">
+            <CircleCheck className="size-5 animate-pop" aria-hidden="true" />{goal ? copy.readyGoal(goal) : copy.ready}
+          </p>
         </header>
 
-        {trainingDays && <p className="rounded-2xl bg-primary/10 p-4 text-lg font-medium">{copy.commitment(trainingDays)}</p>}
+        {trainingDays && <p className="rounded-3xl bg-primary/25 p-4 text-lg font-medium">{copy.commitment(trainingDays)}</p>}
 
         <section aria-labelledby="benefits-title" className="flex flex-col gap-3">
-          <h2 id="benefits-title" className="text-2xl font-semibold">{copy.benefitsTitle}</h2>
-          <ul className="flex flex-col gap-3">
-            {copy.benefits.map(({ title, body }, index) => (
-              <li key={title} className={`flex animate-rise animate-rise-${index + 1} gap-3 rounded-2xl border border-border bg-card p-4`}>
-                <Sparkles className="mt-1 size-6 shrink-0 text-primary" aria-hidden="true" />
-                <div>
-                  <h3 className="text-lg font-semibold">{title}</h3>
-                  <p className="text-base text-muted-foreground">{body}</p>
-                </div>
-              </li>
+          <h2 id="benefits-title" className="text-2xl">{copy.benefitsTitle}</h2>
+          <dl className="flex flex-col">
+            {copy.benefits.map(({ title, body }) => (
+              <div key={title} className="flex flex-col gap-1 border-t border-border py-4">
+                <dt className="font-heading text-xl font-extrabold tracking-display">{title}</dt>
+                <dd className="text-base text-muted-foreground">{body}</dd>
+              </div>
             ))}
-          </ul>
+          </dl>
         </section>
 
         <PremiumComparison />
 
         <p className="flex items-center gap-2 text-base font-medium">
-          <ShieldCheck className="size-5 shrink-0 text-primary" aria-hidden="true" />{copy.cancelAnyTime}
+          <ShieldCheck className="size-5 shrink-0 text-primary-ink" aria-hidden="true" />{copy.cancelAnyTime}
         </p>
       </div>
 
@@ -77,7 +71,7 @@ export const PremiumPitch = ({ goal, trainingDays }: PremiumPitchProps) => {
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-2">
           {error && <p role="alert" className="text-base text-destructive">{error}</p>}
           <div className="flex items-baseline justify-between gap-2">
-            <span className="whitespace-nowrap font-heading text-xl font-semibold tabular-nums">{copy.price(money(MONTHLY))}</span>
+            <span className="whitespace-nowrap font-heading text-xl font-extrabold tabular-nums">{copy.price(money(MONTHLY))}</span>
             <span className="whitespace-nowrap text-base text-muted-foreground">{copy.perDay(money(DAILY))}</span>
           </div>
           <Button size="lg" className="w-full" disabled={!!busy || !access} onClick={() => void runAction('premium')}>

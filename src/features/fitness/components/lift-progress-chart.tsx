@@ -34,7 +34,7 @@ export const LiftProgressChart = ({ lift }: { lift: LiftProgress }) => {
   const gradientId = `lift-fill-${lift.exerciseId}`;
 
   return (
-    <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-auto w-full text-primary" role="img"
+    <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-auto w-full text-pool" role="img"
       aria-label={copy.chartLabel(lift.exerciseName, lift.points.length, lift.first, lift.best, lift.unit)}>
       <defs>
         <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
@@ -62,7 +62,7 @@ export const LiftProgressChart = ({ lift }: { lift: LiftProgress }) => {
       <circle cx={best.cx} cy={best.cy} r="11" fill="currentColor" opacity="0.2" className="origin-center transform-fill animate-pop" />
       <circle cx={best.cx} cy={best.cy} r="6" fill="currentColor" className="origin-center transform-fill animate-pop" />
       <text x={Math.min(Math.max(best.cx, PAD.left + 16), WIDTH - PAD.right - 16)} y={Math.max(best.cy - 16, 12)} textAnchor="middle"
-        className="fill-primary text-xs font-semibold">
+        className="fill-pool text-xs font-semibold">
         {copy.bestMark}
       </text>
       <text x={PAD.left} y={HEIGHT - 6} className="fill-muted-foreground text-xs">{formatDate(lift.points[0].date)}</text>
