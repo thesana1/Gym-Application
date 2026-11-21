@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 
-// Main content area for signed-in pages. Navigation lives in the header's burger menu.
+// Main content area for signed-in pages. Navigation lives in the left side nav.
 type DashboardShellProps = { children: ReactNode };
 
 export const DashboardShell = ({ children }: DashboardShellProps) => (

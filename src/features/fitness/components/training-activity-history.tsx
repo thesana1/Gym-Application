@@ -44,7 +44,7 @@ export const TrainingActivityHistory = () => {
 
   const periods = activity ? [...activity.periods].reverse() : [];
   return (
-    <div className="max-w-2xl animate-rise">
+    <div className="mx-auto w-full max-w-2xl animate-rise">
       <ProgressHeader />
       <div className="flex flex-col gap-4">
         <div role="group" aria-label={copy.weeksLabel} className="grid grid-cols-2 gap-2">

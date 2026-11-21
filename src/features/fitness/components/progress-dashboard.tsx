@@ -97,7 +97,7 @@ export const ProgressDashboard = () => {
   };
 
   return (
-    <div className="max-w-2xl animate-rise">
+    <div className="mx-auto w-full max-w-2xl animate-rise">
       <ProgressHeader />
       <div className="flex flex-col gap-4">
         {error && <p className="text-base text-destructive" role="alert">{error}</p>}

@@ -11,7 +11,7 @@ export type NavItem = {
 
 export type SectionTab = { href: string; label: string };
 
-// The four main sections in the burger menu, in this order.
+// The four main sections in the side nav, in this order.
 export const MAIN_NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/workouts', label: 'Today’s workout', description: 'Follow your plan and save workouts.', icon: 'dumbbell' },
   {
@@ -50,10 +50,5 @@ export const PROGRESS_TABS: SectionTab[] = [
 
 export const NAV_COPY = {
   mainLabel: 'Main menu',
-  openMenu: 'Open menu',
-  menuTitle: 'Menu',
-  menuDescription: 'Go anywhere in GainBase.',
-  moreHeading: 'More',
-  close: 'Close',
   sectionTabsLabel: 'Pages in this section',
 } as const;

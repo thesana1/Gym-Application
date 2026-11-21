@@ -5,6 +5,7 @@ import { type ReactNode } from 'react';
 import { getFitnessProfileService } from '@/features/fitness/service/fitness-profile.service';
 import { DashboardShell } from '@/shared/components/layout/dashboard-shell';
 import { Header } from '@/shared/components/layout/header';
+import { SideNav } from '@/shared/components/layout/side-nav';
 import { ONBOARDING_ROUTES } from '@/shared/const/routes.const';
 import { auth } from '@/shared/lib/auth';
 import { SessionProvider } from '@/shared/providers/session-provider';
@@ -27,8 +28,11 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
     <SessionProvider>
       <StoreProvider>
         <div className="flex min-h-screen flex-col">
-          <Header menu={!onboarding} />
-          <DashboardShell>{children}</DashboardShell>
+          <Header />
+          <div className="flex flex-1">
+            {!onboarding && <SideNav />}
+            <DashboardShell>{children}</DashboardShell>
+          </div>
         </div>
       </StoreProvider>
     </SessionProvider>

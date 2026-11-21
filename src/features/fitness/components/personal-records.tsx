@@ -34,7 +34,7 @@ export const PersonalRecords = () => {
   }, [loadRecords]);
 
   return (
-    <div className="max-w-2xl animate-rise">
+    <div className="mx-auto w-full max-w-2xl animate-rise">
       <ProgressHeader />
       {error ? (
         <div className="flex flex-col items-start gap-3" role="alert">

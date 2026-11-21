@@ -128,7 +128,7 @@ export const TrainingPage = ({ profile, initialTab = 'week' }: TrainingPageProps
   }
 
   return (
-    <div className="max-w-2xl animate-rise">
+    <div className="mx-auto w-full max-w-2xl animate-rise">
       <PageHeader title={copy.title} description={copy.description} />
       {savedNote && (
         <p role="status" className="mb-4 flex items-center gap-2 rounded-lg bg-pool p-4 text-lg font-bold text-pool-foreground">

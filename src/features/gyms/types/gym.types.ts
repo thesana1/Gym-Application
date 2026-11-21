@@ -7,4 +7,6 @@ export type NearbyGym = {
   distanceMeters: number;
   address: string | null;
   openingHours: string | null;
+  // Main photo from the map data; null when the gym has none.
+  photoUrl: string | null;
 };

@@ -15,7 +15,10 @@ describe('findNearbyGymsService', () => {
       { id: 'node/2', lat: 41.72, lng: 44.8, tags: { name: 'Far Gym' } },
       {
         id: 'node/1', lat: 41.701, lng: 44.8,
-        tags: { name: 'Near Gym', 'addr:street': 'Rustaveli Ave', 'addr:housenumber': '12', 'addr:city': 'Tbilisi', opening_hours: 'Mo-Su 07:00-23:00' },
+        tags: {
+          name: 'Near Gym', 'addr:street': 'Rustaveli Ave', 'addr:housenumber': '12', 'addr:city': 'Tbilisi',
+          opening_hours: 'Mo-Su 07:00-23:00', wikimedia_commons: 'File:Near Gym.jpg',
+        },
       },
     ]);
 
@@ -26,8 +29,9 @@ describe('findNearbyGymsService', () => {
       {
         id: 'node/1', name: 'Near Gym', lat: 41.701, lng: 44.8, distanceMeters: 111,
         address: 'Rustaveli Ave 12, Tbilisi', openingHours: 'Mo-Su 07:00-23:00',
+        photoUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Near%20Gym.jpg?width=640',
       },
-      { id: 'node/2', name: 'Far Gym', lat: 41.72, lng: 44.8, distanceMeters: 2224, address: null, openingHours: null },
+      { id: 'node/2', name: 'Far Gym', lat: 41.72, lng: 44.8, distanceMeters: 2224, address: null, openingHours: null, photoUrl: null },
     ]);
     expect(mockFindGyms).toHaveBeenCalledWith(41.7, 44.8, 5000);
   });

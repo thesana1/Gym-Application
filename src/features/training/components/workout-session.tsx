@@ -127,7 +127,7 @@ export const WorkoutSession = ({ workoutId }: { workoutId: string }) => {
   if (finished) return <WorkoutFinish workoutName={session.workout.name} result={finished.result} minutes={finished.minutes} records={records} />;
 
   return (
-    <div className="max-w-2xl animate-rise">
+    <div className="mx-auto w-full max-w-2xl animate-rise">
       {back}
       <h1 className="mb-5 text-balance text-4xl leading-none">{session.workout.name}</h1>
       <SessionBody session={session} complete={complete} onFinished={(result, minutes) => { setFinished({ result, minutes }); window.scrollTo({ top: 0 }); }} />

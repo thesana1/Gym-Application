@@ -14,7 +14,7 @@ export const LeaderboardPage = () => {
   const { boards, error, reload } = useLeaderboards();
 
   return (
-    <div className="max-w-2xl animate-rise">
+    <div className="mx-auto w-full max-w-2xl animate-rise">
       <PageHeader title={copy.title} description={copy.description} />
       {error ? (
         <div className="flex flex-col items-start gap-3" role="alert">

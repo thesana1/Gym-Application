@@ -21,7 +21,15 @@ const addressOf = (tags: Record<string, string>) => {
   return line || null;
 };
 
-const toNearbyGym = (place: OverpassPlace, lat: number, lng: number): NearbyGym => ({
+// Main photo: a direct https `image` link, or a Wikimedia Commons file (resized by Commons itself).
+const photoOf = (tags: Record<string, string>) => {
+  if (tags.image?.startsWith('https://')) return tags.image;
+  const commonsFile = tags.wikimedia_commons?.match(/^File:(.+)$/)?.[1];
+  if (commonsFile) return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(commonsFile)}?width=640`;
+  return null;
+};
+
+const toNearbyGym =(place: OverpassPlace, lat: number, lng: number): NearbyGym => ({
   id: place.id,
   name: place.tags.name ?? null,
   lat: place.lat,
@@ -29,6 +37,7 @@ const toNearbyGym = (place: OverpassPlace, lat: number, lng: number): NearbyGym 
   distanceMeters: distanceMeters(lat, lng, place.lat, place.lng),
   address: addressOf(place.tags),
   openingHours: place.tags.opening_hours ?? null,
+  photoUrl: photoOf(place.tags),
 });
 
 export async function findNearbyGymsService({ lat, lng }: NearbyGymsQueryType): Promise<ServiceResult<NearbyGym[]>> {
