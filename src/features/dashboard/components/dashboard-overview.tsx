@@ -13,15 +13,15 @@ type DashboardOverviewProps = {
   foodPicks: FoodPicksData;
 };
 
-// Home after sign-in: gyms nearby first, then food picks, then today's plan.
+// Home after sign-in: today's plan first, then gyms nearby, then food picks.
 export const DashboardOverview = ({ userName, profile, foodPicks }: DashboardOverviewProps) => {
   const goalLabel = FITNESS_GOALS.find(({ value }) => value === profile?.goal)?.label;
   return (
     <div className="flex flex-col gap-8">
       <PageHeader className="mb-0 animate-rise" title={HOME_COPY.greeting(userName)} description={HOME_COPY.description} />
-      <div className="animate-rise animate-rise-1"><NearbyGyms /></div>
-      <div className="animate-rise animate-rise-2"><FoodPicks picks={foodPicks} goalLabel={goalLabel} /></div>
-      <div className="animate-rise animate-rise-3"><TodayOverview hasProfile={profile !== null} /></div>
+      <div className="animate-rise animate-rise-1"><TodayOverview hasProfile={profile !== null} /></div>
+      <div className="animate-rise animate-rise-2"><NearbyGyms /></div>
+      <div className="animate-rise animate-rise-3"><FoodPicks picks={foodPicks} goalLabel={goalLabel} /></div>
     </div>
   );
 };
