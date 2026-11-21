@@ -4,7 +4,7 @@ import { cn } from '@/shared/lib/utils';
 
 type WeekRopeProps = { days: WeekDay[]; className?: string };
 
-// Done days fill in pool blue; missed days keep a red ring so they stay visible; rest days shrink to a dot.
+// Done days fill in teal; missed days keep a red ring so they stay visible; rest days shrink to a dot.
 const FLOAT: Record<DayStatus, string> = {
   done: 'size-7 bg-pool',
   extra: 'size-7 bg-pool',

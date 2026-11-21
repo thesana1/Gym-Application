@@ -305,13 +305,30 @@ Ask these exact axes; each meaningfully changes the design:
 ```
 STATUS: locked
 Product:    Consumer app (personal gym and food tracker, phone first)
-World:      Outdoor swim club on a sunny morning: bright, clean, encouraging
-Palette:    Warm sun-washed white + lido yellow + deep warm ink; pool blue only for things filling up
-            ground #FBF8F3 (light) / #1C1915 (dark); ink #231E19; lido yellow #F9C440; pool blue #2F6FC6; coral #D9472F (warnings only)
-            tokens: --primary oklch(0.86 0.16 85) yellow with ink --primary-foreground; --primary-ink oklch(0.47 0.11 70) for yellow-family text;
-                    --pool oklch(0.56 0.15 248) light / oklch(0.7 0.13 245) dark; --destructive oklch(0.58 0.2 30)
+World:      Early morning run on a forest trail: fresh, outdoors, encouraging
+Palette:    Warm off-white + chartreuse + green-leaning ink; deep teal only for things filling up
+            ground #F7F5EF (light) / dark oklch(0.19 0.012 150); ink #1E2420; chartreuse #C8E64A; deep teal #1E6E8C; coral #C8402F (warnings only)
+            tokens: --primary oklch(0.87 0.18 120) chartreuse with ink --primary-foreground; --primary-ink oklch(0.5 0.12 125) for chartreuse-family text;
+                    --pool oklch(0.5 0.09 225) light / oklch(0.72 0.1 220) dark (teal; token name kept); --destructive oklch(0.56 0.18 32)
 Type:       Archivo (display + numerals; heavy, tight tracking-display, condensed numerals via font-stretch) + Figtree (body, humanist)
 Feel:       Balanced and warm — press states on every tap, one ripple when something is completed, floats fill in place; reduced-motion respected
-Signature:  Lane-rope floats: rows of round floats that fill in pool blue one by one for sets, workout days and meals;
-            each screen leads with its single next action in one big yellow field; done and missed items stay visible, marked, never removed
+Signature:  Lane-rope floats: rows of round floats that fill in deep teal one by one for sets, workout days and meals;
+            each screen leads with its single next action in one big chartreuse field; done and missed items stay visible, marked, never removed
 ```
+
+## 20. Light / Dark Mode (required)
+
+The app always ships both themes and a visible switch. Never remove either theme or the switch.
+
+- Both palettes live in `src/app/globals.css`: light values in `:root`, dark values in `.dark`. Every colour change must update both blocks.
+- `src/shared/providers/theme-provider.tsx` wraps the app with `next-themes` (`attribute="class"`, default `light`).
+- The switch is `ThemeToggle` (`src/shared/components/layout/theme-toggle.tsx`), a moon/sun button rendered in `Header` (`src/shared/components/layout/header.tsx`) on every page, signed in or not. The circular reveal animation is the `theme-reveal` keyframe at the end of `globals.css`.
+- Never hard-code a theme on a page or section; use tokens (`bg-background`, `text-foreground`, etc.) so both themes work.
+
+## 21. Working Copy Rule
+
+The GitHub repository `thesana1/Gym-Application` (branch `main`) is the source of truth. Other people push to it.
+
+- Before changing code, run `git pull --ff-only origin main` (stash local edits first and pop them after) so changes are based on the latest GitHub code.
+- Never copy whole files from an older folder or clone over newer files; re-apply only the intended edits.
+- The dev server runs from `/Users/TheSana/Desktop/Gym application`; make changes there so the user sees them. If a CSS change does not show up, restart `npm run dev` after deleting `.next`.

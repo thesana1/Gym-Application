@@ -1,21 +1,21 @@
 ---
 name: Gym Application
-description: A personal gym and food tracker that feels like an outdoor swim club on a sunny morning.
+description: A personal gym and food tracker that feels like an early morning run on a forest trail.
 colors:
-  sun-deck: "oklch(0.982 0.007 85)"
-  tile-white: "oklch(0.997 0.003 85)"
-  warm-ink: "oklch(0.22 0.014 60)"
-  lido-yellow: "oklch(0.86 0.16 85)"
-  yellow-ink: "oklch(0.47 0.11 70)"
-  pool-blue: "oklch(0.56 0.15 248)"
-  wet-concrete: "oklch(0.95 0.012 85)"
-  shade-text: "oklch(0.47 0.02 60)"
-  sunlit-hover: "oklch(0.95 0.035 88)"
-  grout: "oklch(0.9 0.014 80)"
-  coral-warning: "oklch(0.58 0.2 30)"
-  night-deck: "oklch(0.185 0.012 60)"
-  night-tile: "oklch(0.225 0.014 60)"
-  night-pool: "oklch(0.7 0.13 245)"
+  trail-deck: "oklch(0.97 0.008 95)"
+  tile-white: "oklch(0.995 0.003 95)"
+  trail-ink: "oklch(0.24 0.012 150)"
+  chartreuse: "oklch(0.87 0.18 120)"
+  chartreuse-ink: "oklch(0.5 0.12 125)"
+  trail-teal: "oklch(0.5 0.09 225)"
+  moss-mist: "oklch(0.94 0.012 110)"
+  shade-text: "oklch(0.47 0.015 150)"
+  sunlit-hover: "oklch(0.95 0.04 120)"
+  grout: "oklch(0.9 0.012 110)"
+  coral-warning: "oklch(0.56 0.18 32)"
+  night-deck: "oklch(0.19 0.012 150)"
+  night-tile: "oklch(0.23 0.014 150)"
+  night-teal: "oklch(0.72 0.1 220)"
 typography:
   display:
     fontFamily: "Archivo, system-ui, sans-serif"
@@ -62,37 +62,37 @@ spacing:
   section: "24px"
 components:
   button-primary:
-    backgroundColor: "{colors.lido-yellow}"
-    textColor: "{colors.warm-ink}"
+    backgroundColor: "{colors.chartreuse}"
+    textColor: "{colors.trail-ink}"
     rounded: "{rounded.float}"
     height: "48px"
     padding: "8px 20px"
   button-primary-hover:
-    backgroundColor: "{colors.lido-yellow}"
-    textColor: "{colors.warm-ink}"
+    backgroundColor: "{colors.chartreuse}"
+    textColor: "{colors.trail-ink}"
   button-outline:
     backgroundColor: "{colors.tile-white}"
-    textColor: "{colors.warm-ink}"
+    textColor: "{colors.trail-ink}"
     rounded: "{rounded.float}"
     height: "48px"
   button-on-field:
-    backgroundColor: "{colors.warm-ink}"
-    textColor: "{colors.lido-yellow}"
+    backgroundColor: "{colors.trail-ink}"
+    textColor: "{colors.chartreuse}"
     rounded: "{rounded.float}"
     height: "56px"
-  field-sun:
-    backgroundColor: "{colors.lido-yellow}"
-    textColor: "{colors.warm-ink}"
+  field-chartreuse:
+    backgroundColor: "{colors.chartreuse}"
+    textColor: "{colors.trail-ink}"
     rounded: "{rounded.field}"
     padding: "24px"
-  field-pool:
-    backgroundColor: "{colors.pool-blue}"
+  field-teal:
+    backgroundColor: "{colors.trail-teal}"
     textColor: "{colors.tile-white}"
     rounded: "{rounded.field}"
     padding: "24px"
   tile:
     backgroundColor: "{colors.tile-white}"
-    textColor: "{colors.warm-ink}"
+    textColor: "{colors.trail-ink}"
     rounded: "{rounded.tile}"
     padding: "20px"
   float-empty:
@@ -100,17 +100,17 @@ components:
     rounded: "{rounded.float}"
     size: "20px"
   float-filled:
-    backgroundColor: "{colors.pool-blue}"
+    backgroundColor: "{colors.trail-teal}"
     rounded: "{rounded.float}"
     size: "20px"
   tab-active:
-    backgroundColor: "{colors.warm-ink}"
-    textColor: "{colors.sun-deck}"
+    backgroundColor: "{colors.trail-ink}"
+    textColor: "{colors.trail-deck}"
     rounded: "{rounded.float}"
     height: "44px"
   input:
     backgroundColor: "{colors.tile-white}"
-    textColor: "{colors.warm-ink}"
+    textColor: "{colors.trail-ink}"
     rounded: "{rounded.tile}"
     height: "48px"
 ---
@@ -119,11 +119,11 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Swim Club on a Sunny Morning"**
+**Creative North Star: "Trail Morning"**
 
-The app feels like arriving at an outdoor pool early: a bright warm deck, one big yellow sign telling you what's next, and lane ropes you count as you go. It is a consumer app for people holding a phone between sets or logging dinner at home, so every screen leads with one next thing at a huge size and pushes everything else back.
+The app feels like an early run on a forest trail: a bright warm ground, one big chartreuse marker telling you what's next, and lane ropes you count as you go. It is a consumer app for people holding a phone between sets or logging dinner at home, so every screen leads with one next thing at a huge size and pushes everything else back.
 
-The palette does real work. Lido yellow marks what is waiting for you. Pool blue only ever means "this filled up / this is done". Ink carries text and the strongest buttons. Coral appears only for missed days and warnings. Density is relaxed on phones and splits into an uneven 3:2 grid on desktop, never three equal cards.
+The palette does real work. Chartreuse marks what is waiting for you. Trail Teal only ever means "this filled up / this is done". Ink carries text and the strongest buttons. Coral appears only for missed days and warnings. Density is relaxed on phones and splits into an uneven 3:2 grid on desktop, never three equal cards.
 
 It rejects the fitness-app default (near-black with neon glow) and the wellness default (pastel calm cards). It also avoids glass, gradients, and icon-in-a-square feature lists.
 
@@ -136,33 +136,33 @@ It rejects the fitness-app default (near-black with neon glow) and the wellness 
 
 ## Colors
 
-Warm sun-washed neutrals with one loud yellow and one meaningful blue.
+Warm off-white neutrals with a green-leaning ink, one loud chartreuse and one meaningful teal.
 
 ### Primary
-- **Lido Yellow** (oklch(0.86 0.16 85)): the Field behind "today's next thing", primary buttons, the active tab pill, selected options. Always carries Warm Ink text, never white.
-- **Yellow Ink** (oklch(0.47 0.11 70)): the readable yellow-family colour for links, small emphasis and focus rings on light ground (yellow itself fails contrast as text).
+- **Chartreuse** (oklch(0.87 0.18 120)): the Field behind "today's next thing", primary buttons, the active tab pill, selected options. Always carries Trail Ink text, never white.
+- **Chartreuse Ink** (oklch(0.5 0.12 125); dark mode oklch(0.87 0.16 120)): the readable chartreuse-family colour for links, small emphasis and focus rings on light ground (chartreuse itself fails contrast as text).
 
 ### Secondary
-- **Pool Blue** (oklch(0.56 0.15 248); dark mode oklch(0.7 0.13 245)): filled floats, completed sets, "You did it!" Fields, the strength graph, saved confirmations. It means progress and nothing else.
+- **Trail Teal** (oklch(0.5 0.09 225); dark mode oklch(0.72 0.1 220)): filled floats, completed sets, "You did it!" Fields, the strength graph, saved confirmations. It means progress and nothing else.
 
 ### Tertiary
-- **Coral Warning** (oklch(0.58 0.2 30)): missed days in the week rope, destructive actions, form errors only.
+- **Coral Warning** (oklch(0.56 0.18 32); dark mode oklch(0.7 0.16 32)): missed days in the week rope, destructive actions, form errors only.
 
 ### Neutral
-- **Sun Deck** (oklch(0.982 0.007 85)): page ground. Warm white, not cream.
-- **Tile White** (oklch(0.997 0.003 85)): tiles, inputs, the bottom bar.
-- **Warm Ink** (oklch(0.22 0.014 60)): text, active section tabs, ink buttons on Fields.
-- **Shade Text** (oklch(0.47 0.02 60)): secondary text, about 6:1 on Sun Deck.
-- **Wet Concrete** (oklch(0.95 0.012 85)): muted fills, empty states, tab tracks.
-- **Grout** (oklch(0.9 0.014 80)): borders and row dividers.
-- **Night Deck / Night Tile** (oklch(0.185 0.012 60) / oklch(0.225 0.014 60)): dark-mode ground and tiles. The yellow stays the same at night.
+- **Trail Deck** (oklch(0.97 0.008 95)): page ground. Warm off-white, not cream.
+- **Tile White** (oklch(0.995 0.003 95)): tiles, inputs, the bottom bar.
+- **Trail Ink** (oklch(0.24 0.012 150)): text, active section tabs, ink buttons on Fields.
+- **Shade Text** (oklch(0.47 0.015 150)): secondary text, about 6:1 on Trail Deck.
+- **Moss Mist** (oklch(0.94 0.012 110)): muted fills, empty states, tab tracks.
+- **Grout** (oklch(0.9 0.012 110)): borders and row dividers.
+- **Night Deck / Night Tile** (oklch(0.19 0.012 150) / oklch(0.23 0.014 150)): dark-mode ground and tiles. The chartreuse stays the same at night.
 
 ### Named Rules
-**The Blue Means Done Rule.** Pool Blue is only for things that filled up or finished. Never use it for decoration, links or plain buttons.
+**The Teal Means Done Rule.** Trail Teal is only for things that filled up or finished. Never use it for decoration, links or plain buttons.
 
 **The One Field Rule.** A screen has at most one big coloured Field. If two things compete for it, the less urgent one becomes a tile.
 
-**The Ink On Yellow Rule.** Text and buttons on Lido Yellow use Warm Ink (or inherit the Field's ink via `currentColor`), so they stay readable in light and dark mode.
+**The Ink On Chartreuse Rule.** Text and buttons on Chartreuse use Trail Ink (or inherit the Field's ink via `currentColor`), so they stay readable in light and dark mode.
 
 ## Typography
 
@@ -190,7 +190,7 @@ Phone first at 375px with a 16px gutter. Content column caps at `max-w-2xl` (672
 
 ## Elevation & Depth
 
-Flat by default. Depth comes from colour fields and borders, not shadows. Only two shadows exist: a small Yellow Ink tinted shadow under primary buttons (removed on press), and a larger soft shadow under floating things (the sticky action, the rest-timer pill, the landing demo).
+Flat by default. Depth comes from colour fields and borders, not shadows. Only two shadows exist: a small Chartreuse Ink tinted shadow under primary buttons (removed on press), and a larger soft shadow under floating things (the sticky action, the rest-timer pill, the landing demo).
 
 ## Shapes
 
@@ -200,32 +200,32 @@ Three shapes, each with a job. Tiles are small-radius rectangles (8px), like poo
 
 ### Buttons
 - **Shape:** fully round pill.
-- **Primary:** Lido Yellow with Warm Ink bold text, 48px tall (56px large), small tinted shadow.
-- **On a Field:** Warm Ink pill with yellow text (`FIELD_BUTTON`); quiet outline variant uses `currentColor` at 30% (`FIELD_OUTLINE`).
+- **Primary:** Chartreuse with Trail Ink bold text, 48px tall (56px large), small tinted shadow.
+- **On a Field:** Trail Ink pill with chartreuse text (`FIELD_BUTTON`); quiet outline variant uses `currentColor` at 30% (`FIELD_OUTLINE`).
 - **Outline:** Tile White with a 2px ink-at-15% border; border darkens on hover.
 - **Press:** every button scales to 97% on press with a 150ms ease-out.
 
 ### Field
-- The one big region per screen (`src/shared/components/ui/field.tsx`). Sun tone for "next thing to do", pool tone for "done". Holds a question-style headline, one line of context, one action, and optionally the week rope.
+- The one big region per screen (`src/shared/components/ui/field.tsx`). Chartreuse tone for "next thing to do", teal tone for "done". Holds a question-style headline, one line of context, one action, and optionally the week rope.
 
 ### Lane Rope (signature)
-- `src/shared/components/ui/lane-rope.tsx`. A row of round floats: empty floats have a 2px Pool Blue ring at 25%; filled floats are solid Pool Blue; the current one is yellow with an ink ring. When a float fills while visible it sends one ripple. Used for workout sets, calorie targets (10 floats), and landing steps.
-- **Week Rope** (`src/features/training/components/week-rope.tsx`): seven day-floats. Done is filled blue, missed keeps a coral ring, today has an ink ring, rest days shrink to a dot.
+- `src/shared/components/ui/lane-rope.tsx`. A row of round floats: empty floats have a 2px Trail Teal ring at 25%; filled floats are solid Trail Teal; the current one is chartreuse with an ink ring. When a float fills while visible it sends one ripple. Used for workout sets, calorie targets (10 floats), and landing steps.
+- **Week Rope** (`src/features/training/components/week-rope.tsx`): seven day-floats. Done is filled teal, missed keeps a coral ring, today has an ink ring, rest days shrink to a dot.
 
 ### Set Float
-- In the workout checklist each set's Done control is a 48px float that fills blue with a ripple and shrinks to 90% on press.
+- In the workout checklist each set's Done control is a 48px float that fills teal with a ripple and shrinks to 90% on press.
 
 ### Tiles
 - Tile White, 8px radius, 1px Grout border, 20px padding. Lists inside tiles use row dividers, not nested cards.
 
 ### Inputs
-- 48px, 2px border, Tile White; focus turns the border ink with a 4px yellow ring.
+- 48px, 2px border, Tile White; focus turns the border ink with a 4px chartreuse ring.
 
 ### Tabs
-- Pill track in Wet Concrete; the active tab is a Warm Ink pill with light text. Same look for in-page tabs and section links.
+- Pill track in Moss Mist; the active tab is a Trail Ink pill with light text. Same look for in-page tabs and section links.
 
 ### Navigation
-- Bottom bar: Tile White, five items, 56px targets, active icon sits in a yellow pill. The More sheet lists items as plain icon rows (no icon tiles). Header wordmark: two floats (yellow, blue) and the app name in Archivo 800.
+- Bottom bar: Tile White, five items, 56px targets, active icon sits in a chartreuse pill. The More sheet lists items as plain icon rows (no icon tiles). Header wordmark: two floats (chartreuse, teal) and the app name in Archivo 800.
 
 ## Do's and Don'ts
 
@@ -237,8 +237,8 @@ Three shapes, each with a job. Tiles are small-radius rectangles (8px), like poo
 - **Do** guard all motion with `prefers-reduced-motion` (ripples hide, fills and rises stop).
 
 ### Don't:
-- **Don't** use Pool Blue for anything that isn't progress or completion.
-- **Don't** put white text on Lido Yellow.
+- **Don't** use Trail Teal for anything that isn't progress or completion.
+- **Don't** put white text on Chartreuse.
 - **Don't** build sections from three identical icon cards or icon-in-a-square feature lists.
 - **Don't** add eyebrows or kickers above headings.
 - **Don't** use gradients, glass blur or glowing blobs as decoration.
