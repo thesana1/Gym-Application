@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { formatDate, truncate, capitalize } from './format';
+import { formatDate, formatDistance, truncate, capitalize } from './format';
 
 describe('formatDate', () => {
   it('formats a date object', () => {
@@ -39,5 +39,12 @@ describe('capitalize', () => {
 
   it('handles empty string', () => {
     expect(capitalize('')).toBe('');
+  });
+});
+
+describe('formatDistance', () => {
+  it('uses meters under a kilometre and kilometres above', () => {
+    expect(formatDistance(850)).toBe('850 m');
+    expect(formatDistance(2440)).toBe('2.4 km');
   });
 });

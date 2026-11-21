@@ -1,4 +1,4 @@
-# Next.js Starter
+# GainBase
 
 Production-ready Next.js 16 starter with App Router, TypeScript, Tailwind CSS,
 shadcn/ui, NextAuth v5, MongoDB via Mongoose, Zustand, Zod, and Vitest.
@@ -124,7 +124,7 @@ SMTP_REQUIRE_TLS=true
 SMTP_USER=your-smtp-username
 SMTP_PASSWORD=your-smtp-password
 SMTP_FROM_EMAIL=no-reply@your-domain.com
-SMTP_FROM_NAME=Gym Application
+SMTP_FROM_NAME=GainBase
 ```
 
 Use the SMTP credentials supplied by your provider and an authorized sender

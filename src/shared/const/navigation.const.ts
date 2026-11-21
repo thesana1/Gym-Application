@@ -5,36 +5,37 @@ export type NavItem = {
   label: string;
   description: string;
   icon: NavIcon;
-  // Other pages that belong to this section, so its tab stays highlighted there.
+  // Other pages that belong to this section, so it stays highlighted there.
   matches?: string[];
 };
 
 export type SectionTab = { href: string; label: string };
 
+// The four main sections in the burger menu, in this order.
 export const MAIN_NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard', label: 'Today', description: 'Your one thing for today.', icon: 'home' },
-  { href: '/dashboard/workouts', label: 'Workouts', description: 'Your plan and every workout you did.', icon: 'dumbbell' },
+  { href: '/dashboard/workouts', label: 'Today’s workout', description: 'Follow your plan and save workouts.', icon: 'dumbbell' },
   {
-    href: '/dashboard/nutrition', label: 'Food', description: 'What you ate and drank today.', icon: 'apple',
-    matches: ['/dashboard/food-generator'],
-  },
-  {
-    href: '/dashboard/progress', label: 'Progress', description: 'Watch yourself get stronger.', icon: 'chart',
+    href: '/dashboard/progress', label: 'My progress', description: 'See how you are doing.', icon: 'chart',
     matches: ['/dashboard/records', '/dashboard/activity'],
+  },
+  { href: '/dashboard/assistant', label: 'Ask AI', description: 'Quick answers from our AI coach.', icon: 'message' },
+  {
+    href: '/dashboard/nutrition', label: 'Everything about food', description: 'Meals, calories and meal ideas.', icon: 'apple',
+    matches: ['/dashboard/food-generator'],
   },
 ];
 
+// Smaller links under the main sections.
 export const MORE_NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard/assistant', label: 'Ask Coach', description: 'Ask anything about training or food.', icon: 'message' },
+  { href: '/dashboard', label: 'Home', description: 'Gyms near you and food ideas.', icon: 'home' },
   { href: '/dashboard/leaderboard', label: 'Leaderboard', description: 'See how you rank against other members.', icon: 'medal' },
-  { href: '/dashboard/challenges', label: 'My challenges', description: 'Small goals you set for yourself.', icon: 'trophy' },
-  { href: '/dashboard/profile', label: 'My profile', description: 'Your goal, days and gear.', icon: 'user-round' },
+  { href: '/dashboard/challenges', label: 'My challenges', description: 'Pick a small goal and keep going.', icon: 'trophy' },
+  { href: '/dashboard/profile', label: 'My profile', description: 'Your goal, training days and equipment.', icon: 'user-round' },
   { href: '/dashboard/membership', label: 'Premium', description: 'More coaching and progress photos.', icon: 'badge-check' },
 ];
 
+// Only shown to admins (see useMoreNavItems).
 export const ADMIN_NAV_ITEM: NavItem = { href: '/dashboard/admin', label: 'Admin', description: 'Members, Premium and activity.', icon: 'shield' };
-
-export const ALL_NAV_ITEMS: NavItem[] = [...MAIN_NAV_ITEMS, ...MORE_NAV_ITEMS];
 
 export const FOOD_TABS: SectionTab[] = [
   { href: '/dashboard/nutrition', label: 'Today' },
@@ -49,10 +50,10 @@ export const PROGRESS_TABS: SectionTab[] = [
 
 export const NAV_COPY = {
   mainLabel: 'Main menu',
-  more: 'More',
-  moreTitle: 'More',
-  moreDescription: 'The rest of your club.',
+  openMenu: 'Open menu',
+  menuTitle: 'Menu',
+  menuDescription: 'Go anywhere in GainBase.',
+  moreHeading: 'More',
   close: 'Close',
-  sidebarMoreHeading: 'More',
   sectionTabsLabel: 'Pages in this section',
 } as const;
