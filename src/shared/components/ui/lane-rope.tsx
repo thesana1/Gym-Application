@@ -8,7 +8,7 @@ type LaneRopeProps = {
   total: number;
   filled: number;
   label: string;
-  // Marks one float as "now" (today, the next set) with a yellow ring.
+  // Marks one float as "now" (today, the next set) with a chartreuse ring.
   current?: number;
   size?: 'sm' | 'md' | 'lg';
   // The real amount the floats stand for (for example 750 of 2000 kcal), read out by screen readers.
@@ -18,7 +18,7 @@ type LaneRopeProps = {
 
 const SIZES = { sm: 'size-3', md: 'size-5', lg: 'size-8' } as const;
 
-// The app's signature: a lane rope of round floats that fill in pool blue one by one.
+// The app's signature: a lane rope of round floats that fill in teal one by one.
 // When a float fills while the person watches, it sends out one ripple.
 export const LaneRope = ({ total, filled, label, current, size = 'md', value, className }: LaneRopeProps) => {
   const shown = Math.max(0, Math.min(total, filled));

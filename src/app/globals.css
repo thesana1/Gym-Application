@@ -52,81 +52,81 @@
   --radius-4xl: calc(var(--radius) * 3.2);
 }
 
-/* Outdoor swim club in the morning sun: warm white deck, lido yellow, deep ink, pool blue for anything filling up. */
+/* Early run on a forest trail: warm off-white ground, chartreuse for the next thing to do, deep teal for anything filling up. */
 :root {
-  --background: oklch(0.982 0.007 85);
-  --foreground: oklch(0.22 0.014 60);
-  --card: oklch(0.997 0.003 85);
-  --card-foreground: oklch(0.22 0.014 60);
-  --popover: oklch(0.997 0.003 85);
-  --popover-foreground: oklch(0.22 0.014 60);
-  --primary: oklch(0.86 0.16 85);
-  --primary-foreground: oklch(0.22 0.014 60);
-  --primary-ink: oklch(0.47 0.11 70);
-  --pool: oklch(0.56 0.15 248);
-  --pool-foreground: oklch(0.99 0.004 85);
-  --secondary: oklch(0.95 0.012 85);
-  --secondary-foreground: oklch(0.22 0.014 60);
-  --muted: oklch(0.95 0.012 85);
-  --muted-foreground: oklch(0.47 0.02 60);
-  --accent: oklch(0.95 0.035 88);
-  --accent-foreground: oklch(0.22 0.014 60);
-  --destructive: oklch(0.58 0.2 30);
-  --border: oklch(0.9 0.014 80);
-  --input: oklch(0.86 0.016 80);
-  --ring: oklch(0.47 0.11 70);
-  --chart-1: oklch(0.56 0.15 248);
-  --chart-2: oklch(0.86 0.16 85);
-  --chart-3: oklch(0.7 0.1 248);
-  --chart-4: oklch(0.58 0.2 30);
-  --chart-5: oklch(0.47 0.02 60);
+  --background: oklch(0.97 0.008 95);
+  --foreground: oklch(0.24 0.012 150);
+  --card: oklch(0.995 0.003 95);
+  --card-foreground: oklch(0.24 0.012 150);
+  --popover: oklch(0.995 0.003 95);
+  --popover-foreground: oklch(0.24 0.012 150);
+  --primary: oklch(0.87 0.18 120);
+  --primary-foreground: oklch(0.24 0.012 150);
+  --primary-ink: oklch(0.5 0.12 125);
+  --pool: oklch(0.5 0.09 225);
+  --pool-foreground: oklch(0.99 0.004 95);
+  --secondary: oklch(0.94 0.012 110);
+  --secondary-foreground: oklch(0.24 0.012 150);
+  --muted: oklch(0.94 0.012 110);
+  --muted-foreground: oklch(0.47 0.015 150);
+  --accent: oklch(0.95 0.04 120);
+  --accent-foreground: oklch(0.24 0.012 150);
+  --destructive: oklch(0.56 0.18 32);
+  --border: oklch(0.9 0.012 110);
+  --input: oklch(0.86 0.014 110);
+  --ring: oklch(0.5 0.12 125);
+  --chart-1: oklch(0.5 0.09 225);
+  --chart-2: oklch(0.87 0.18 120);
+  --chart-3: oklch(0.68 0.07 225);
+  --chart-4: oklch(0.56 0.18 32);
+  --chart-5: oklch(0.47 0.015 150);
   --radius: 0.5rem;
-  --sidebar: oklch(0.982 0.007 85);
-  --sidebar-foreground: oklch(0.22 0.014 60);
-  --sidebar-primary: oklch(0.86 0.16 85);
-  --sidebar-primary-foreground: oklch(0.22 0.014 60);
-  --sidebar-accent: oklch(0.95 0.035 88);
-  --sidebar-accent-foreground: oklch(0.22 0.014 60);
-  --sidebar-border: oklch(0.9 0.014 80);
-  --sidebar-ring: oklch(0.47 0.11 70);
+  --sidebar: oklch(0.97 0.008 95);
+  --sidebar-foreground: oklch(0.24 0.012 150);
+  --sidebar-primary: oklch(0.87 0.18 120);
+  --sidebar-primary-foreground: oklch(0.24 0.012 150);
+  --sidebar-accent: oklch(0.95 0.04 120);
+  --sidebar-accent-foreground: oklch(0.24 0.012 150);
+  --sidebar-border: oklch(0.9 0.012 110);
+  --sidebar-ring: oklch(0.5 0.12 125);
 }
 
-/* The same club after sunset: warm dark deck, the yellow stays lit. */
+/* The same trail after sunset: deep green-black ground, the chartreuse stays lit. */
 .dark {
-  --background: oklch(0.185 0.012 60);
-  --foreground: oklch(0.96 0.01 85);
-  --card: oklch(0.225 0.014 60);
-  --card-foreground: oklch(0.96 0.01 85);
-  --popover: oklch(0.225 0.014 60);
-  --popover-foreground: oklch(0.96 0.01 85);
-  --primary: oklch(0.86 0.16 85);
-  --primary-foreground: oklch(0.22 0.014 60);
-  --primary-ink: oklch(0.86 0.14 85);
-  --pool: oklch(0.7 0.13 245);
-  --pool-foreground: oklch(0.18 0.02 250);
-  --secondary: oklch(0.27 0.014 60);
-  --secondary-foreground: oklch(0.96 0.01 85);
-  --muted: oklch(0.27 0.014 60);
-  --muted-foreground: oklch(0.76 0.02 80);
-  --accent: oklch(0.3 0.03 80);
-  --accent-foreground: oklch(0.96 0.01 85);
-  --destructive: oklch(0.7 0.17 30);
+  --background: oklch(0.19 0.012 150);
+  --foreground: oklch(0.96 0.008 110);
+  --card: oklch(0.23 0.014 150);
+  --card-foreground: oklch(0.96 0.008 110);
+  --popover: oklch(0.23 0.014 150);
+  --popover-foreground: oklch(0.96 0.008 110);
+  --primary: oklch(0.87 0.18 120);
+  --primary-foreground: oklch(0.24 0.012 150);
+  --primary-ink: oklch(0.87 0.16 120);
+  --pool: oklch(0.72 0.1 220);
+  --pool-foreground: oklch(0.18 0.02 225);
+  --secondary: oklch(0.27 0.014 150);
+  --secondary-foreground: oklch(0.96 0.008 110);
+  --muted: oklch(0.27 0.014 150);
+  --muted-foreground: oklch(0.76 0.015 120);
+  --accent: oklch(0.3 0.03 130);
+  --accent-foreground: oklch(0.96 0.008 110);
+  --destructive: oklch(0.7 0.16 32);
   --border: oklch(1 0 0 / 11%);
   --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.86 0.14 85);
-  --chart-1: oklch(0.7 0.13 245);
-  --chart-2: oklch(0.86 0.16 85);
-  --chart-3: oklch(0.55 0.1 245);
-  --chart-4: oklch(0.7 0.17 30);
-  --chart-5: oklch(0.76 0.02 80);
-  --sidebar: oklch(0.185 0.012 60);
-  --sidebar-foreground: oklch(0.96 0.01 85);
-  --sidebar-primary: oklch(0.86 0.16 85);
-  --sidebar-primary-foreground: oklch(0.22 0.014 60);
-  --sidebar-accent: oklch(0.3 0.03 80);
-  --sidebar-accent-foreground: oklch(0.96 0.01 85);
+  --ring: oklch(0.87 0.16 120);
+  --chart-1: oklch(0.72 0.1 220);
+  --chart-2: oklch(0.87 0.18 120);
+  --chart-3: oklch(0.55 0.08 220);
+  --chart-4: oklch(0.7 0.16 32);
+  --chart-5: oklch(0.76 0.015 120);
+  --sidebar: oklch(0.19 0.012 150);
+  --sidebar-foreground: oklch(0.96 0.008 110);
+  --sidebar-primary: oklch(0.87 0.18 120);
+  --sidebar-primary-foreground: oklch(0.24 0.012 150);
+  --sidebar-accent: oklch(0.3 0.03 130);
+  --sidebar-accent-foreground: oklch(0.96 0.008 110);
   --sidebar-border: oklch(1 0 0 / 11%);
-  --sidebar-ring: oklch(0.86 0.14 85);
+  --sidebar-ring: oklch(0.87 0.16 120);
 }
 
 @layer base {
